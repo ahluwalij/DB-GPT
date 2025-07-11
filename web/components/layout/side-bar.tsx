@@ -4,7 +4,7 @@ import UserBar from '@/new-components/layout/UserBar';
 import { STORAGE_LANG_KEY, STORAGE_THEME_KEY, STORAGE_USERINFO_KEY } from '@/utils/constants/index';
 import Icon, { GlobalOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Popover, Tooltip } from 'antd';
-import { ItemType } from 'antd/es/menu/hooks/useItems';
+import type { MenuProps } from 'antd';
 import cls from 'classnames';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -20,7 +20,7 @@ type SettingItem = {
   icon: ReactNode;
   noDropdownItem?: boolean;
   onClick?: () => void;
-  items?: ItemType[];
+  items?: MenuProps['items'];
   onSelect?: (p: { key: string }) => void;
   defaultSelectedKeys?: string[];
   placement?: 'top' | 'topLeft';
@@ -53,7 +53,7 @@ function SideBar() {
   const { isMenuExpand, setIsMenuExpand, mode, setMode, adminList } = useContext(ChatContext);
   const { pathname } = useRouter();
   const { t, i18n } = useTranslation();
-  const [logo, setLogo] = useState<string>('/logo_zh_latest.png');
+  const [logo, setLogo] = useState<string>('/uagi-logo.svg');
 
   const hasAdmin = useMemo(() => {
     const { user_id } = JSON.parse(localStorage.getItem(STORAGE_USERINFO_KEY) || '{}');
@@ -315,8 +315,8 @@ function SideBar() {
   }, [t, pathname, hasAdmin]);
 
   // TODO: unused function
-  // const dropDownRoutes: ItemType[] = useMemo(() => {
-  //   return routes.map<ItemType>(item => ({
+  // const dropDownRoutes: MenuProps['items'] = useMemo(() => {
+  //   return routes.map(item => ({
   //     key: item.key,
   //     label: (
   //       <Link href={item.path} className='text-base'>
@@ -328,10 +328,10 @@ function SideBar() {
   // }, [routes]);
 
   // TODO: unused function
-  // const dropDownSettings: ItemType[] = useMemo(() => {
+  // const dropDownSettings: MenuProps['items'] = useMemo(() => {
   //   return settings
   //     .filter(item => !item.noDropdownItem)
-  //     .map<ItemType>(item => ({
+  //     .map(item => ({
   //       key: item.key,
   //       label: (
   //         <div className='text-base' onClick={item.onClick}>
@@ -343,8 +343,8 @@ function SideBar() {
   // }, [settings]);
 
   // TODO: unused function
-  // const dropDownFunctions: ItemType[] = useMemo(() => {
-  //   return functions.map<ItemType>(item => ({
+  // const dropDownFunctions: MenuProps['items'] = useMemo(() => {
+  //   return functions.map(item => ({
   //     key: item.key,
   //     label: (
   //       <Link href={item.path} className='text-base'>
@@ -409,7 +409,8 @@ function SideBar() {
   }, []);
 
   useEffect(() => {
-    setLogo(mode === 'dark' ? '/logo_s_latest.png' : '/logo_zh_latest.png');
+    // Keep the same logo for both light and dark mode since it's SVG
+    setLogo('/uagi-logo.svg');
   }, [mode]);
 
   if (!isMenuExpand) {
@@ -422,7 +423,7 @@ function SideBar() {
       >
         <div>
           <Link href='/' className='flex justify-center items-center pb-4'>
-            <Image src={isMenuExpand ? logo : '/LOGO_SMALL.png'} alt='DB-GPT' width={40} height={40} />
+            <Image src='/uagi-icon.svg' alt='UAGI' width={40} height={40} />
           </Link>
           <div className='flex flex-col gap-4 items-center'>
             {functions.map(i => (
@@ -458,7 +459,7 @@ function SideBar() {
       <div>
         {/* LOGO */}
         <Link href='/' className='flex items-center justify-center p-2 pb-4'>
-          <Image src={isMenuExpand ? logo : '/LOGO_SMALL.png'} alt='DB-GPT' width={180} height={40} />
+          <Image src='/uagi-logo.svg' alt='UAGI' width={180} height={40} />
         </Link>
         {/* functions */}
         <div className='flex flex-col gap-4'>
