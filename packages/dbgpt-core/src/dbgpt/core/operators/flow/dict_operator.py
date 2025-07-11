@@ -4,7 +4,6 @@ from typing import Dict
 
 from dbgpt.core.awel import JoinOperator
 from dbgpt.core.awel.flow import IOField, OperatorCategory, Parameter, ViewMetadata
-from dbgpt.util.i18n_utils import _
 
 
 class MergeStringToDictOperator(JoinOperator[Dict[str, str]]):

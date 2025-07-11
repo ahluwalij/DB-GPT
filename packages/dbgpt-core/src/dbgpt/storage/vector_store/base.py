@@ -13,7 +13,6 @@ from dbgpt.storage.base import IndexStoreBase, IndexStoreConfig
 from dbgpt.storage.vector_store.filters import MetadataFilters
 from dbgpt.util import RegisterParameters
 from dbgpt.util.executor_utils import blocking_func_to_async
-from dbgpt.util.i18n_utils import _
 
 logger = logging.getLogger(__name__)
 

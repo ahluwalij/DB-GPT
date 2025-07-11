@@ -7,7 +7,6 @@ from dbgpt.core import Chunk
 from dbgpt.core.awel import MapOperator
 from dbgpt.core.awel.flow import IOField, OperatorCategory, Parameter, ViewMetadata
 from dbgpt.storage.knowledge_graph.base import KnowledgeGraphBase
-from dbgpt.util.i18n_utils import _
 
 
 class KnowledgeGraphOperator(MapOperator[List[Chunk], List[Chunk]]):

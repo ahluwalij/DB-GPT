@@ -40,7 +40,6 @@ from dbgpt.core.interface.operators.message_operator import (
 )
 from dbgpt.core.interface.operators.prompt_operator import HistoryPromptBuilderOperator
 from dbgpt.model.operators import LLMOperator, StreamingLLMOperator
-from dbgpt.util.i18n_utils import _
 from dbgpt.util.tracer import root_tracer
 from dbgpt_serve.conversation.serve import Serve as ConversationServe
 

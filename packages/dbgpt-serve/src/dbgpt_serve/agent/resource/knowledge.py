@@ -8,7 +8,6 @@ from dbgpt.agent.resource.knowledge import (
     RetrieverResourceParameters,
 )
 from dbgpt.util import ParameterDescription
-from dbgpt.util.i18n_utils import _
 from dbgpt_serve.rag.retriever.knowledge_space import KnowledgeSpaceRetriever
 
 logger = logging.getLogger(__name__)

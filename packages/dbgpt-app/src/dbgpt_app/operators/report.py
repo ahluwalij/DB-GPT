@@ -18,7 +18,6 @@ from dbgpt.core.awel.flow.base import (
 )
 from dbgpt.core.interface.llm import ModelRequest
 from dbgpt.model.operators import MixinLLMOperator
-from dbgpt.util.i18n_utils import _
 from dbgpt_app.operators.datasource import GPTVisMixin
 
 _DEFAULT_PROMPT_EN = """You are a helpful AI assistant.

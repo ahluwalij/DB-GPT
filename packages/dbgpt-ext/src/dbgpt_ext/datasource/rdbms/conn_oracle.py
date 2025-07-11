@@ -12,7 +12,6 @@ from dbgpt.core.awel.flow import (
     auto_register_resource,
 )
 from dbgpt.datasource.rdbms.base import RDBMSConnector, RDBMSDatasourceParameters
-from dbgpt.util.i18n_utils import _
 
 
 @auto_register_resource(

@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './styles.module.css';
 
-const LangMap = { zh: '中文', en: 'English' };
+const LangMap = { zh: 'Chinese', en: 'English' };
 
 const DeleteBtn: React.FC<{ record: IPrompt; refresh: () => void }> = ({ record, refresh }) => {
   const userInfo = useUser();
@@ -22,7 +22,7 @@ const DeleteBtn: React.FC<{ record: IPrompt; refresh: () => void }> = ({ record,
 
   const { message } = App.useApp();
 
-  // 删除prompt
+  // Delete prompt
   const { run: deletePromptRun, loading: deleteLoading } = useRequest(
     async record => {
       await deletePrompt({
@@ -32,7 +32,7 @@ const DeleteBtn: React.FC<{ record: IPrompt; refresh: () => void }> = ({ record,
     {
       manual: true,
       onSuccess: async () => {
-        message.success('删除成功');
+        message.success('Delete successful');
         await refresh();
       },
     },
@@ -43,8 +43,8 @@ const DeleteBtn: React.FC<{ record: IPrompt; refresh: () => void }> = ({ record,
   }
 
   return (
-    <Popconfirm title='确认删除吗？' onConfirm={async () => await deletePromptRun(record)}>
-      <Button loading={deleteLoading}>{t('Delete')}</Button>
+    <Popconfirm title='Are you sure you want to delete?' onConfirm={async () => await deletePromptRun(record)}>
+      <Button loading={deleteLoading}>Delete</Button>
     </Popconfirm>
   );
 };
@@ -88,32 +88,32 @@ const Prompt = () => {
 
   const getColumns = (t: TFunction, handleEdit: (prompt: IPrompt) => void): ColumnsType<IPrompt> => [
     {
-      title: t('Prompt_Info_Name'),
+      title: 'Name',
       dataIndex: 'prompt_name',
       key: 'prompt_name',
       width: '10%',
     },
     {
-      title: t('Prompt_Info_Scene'),
+      title: 'Scene',
       dataIndex: 'chat_scene',
       key: 'chat_scene',
       width: '10%',
     },
     {
-      title: t('language'),
+      title: 'Language',
       dataIndex: 'prompt_language',
       key: 'prompt_language',
       render: lang => (lang ? LangMap[lang as keyof typeof LangMap] : '-'),
       width: '10%',
     },
     {
-      title: t('Prompt_Info_Content'),
+      title: 'Content',
       dataIndex: 'content',
       key: 'content',
       render: content => <Typography.Paragraph ellipsis={{ rows: 2, tooltip: true }}>{content}</Typography.Paragraph>,
     },
     {
-      title: t('Operation'),
+      title: 'Operation',
       dataIndex: 'operate',
       key: 'operate',
       render: (_, record) => (
@@ -124,7 +124,7 @@ const Prompt = () => {
             }}
             type='primary'
           >
-            {t('Edit')}
+            Edit
           </Button>
           <DeleteBtn record={record} refresh={refresh} />
         </Space>
@@ -139,11 +139,11 @@ const Prompt = () => {
   const items: SegmentedProps['options'] = [
     {
       value: 'common',
-      label: t('Public') + ' Prompts',
+      label: 'Public Prompts',
     },
     // {
     //   value: 'private',
-    //   label: t('Private') + ' Prompts',
+    //   label: 'Private Prompts',
     // },
   ];
 
@@ -179,7 +179,7 @@ const Prompt = () => {
               onClick={handleAddBtn}
               icon={<PlusOutlined />}
             >
-              {t('Add')} Prompts
+              Add Prompts
             </Button>
           </div>
         </div>

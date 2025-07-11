@@ -7,7 +7,6 @@ from dbgpt.core import Chunk
 from dbgpt.core.awel import MapOperator
 from dbgpt.core.awel.flow import IOField, OperatorCategory, Parameter, ViewMetadata
 from dbgpt.storage.vector_store.base import VectorStoreBase
-from dbgpt.util.i18n_utils import _
 
 
 class VectorStorageOperator(MapOperator[List[Chunk], List[Chunk]]):

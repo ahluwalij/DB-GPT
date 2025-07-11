@@ -20,7 +20,6 @@ from dbgpt.core.awel.flow import (
     OperatorType,
     ViewMetadata,
 )
-from dbgpt.util.i18n_utils import _
 
 T = TypeVar("T")
 ResponseTye = Union[str, bytes, ModelOutput]
@@ -35,28 +34,28 @@ class BaseOutputParser(MapOperator[ModelOutput, Any], ABC):
     """
 
     metadata = ViewMetadata(
-        label=_("Base Output Operator"),
+        label="Base Output Operator",
         name="base_output_operator",
         operator_type=OperatorType.TRANSFORM_STREAM,
         category=OperatorCategory.OUTPUT_PARSER,
-        description=_("The base LLM out parse."),
+        description="The base LLM out parse.",
         parameters=[],
         inputs=[
             IOField.build_from(
-                _("Model Output"),
+                "Model Output",
                 "model_output",
                 ModelOutput,
                 is_list=True,
-                description=_("The model output of upstream."),
+                description="The model output of upstream.",
             )
         ],
         outputs=[
             IOField.build_from(
-                _("Model Output"),
+                "Model Output",
                 "model_output",
                 str,
                 is_list=True,
-                description=_("The model output after parsing."),
+                description="The model output after parsing.",
             )
         ],
     )
@@ -298,25 +297,25 @@ class SQLOutputParser(BaseOutputParser):
     """Parse the SQL output of an LLM call."""
 
     metadata = ViewMetadata(
-        label=_("SQL Output Parser"),
+        label="SQL Output Parser",
         name="default_sql_output_parser",
         category=OperatorCategory.OUTPUT_PARSER,
-        description=_("Parse the SQL output of an LLM call."),
+        description="Parse the SQL output of an LLM call.",
         parameters=[],
         inputs=[
             IOField.build_from(
-                _("Model Output"),
+                "Model Output",
                 "model_output",
                 ModelOutput,
-                description=_("The model output of upstream."),
+                description="The model output of upstream.",
             )
         ],
         outputs=[
             IOField.build_from(
-                _("Dict SQL Output"),
+                "Dict SQL Output",
                 "dict",
                 dict,
-                description=_("The dict output after parsing."),
+                description="The dict output after parsing.",
             )
         ],
         tags={"order": TAGS_ORDER_HIGH},
@@ -337,28 +336,26 @@ class SQLListOutputParser(BaseOutputParser):
     """Parse the SQL list output of an LLM call."""
 
     metadata = ViewMetadata(
-        label=_("SQL List Output Parser"),
+        label="SQL List Output Parser",
         name="default_sql_list_output_parser",
         category=OperatorCategory.OUTPUT_PARSER,
-        description=_(
-            "Parse the SQL list output of an LLM call, mostly used for dashboard."
-        ),
+        description="Parse the SQL list output of an LLM call, mostly used for dashboard.",
         parameters=[],
         inputs=[
             IOField.build_from(
-                _("Model Output"),
+                "Model Output",
                 "model_output",
                 ModelOutput,
-                description=_("The model output of upstream."),
+                description="The model output of upstream.",
             )
         ],
         outputs=[
             IOField.build_from(
-                _("List SQL Output"),
+                "List SQL Output",
                 "list",
                 dict,
                 is_list=True,
-                description=_("The list output after parsing."),
+                description="The list output after parsing.",
             )
         ],
         tags={"order": TAGS_ORDER_HIGH},

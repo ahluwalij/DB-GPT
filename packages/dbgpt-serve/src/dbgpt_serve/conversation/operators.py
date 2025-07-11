@@ -11,7 +11,6 @@ from dbgpt.core import (
 )
 from dbgpt.core.awel.flow import IOField, OperatorCategory, ViewMetadata
 from dbgpt.core.operators import PreChatHistoryLoadOperator
-from dbgpt.util.i18n_utils import _
 
 from .serve import Serve
 

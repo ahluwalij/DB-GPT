@@ -15,7 +15,6 @@ from dbgpt.core.awel.flow import (
 )
 from dbgpt.datasource.parameter import BaseDatasourceParameters
 from dbgpt.datasource.rdbms.base import RDBMSConnector
-from dbgpt.util.i18n_utils import _
 
 logger = logging.getLogger(__name__)
 

@@ -18,7 +18,6 @@ from dbgpt.util.command_utils import (
     _stop_service,
 )
 from dbgpt.util.console import CliLogger
-from dbgpt.util.i18n_utils import _
 from dbgpt.util.parameter_utils import (
     _build_parameter_class,
     build_lazy_click_command,

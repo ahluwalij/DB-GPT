@@ -1,6 +1,5 @@
 import { IFlowData, IFlowUpdateParam } from '@/types/flow';
 import { Button, Form, Input, Modal, Radio, message } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { ReactFlowInstance } from 'reactflow';
 
 type Props = {
@@ -16,7 +15,6 @@ export const ExportFlowModal: React.FC<Props> = ({
   isExportFlowModalOpen,
   setIsExportFlowModalOpen,
 }) => {
-  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -35,7 +33,7 @@ export const ExportFlowModal: React.FC<Props> = ({
       const linkUrl = `${process.env.API_BASE_URL ?? ''}/api/v2/serve/awel/flow/export/${values.uid}?export_type=${values.export_type}&format=${values.format}`;
       window.open(linkUrl);
     }
-    messageApi.success(t('Export_Flow_Success'));
+    messageApi.success('Flow exported successfully');
 
     setIsExportFlowModalOpen(false);
   };
@@ -43,15 +41,15 @@ export const ExportFlowModal: React.FC<Props> = ({
   return (
     <>
       <Modal
-        title={t('Export_Flow')}
+        title='Export Flow'
         open={isExportFlowModalOpen}
         onCancel={() => setIsExportFlowModalOpen(false)}
         footer={[
           <Button key='cancel' onClick={() => setIsExportFlowModalOpen(false)}>
-            {t('cancel')}
+            Cancel
           </Button>,
           <Button key='submit' type='primary' onClick={() => form.submit()}>
-            {t('verify')}
+            Export
           </Button>,
         ]}
       >
@@ -67,14 +65,14 @@ export const ExportFlowModal: React.FC<Props> = ({
             uid: flowInfo?.uid,
           }}
         >
-          <Form.Item label={t('Export_File_Type')} name='export_type'>
+          <Form.Item label='Export File Type' name='export_type'>
             <Radio.Group>
               <Radio value='json'>JSON</Radio>
               <Radio value='dbgpts'>DBGPTS</Radio>
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item label={t('Export_File_Format')} name='format'>
+          <Form.Item label='Export File Format' name='format'>
             <Radio.Group>
               <Radio value='file'>File</Radio>
               <Radio value='json'>JSON</Radio>

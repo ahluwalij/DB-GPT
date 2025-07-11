@@ -1,7 +1,6 @@
 from typing import List
 
 from dbgpt.core import EmbeddingModelMetadata
-from dbgpt.util.i18n_utils import _
 
 EMBED_COMMON_LLAMA_CPP_MODELS = []
 EMBED_COMMON_HF_MODELS = []

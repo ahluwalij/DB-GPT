@@ -17,7 +17,6 @@ from dbgpt.storage.vector_store.base import (
 )
 from dbgpt.storage.vector_store.filters import MetadataFilters
 from dbgpt.util import string_utils
-from dbgpt.util.i18n_utils import _
 
 logger = logging.getLogger(__name__)
 

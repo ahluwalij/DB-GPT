@@ -9,7 +9,6 @@ from typing import Any, AsyncIterator, Dict, Optional
 
 from dbgpt.component import ComponentType, SystemApp
 from dbgpt.configs.model_config import resolve_root_path
-from dbgpt.util.i18n_utils import _
 from dbgpt.util.module_utils import import_from_checked_string
 from dbgpt.util.parameter_utils import BaseParameters
 from dbgpt.util.tracer.base import (
@@ -331,7 +330,7 @@ class TracerParameters(BaseParameters):
     file: Optional[str] = field(
         default=None,
         metadata={
-            "help": _(
+            "help": (
                 "The file to store the tracer, e.g. dbgpt_webserver_tracer.jsonl"
             ),
         },
@@ -339,19 +338,19 @@ class TracerParameters(BaseParameters):
     root_operation_name: Optional[str] = field(
         default=None,
         metadata={
-            "help": _("The root operation name of the tracer"),
+            "help": "The root operation name of the tracer",
         },
     )
     exporter: Optional[str] = field(
         default=None,
         metadata={
-            "help": _("The exporter of the tracer, e.g. telemetry"),
+            "help": "The exporter of the tracer, e.g. telemetry",
         },
     )
     otlp_endpoint: Optional[str] = field(
         default=None,
         metadata={
-            "help": _(
+            "help": (
                 "The endpoint of the OpenTelemetry Protocol, you can set "
                 "'${env:OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}' to use the environment "
                 "variable"
@@ -361,7 +360,7 @@ class TracerParameters(BaseParameters):
     otlp_insecure: Optional[bool] = field(
         default=None,
         metadata={
-            "help": _(
+            "help": (
                 "Whether to use insecure connection, you can set "
                 "'${env:OTEL_EXPORTER_OTLP_TRACES_INSECURE}' to use the environment "
             )
@@ -370,7 +369,7 @@ class TracerParameters(BaseParameters):
     otlp_timeout: Optional[int] = field(
         default=None,
         metadata={
-            "help": _(
+            "help": (
                 "The timeout of the connection, in seconds, you can set "
                 "'${env:OTEL_EXPORTER_OTLP_TRACES_TIMEOUT}' to use the environment "
             )
@@ -379,7 +378,7 @@ class TracerParameters(BaseParameters):
     tracer_storage_cls: Optional[str] = field(
         default=None,
         metadata={
-            "help": _("The class of the tracer storage"),
+            "help": "The class of the tracer storage",
         },
     )
 

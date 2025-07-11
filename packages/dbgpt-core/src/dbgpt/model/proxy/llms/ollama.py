@@ -17,7 +17,6 @@ from dbgpt.model.proxy.base import (
     register_proxy_model_adapter,
 )
 from dbgpt.model.proxy.llms.proxy_model import ProxyModel, parse_model_request
-from dbgpt.util.i18n_utils import _
 
 from ...utils.parse_utils import (
     parse_chat_message,

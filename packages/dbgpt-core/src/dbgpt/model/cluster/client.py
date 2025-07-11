@@ -13,7 +13,6 @@ from dbgpt.core.interface.llm import (
 )
 from dbgpt.model.cluster.manager_base import WorkerManager
 from dbgpt.model.parameter import WorkerType
-from dbgpt.util.i18n_utils import _
 
 
 @register_resource(

@@ -4,7 +4,6 @@ from typing import List, Optional
 
 from dbgpt.core import LLMClient, ModelMessage, ModelMessageRoleType, ModelRequest
 from dbgpt.core.awel.flow import Parameter, ResourceCategory, register_resource
-from dbgpt.util.i18n_utils import _
 
 REWRITE_PROMPT_TEMPLATE_EN = """
 Based on the given context {context}, Generate {nums} search queries related to:

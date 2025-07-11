@@ -16,7 +16,6 @@ from dbgpt.model.adapter.embed_metadata import (
     EMBED_COMMON_HF_JINA_MODELS,
     EMBED_COMMON_HF_QWEN_MODELS,
 )
-from dbgpt.util.i18n_utils import _
 from dbgpt.util.tracer import DBGPT_TRACER_SPAN_ID, root_tracer
 
 DEFAULT_MODEL_NAME = "sentence-transformers/all-mpnet-base-v2"

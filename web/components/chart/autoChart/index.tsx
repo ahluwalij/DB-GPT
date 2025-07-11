@@ -1,5 +1,4 @@
 import { ChatContext } from '@/app/chat-context';
-import i18n, { I18nKeys } from '@/app/i18n';
 import { DownloadOutlined } from '@ant-design/icons';
 import { Advice, Advisor, Datum } from '@antv/ava';
 import { Chart, ChartRef } from '@berryv/g2-react';
@@ -16,7 +15,7 @@ const { Option } = Select;
 
 export const AutoChart = (props: AutoChartProps) => {
   const { data: originalData, chartType, scopeOfCharts, ruleConfig } = props;
-  // 处理空值数据 (为'-'的数据)
+  // Process null data (data marked as '-')
   const data = processNilData(originalData) as Datum[];
   const { mode } = useContext(ChatContext);
 
@@ -30,7 +29,7 @@ export const AutoChart = (props: AutoChartProps) => {
     const advisorConfig: CustomAdvisorConfig = {
       charts: input_charts,
       scopeOfCharts: {
-        // 排除面积图
+        // Exclude area charts
         exclude: ['area_chart', 'stacked_area_chart', 'percent_stacked_area_chart'],
       },
       ruleConfig,
@@ -38,7 +37,7 @@ export const AutoChart = (props: AutoChartProps) => {
     setAdvisor(customizeAdvisor(advisorConfig));
   }, [ruleConfig, scopeOfCharts]);
 
-  /** 将 AVA 得到的图表推荐结果和模型的合并 */
+  /** Merge chart recommendations from AVA and model */
   const getMergedAdvices = (avaAdvices: Advice[]) => {
     if (!advisor) return [];
     const filteredAdvices = defaultAdvicesFilter({
@@ -55,11 +54,11 @@ export const AutoChart = (props: AutoChartProps) => {
     const allAdvices = allChartTypes
       .map(chartTypeItem => {
         const avaAdvice = filteredAdvices.find(item => item.type === chartTypeItem);
-        // 如果在 AVA 推荐列表中，直接采用推荐列表中的结果
+        // If in AVA recommendation list, use the result from the recommendation list directly
         if (avaAdvice) {
           return avaAdvice;
         }
-        // 如果不在，则单独为其生成图表 spec
+        // If not, generate chart spec for it separately
         const dataAnalyzerOutput = advisor.dataAnalyzer.execute({ data });
         if ('data' in dataAnalyzerOutput) {
           const specGeneratorOutput = advisor.specGenerator.execute({
@@ -80,7 +79,7 @@ export const AutoChart = (props: AutoChartProps) => {
         data,
         myChartAdvisor: advisor,
       });
-      // 合并模型推荐的图表类型和 ava 推荐的图表类型
+      // Merge chart types recommended by model and ava
       const allAdvices = getMergedAdvices(avaAdvices);
       setAdvices(allAdvices);
       setRenderChartType(allAdvices[0]?.type as ChartType);
@@ -94,7 +93,7 @@ export const AutoChart = (props: AutoChartProps) => {
       const spec: Specification = advices?.find((item: Advice) => item.type === chartTypeInput)?.spec ?? undefined;
       if (spec) {
         if (spec.data && ['line_chart', 'step_line_chart'].includes(chartTypeInput)) {
-          // 处理 ava 内置折线图的排序问题
+          // Handle sorting issues with ava built-in line charts
           const dataAnalyzerOutput = advisor?.dataAnalyzer.execute({ data });
           if (dataAnalyzerOutput && 'dataProps' in dataAnalyzerOutput) {
             spec.data = sortData({
@@ -105,7 +104,7 @@ export const AutoChart = (props: AutoChartProps) => {
           }
         }
         if (chartTypeInput === 'pie_chart' && spec?.encode?.color) {
-          // 补充饼图的 tooltip title 展示
+          // Add pie chart tooltip title display
           spec.tooltip = { title: { field: spec.encode.color } };
         }
         return (
@@ -124,13 +123,43 @@ export const AutoChart = (props: AutoChartProps) => {
     }
   }, [advices, mode, renderChartType]);
 
+  // Helper function to get chart type name
+  const getChartTypeName = (type: string) => {
+    const chartNames: Record<string, string> = {
+      bar_chart: 'Bar Chart',
+      line_chart: 'Line Chart', 
+      pie_chart: 'Pie Chart',
+      area_chart: 'Area Chart',
+      scatter_plot: 'Scatter Plot',
+      multi_line_chart: 'Multi Line Chart',
+      step_line_chart: 'Step Line Chart',
+      column_chart: 'Column Chart',
+      grouped_column_chart: 'Grouped Column Chart',
+      stacked_column_chart: 'Stacked Column Chart',
+      percent_stacked_column_chart: 'Percent Stacked Column Chart',
+      grouped_bar_chart: 'Grouped Bar Chart',
+      stacked_bar_chart: 'Stacked Bar Chart',
+      percent_stacked_bar_chart: 'Percent Stacked Bar Chart',
+      histogram: 'Histogram',
+      density_plot: 'Density Plot',
+      heatmap: 'Heatmap',
+      donut_chart: 'Donut Chart',
+      rose_chart: 'Rose Chart',
+      box_plot: 'Box Plot',
+      violin_plot: 'Violin Plot',
+      radar_chart: 'Radar Chart',
+      funnel_chart: 'Funnel Chart',
+    };
+    return chartNames[type] || type;
+  };
+
   if (renderChartType) {
     return (
       <div>
         <Row justify='space-between' className='mb-2'>
           <Col>
             <Space>
-              <span>{i18n.t('Advices')}</span>
+              <span>Chart Type</span>
               <Select
                 className='w-52'
                 value={renderChartType}
@@ -139,7 +168,7 @@ export const AutoChart = (props: AutoChartProps) => {
                 size={'small'}
               >
                 {advices?.map(item => {
-                  const name = i18n.t(item.type as I18nKeys);
+                  const name = getChartTypeName(item.type);
                   return (
                     <Option key={item.type} value={item.type}>
                       <Tooltip title={name} placement={'right'}>
@@ -152,9 +181,9 @@ export const AutoChart = (props: AutoChartProps) => {
             </Space>
           </Col>
           <Col>
-            <Tooltip title={i18n.t('Download')}>
+            <Tooltip title="Download">
               <Button
-                onClick={() => downloadImage(chartRef.current, i18n.t(renderChartType as I18nKeys))}
+                onClick={() => downloadImage(chartRef.current, getChartTypeName(renderChartType))}
                 icon={<DownloadOutlined />}
                 type='text'
               />
@@ -166,7 +195,7 @@ export const AutoChart = (props: AutoChartProps) => {
     );
   }
 
-  return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'暂无合适的可视化视图'} />;
+  return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'No suitable visualization available'} />;
 };
 
 export * from './helpers';

@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from dbgpt.configs.model_config import get_device
 from dbgpt.util.configure import RegisterParameters
-from dbgpt.util.i18n_utils import _
 from dbgpt.util.parameter_utils import BaseParameters
 from dbgpt.util.tracer import TracerParameters
 from dbgpt.util.utils import LoggingParameters
@@ -20,14 +19,14 @@ class BaseDeployModelParameters(BaseParameters):
 
     name: str = field(
         metadata={
-            "help": _("The name of the model."),
+            "help": "The name of the model.",
             "order": -1000,
         },
     )
     provider: Optional[str] = field(
         default=None,
         metadata={
-            "help": _(
+            "help": (
                 "The provider of the model. If model is deployed in local, this is the "
                 "inference type. If model is deployed in third-party service, this is "
                 "platform name('proxy/<platform>')"
@@ -44,10 +43,10 @@ class BaseDeployModelParameters(BaseParameters):
         },
     )
     verbose: Optional[bool] = field(
-        default=False, metadata={"help": _("Show verbose output.")}
+        default=False, metadata={"help": "Show verbose output."}
     )
     concurrency: Optional[int] = field(
-        default=5, metadata={"help": _("Model concurrency limit")}
+        default=5, metadata={"help": "Model concurrency limit"}
     )
 
     @property
@@ -79,7 +78,7 @@ class LLMDeployModelParameters(BaseDeployModelParameters, RegisterParameters):
     backend: Optional[str] = field(
         default=None,
         metadata={
-            "help": _(
+            "help": (
                 "The real model name to pass to the provider, default is None. If "
                 "backend is None, use name as the real model name."
             ),
@@ -89,7 +88,7 @@ class LLMDeployModelParameters(BaseDeployModelParameters, RegisterParameters):
     prompt_template: Optional[str] = field(
         default=None,
         metadata={
-            "help": _(
+            "help": (
                 "Prompt template. If None, the prompt template is automatically "
                 "determined from model. Just for local deployment."
             )
@@ -98,7 +97,7 @@ class LLMDeployModelParameters(BaseDeployModelParameters, RegisterParameters):
     context_length: Optional[int] = field(
         default=None,
         metadata={
-            "help": _(
+            "help": (
                 "The context length of the model. If None, it is automatically "
                 "determined from model."
             )
@@ -107,7 +106,7 @@ class LLMDeployModelParameters(BaseDeployModelParameters, RegisterParameters):
     reasoning_model: Optional[bool] = field(
         default=None,
         metadata={
-            "help": _(
+            "help": (
                 "Whether the model is a reasoning model. If None, it is "
                 "automatically determined from model."
             )
@@ -142,7 +141,7 @@ class EmbeddingDeployModelParameters(BaseDeployModelParameters, RegisterParamete
     __cfg_type__ = "embedding"
 
     concurrency: Optional[int] = field(
-        default=100, metadata={"help": _("Model concurrency limit")}
+        default=100, metadata={"help": "Model concurrency limit"}
     )
 
     @classmethod
@@ -160,7 +159,7 @@ class RerankerDeployModelParameters(BaseDeployModelParameters, RegisterParameter
     __cfg_type__ = "reranker"
 
     concurrency: Optional[int] = field(
-        default=50, metadata={"help": _("Model concurrency limit")}
+        default=50, metadata={"help": "Model concurrency limit"}
     )
 
     @classmethod
@@ -197,7 +196,7 @@ class BitsandbytesQuantization(BaseHFQuantization):
     load_in_8bits: bool = field(
         default=False,
         metadata={
-            "help": _(
+            "help": (
                 "Whether to load the model in 8 bits(LLM.int8() algorithm), default is "
                 "False."
             ),
@@ -206,7 +205,7 @@ class BitsandbytesQuantization(BaseHFQuantization):
     load_in_4bits: bool = field(
         default=False,
         metadata={
-            "help": _("Whether to load the model in 4 bits, default is False."),
+            "help": "Whether to load the model in 4 bits, default is False.",
         },
     )
 
@@ -259,25 +258,25 @@ class BitsandbytesQuantization8bits(BitsandbytesQuantization):
     load_in_8bits: bool = field(
         default=True,
         metadata={
-            "help": _("Whether to load the model in 8 bits(LLM.int8() algorithm)."),
+            "help": "Whether to load the model in 8 bits(LLM.int8() algorithm).",
         },
     )
 
     llm_int8_enable_fp32_cpu_offload: bool = field(
         default=False,
         metadata={
-            "help": _(
+            "help": (
                 "8-bit models can offload weights between the CPU and GPU to support "
                 "fitting very large models into memory. The weights dispatched to the "
-                "CPU are actually stored in float32, and aren’t converted to 8-bit. "
+                "CPU are actually stored in float32, and aren't converted to 8-bit. "
             ),
         },
     )
     llm_int8_threshold: float = field(
         default=6.0,
         metadata={
-            "help": _(
-                "An “outlier” is a hidden state value greater than a certain threshold,"
+            "help": (
+                "An 'outlier' is a hidden state value greater than a certain threshold,"
                 " and these values are computed in fp16. While the values are usually "
                 "normally distributed ([-3.5, 3.5]), this distribution can be very "
                 "different for large models ([-60, 6] or [6, 60]). 8-bit quantization "
@@ -291,7 +290,7 @@ class BitsandbytesQuantization8bits(BitsandbytesQuantization):
     llm_int8_skip_modules: List[str] = field(
         default_factory=list,
         metadata={
-            "help": _(
+            "help": (
                 "An explicit list of the modules that we do not want to convert in "
                 "8-bit. This is useful for models such as Jukebox that has several "
                 "heads in different places and not necessarily at the last position. "
@@ -325,14 +324,14 @@ class BitsandbytesQuantization4bits(BitsandbytesQuantization):
     load_in_4bits: bool = field(
         default=True,
         metadata={
-            "help": _("Whether to load the model in 4 bits."),
+            "help": "Whether to load the model in 4 bits.",
         },
     )
 
     bnb_4bit_compute_dtype: Optional[str] = field(
         default=None,
         metadata={
-            "help": _(
+            "help": (
                 "To speedup computation, you can change the data type from float32 "
                 "(the default value) to bfloat16"
             ),
@@ -347,7 +346,7 @@ class BitsandbytesQuantization4bits(BitsandbytesQuantization):
         default="nf4",
         metadata={
             "valid_values": ["nf4", "fp4"],
-            "help": _(
+            "help": (
                 "Quantization datatypes, `fp4` (four bit float) and `nf4` "
                 "(normal four bit float), only valid when load_4bit=True"
             ),
@@ -356,7 +355,7 @@ class BitsandbytesQuantization4bits(BitsandbytesQuantization):
     bnb_4bit_use_double_quant: bool = field(
         default=True,
         metadata={
-            "help": _(
+            "help": (
                 "Nested quantization is a technique that can save additional memory at "
                 "no additional performance cost. This feature performs a second "
                 "quantization of the already quantized weights to save an additional "
@@ -400,23 +399,23 @@ class BaseServerParameters(BaseParameters):
     __cfg_type__ = "service"
 
     host: Optional[str] = field(
-        default="0.0.0.0", metadata={"help": _("The host IP address to bind to.")}
+        default="0.0.0.0", metadata={"help": "The host IP address to bind to."}
     )
     port: Optional[int] = field(
-        default=None, metadata={"help": _("The port number to bind to.")}
+        default=None, metadata={"help": "The port number to bind to."}
     )
     daemon: Optional[bool] = field(
-        default=False, metadata={"help": _("Run the server as a daemon.")}
+        default=False, metadata={"help": "Run the server as a daemon."}
     )
     log: LoggingParameters = field(
         default_factory=LoggingParameters,
         metadata={
-            "help": _("Logging configuration"),
+            "help": "Logging configuration",
         },
     )
     trace: Optional[TracerParameters] = field(
         default=None,
         metadata={
-            "help": _("Tracer configuration"),
+            "help": "Tracer configuration",
         },
     )

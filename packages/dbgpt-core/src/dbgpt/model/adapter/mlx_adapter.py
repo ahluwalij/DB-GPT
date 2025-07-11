@@ -8,7 +8,6 @@ from dbgpt.model.adapter.base import LLMModelAdapter, register_model_adapter
 from dbgpt.model.adapter.model_metadata import COMMON_HF_MODELS
 from dbgpt.model.adapter.template import ConversationAdapter
 from dbgpt.model.base import ModelType
-from dbgpt.util.i18n_utils import _
 
 logger = logging.getLogger(__name__)
 

@@ -8,7 +8,6 @@ from dbgpt.model.adapter.base import LLMModelAdapter, register_model_adapter
 from dbgpt.model.adapter.model_metadata import COMMON_HF_MODELS
 from dbgpt.model.adapter.template import ConversationAdapter, ConversationAdapterFactory
 from dbgpt.model.base import ModelType
-from dbgpt.util.i18n_utils import _
 from dbgpt.util.parameter_utils import (
     _get_dataclass_print_str,
 )

@@ -8,7 +8,6 @@ from dbgpt.core.schema.types import (
     ChatCompletionContentPartParam,
     ChatCompletionMessageParam,
 )
-from dbgpt.util.i18n_utils import _
 
 MEDIA_DATA_TYPE = Union[str, bytes]
 MEDIA_DATA_FORMAT_TYPE = Literal[
@@ -23,9 +22,9 @@ MEDIA_DATA_FORMAT_TYPE = Literal[
 class MediaObject:
     """Media object for the model output or model request."""
 
-    data: MEDIA_DATA_TYPE = field(metadata={"help": _("The media data")})
+    data: MEDIA_DATA_TYPE = field(metadata={"help": "The media data"})
     format: MEDIA_DATA_FORMAT_TYPE = field(
-        default="text", metadata={"help": _("The format of the media")}
+        default="text", metadata={"help": "The format of the media"}
     )
 
 
@@ -125,9 +124,9 @@ class MediaContent:
         )
     """
 
-    object: MediaObject = field(metadata={"help": _("The media object")})
+    object: MediaObject = field(metadata={"help": "The media object"})
     type: Literal["text", "thinking", "image", "audio", "video"] = field(
-        default="text", metadata={"help": _("The type of the model media content")}
+        default="text", metadata={"help": "The type of the model media content"}
     )
 
     @classmethod

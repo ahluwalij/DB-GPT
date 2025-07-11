@@ -15,7 +15,6 @@ from dbgpt.core.interface.file import FileStorageClient
 from dbgpt.rag.retriever import BaseRetriever
 from dbgpt.rag.retriever.embedding import EmbeddingRetriever
 from dbgpt.util.executor_utils import blocking_func_to_async
-from dbgpt.util.i18n_utils import _
 from dbgpt.util.tracer import SpanType, root_tracer
 from dbgpt_app.knowledge.request.request import (
     ChunkEditRequest,

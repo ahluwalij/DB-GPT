@@ -21,7 +21,6 @@ from dbgpt.core.awel.task.base import IN, OUT
 from dbgpt.core.interface.operators.prompt_operator import BasePromptBuilderOperator
 from dbgpt.core.interface.operators.retriever import RetrieverOperator
 from dbgpt.util.function_utils import rearrange_args_by_type
-from dbgpt.util.i18n_utils import _
 from dbgpt_app.knowledge.api import knowledge_space_service
 from dbgpt_app.knowledge.request.request import KnowledgeSpaceRequest
 from dbgpt_app.knowledge.service import KnowledgeService
@@ -41,28 +40,28 @@ class SpaceRetrieverOperator(RetrieverOperator[IN, OUT]):
     """knowledge space retriever operator."""
 
     metadata = ViewMetadata(
-        label=_("Knowledge Space Operator"),
+        label="Knowledge Space Operator",
         name="space_operator",
         category=OperatorCategory.RAG,
-        description=_("knowledge space retriever operator."),
-        inputs=[IOField.build_from(_("Query"), "query", str, _("user query"))],
+        description="Knowledge space retriever operator, retrieve knowledge from knowledge space",
+        inputs=[IOField.build_from("Query", "query", str, "User query")],
         outputs=[
             IOField.build_from(
-                _("related chunk content"),
+                "Related chunk content",
                 "related chunk content",
                 List,
-                description=_("related chunk content"),
+                description="Related chunk content",
             )
         ],
         parameters=[
             Parameter.build_from(
-                _("Space Name"),
+                "Space Name",
                 "space_name",
                 str,
                 options=FunctionDynamicOptions(func=_load_space_name),
                 optional=False,
                 default=None,
-                description=_("space name."),
+                description="Knowledge space name",
             )
         ],
         documentation_url="https://github.com/openai/openai-python",
@@ -122,65 +121,65 @@ class KnowledgeSpacePromptBuilderOperator(
     """
 
     metadata = ViewMetadata(
-        label=_("Knowledge Space Prompt Builder Operator"),
+        label="Knowledge Space Prompt Builder Operator",
         name="knowledge_space_prompt_builder_operator",
-        description=_("Build messages from prompt template and chat history."),
+        description="Build messages from prompt template and chat history",
         operator_type=OperatorType.JOIN,
         category=OperatorCategory.CONVERSION,
         parameters=[
             Parameter.build_from(
-                _("Chat Prompt Template"),
+                "Chat Prompt Template",
                 "prompt",
                 ChatPromptTemplate,
-                description=_("The chat prompt template."),
+                description="The chat prompt template",
             ),
             Parameter.build_from(
-                _("History Key"),
+                "History Key",
                 "history_key",
                 str,
                 optional=True,
                 default="chat_history",
-                description=_("The key of history in prompt dict."),
+                description="The key of history in prompt dict",
             ),
             Parameter.build_from(
-                _("String History"),
+                "String History",
                 "str_history",
                 bool,
                 optional=True,
                 default=False,
-                description=_("Whether to convert the history to string."),
+                description="Whether to convert the history to string",
             ),
         ],
         inputs=[
             IOField.build_from(
-                _("user input"),
+                "User input",
                 "user_input",
                 str,
                 is_list=False,
-                description=_("user input"),
+                description="User input",
             ),
             IOField.build_from(
-                _("space related context"),
+                "Space related context",
                 "related_context",
                 List,
                 is_list=False,
-                description=_("context of knowledge space."),
+                description="Context of knowledge space",
             ),
             IOField.build_from(
-                _("History"),
+                "History",
                 "history",
                 BaseMessage,
                 is_list=True,
-                description=_("The history."),
+                description="The history",
             ),
         ],
         outputs=[
             IOField.build_from(
-                _("Formatted Messages"),
+                "Formatted Messages",
                 "formatted_messages",
                 ModelMessage,
                 is_list=True,
-                description=_("The formatted messages."),
+                description="The formatted messages",
             )
         ],
     )

@@ -25,7 +25,6 @@ from dbgpt.core.awel.flow import (
 from dbgpt.core.interface.llm import ModelOutput
 from dbgpt.core.operators import BaseLLM
 from dbgpt.util.chat_util import transform_to_sse
-from dbgpt.util.i18n_utils import _
 
 if TYPE_CHECKING:
     from httpx._types import ProxiesTypes, ProxyTypes

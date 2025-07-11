@@ -10,7 +10,6 @@ from dbgpt.component import BaseComponent, ComponentType, SystemApp
 from dbgpt.core import CacheConfig, CacheKey, CacheValue, Serializable, Serializer
 from dbgpt.core.interface.cache import K, V
 from dbgpt.util.executor_utils import ExecutorFactory, blocking_func_to_async
-from dbgpt.util.i18n_utils import _
 from dbgpt.util.parameter_utils import BaseParameters
 
 from .storage.base import CacheStorage

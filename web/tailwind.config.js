@@ -33,8 +33,8 @@ module.exports = {
         default: '#0C75FC',
       },
       backgroundImage: {
-        'gradient-light': "url('/images/bg.png')",
-        'gradient-dark': 'url("/images/bg_dark.png")',
+        'gradient-light': 'linear-gradient(135deg, #f7f7f7 0%, #e0e7f2 100%)',
+        'gradient-dark': 'linear-gradient(135deg, #151622 0%, #232734 100%)',
         'button-gradient': 'linear-gradient(to right, theme("colors.gradientL"), theme("colors.gradientR"))',
       },
       keyframes: {

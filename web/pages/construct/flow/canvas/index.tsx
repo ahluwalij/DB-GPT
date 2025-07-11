@@ -16,7 +16,6 @@ import { ExportOutlined, FileAddOutlined, FrownOutlined, ImportOutlined, SaveOut
 import { Divider, Space, Tooltip, message, notification } from 'antd';
 import { useSearchParams } from 'next/navigation';
 import React, { DragEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import ReactFlow, {
   Background,
   Connection,
@@ -34,7 +33,6 @@ const nodeTypes = { customNode: CanvasNode };
 const edgeTypes = { buttonedge: ButtonEdge };
 
 const Canvas: React.FC = () => {
-  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const id = searchParams?.get('id') || '';
   const reactFlow = useReactFlow();
@@ -174,7 +172,7 @@ const Canvas: React.FC = () => {
     if (!node) {
       messageApi.open({
         type: 'warning',
-        content: t('Please_Add_Nodes_First'),
+        content: 'Please add nodes first',
       });
       return;
     }
@@ -201,22 +199,22 @@ const Canvas: React.FC = () => {
   const getButtonList = () => {
     const buttonList = [
       {
-        title: t('template'),
+        title: 'Template',
         icon: <FileAddOutlined className='block text-xl' onClick={() => setIsFlowTemplateModalOpen(true)} />,
       },
       {
-        title: t('Import'),
+        title: 'Import',
         icon: <ImportOutlined className='block text-xl' onClick={() => setIsImportFlowModalOpen(true)} />,
       },
       {
-        title: t('save'),
+        title: 'Save',
         icon: <SaveOutlined className='block text-xl' onClick={onSave} />,
       },
     ];
 
     if (id !== '') {
       buttonList.unshift({
-        title: t('Export'),
+        title: 'Export',
         icon: <ExportOutlined className='block text-xl' onClick={() => setIsExportFlowModalOpen(true)} />,
       });
     }

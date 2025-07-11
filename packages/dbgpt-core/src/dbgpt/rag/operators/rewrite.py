@@ -6,7 +6,6 @@ from dbgpt.core import LLMClient
 from dbgpt.core.awel import MapOperator
 from dbgpt.core.awel.flow import IOField, OperatorCategory, Parameter, ViewMetadata
 from dbgpt.rag.retriever.rewrite import QueryRewrite
-from dbgpt.util.i18n_utils import _
 
 
 class QueryRewriteOperator(MapOperator[dict, Any]):

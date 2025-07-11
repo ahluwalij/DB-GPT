@@ -3,7 +3,6 @@ import CanvasWrapper from '@/pages/construct/flow/canvas/index';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Form, GetProp, Modal, Radio, Upload, UploadFile, UploadProps, message } from 'antd';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Edge, Node } from 'reactflow';
 
 type Props = {
@@ -15,7 +14,6 @@ type Props = {
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
 export const ImportFlowModal: React.FC<Props> = ({ isImportModalOpen, setIsImportFlowModalOpen }) => {
-  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -38,7 +36,7 @@ export const ImportFlowModal: React.FC<Props> = ({ isImportModalOpen, setIsImpor
     const [, , res] = await apiInterceptors(importFlow(formData));
 
     if (res?.success) {
-      messageApi.success(t('Import_Flow_Success'));
+      messageApi.success('Flow imported successfully');
       localStorage.setItem('importFlowData', JSON.stringify(res?.data));
       CanvasWrapper();
     } else if (res?.err_msg) {
@@ -64,15 +62,15 @@ export const ImportFlowModal: React.FC<Props> = ({ isImportModalOpen, setIsImpor
   return (
     <>
       <Modal
-        title={t('Import_Flow')}
+        title='Import Flow'
         open={isImportModalOpen}
         onCancel={() => setIsImportFlowModalOpen(false)}
         footer={[
           <Button key='cancel' onClick={() => setIsImportFlowModalOpen(false)}>
-            {t('cancel')}
+            Cancel
           </Button>,
           <Button key='submit' type='primary' onClick={() => form.submit()}>
-            {t('verify')}
+            Import
           </Button>,
         ]}
       >
@@ -88,20 +86,20 @@ export const ImportFlowModal: React.FC<Props> = ({ isImportModalOpen, setIsImpor
         >
           <Form.Item
             name='file'
-            label={t('Select_File')}
+            label='Select File'
             valuePropName='fileList'
             getValueFromEvent={e => (Array.isArray(e) ? e : e && e.fileList)}
             rules={[{ required: true, message: 'Please upload a file' }]}
           >
             <Upload {...props} accept='.json,.zip' maxCount={1}>
-              <Button icon={<UploadOutlined />}> {t('Upload')}</Button>
+              <Button icon={<UploadOutlined />}>Upload</Button>
             </Upload>
           </Form.Item>
 
-          <Form.Item name='save_flow' label={t('Save_After_Import')} hidden>
+          <Form.Item name='save_flow' label='Save After Import' hidden>
             <Radio.Group>
-              <Radio value={true}>{t('Yes')}</Radio>
-              <Radio value={false}>{t('No')}</Radio>
+              <Radio value={true}>Yes</Radio>
+              <Radio value={false}>No</Radio>
             </Radio.Group>
           </Form.Item>
         </Form>

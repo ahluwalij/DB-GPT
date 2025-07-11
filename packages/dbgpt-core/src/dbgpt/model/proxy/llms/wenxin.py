@@ -27,7 +27,6 @@ from dbgpt.model.proxy.base import (
     register_proxy_model_adapter,
 )
 from dbgpt.model.proxy.llms.proxy_model import ProxyModel
-from dbgpt.util.i18n_utils import _
 
 # https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t
 MODEL_VERSION_MAPPING = {

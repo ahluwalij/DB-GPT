@@ -21,7 +21,6 @@ from dbgpt.storage.vector_store.base import (
     VectorStoreConfig,
 )
 from dbgpt.storage.vector_store.filters import FilterOperator, MetadataFilters
-from dbgpt.util.i18n_utils import _
 
 logger = logging.getLogger(__name__)
 

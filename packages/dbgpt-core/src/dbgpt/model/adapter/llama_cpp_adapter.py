@@ -24,7 +24,6 @@ from dbgpt.model.adapter.base import (
 )
 from dbgpt.model.adapter.model_metadata import COMMON_LLAMA_CPP_MODELS
 from dbgpt.model.base import ModelType
-from dbgpt.util.i18n_utils import _
 
 logger = logging.getLogger(__name__)
 

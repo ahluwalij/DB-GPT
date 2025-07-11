@@ -24,7 +24,6 @@ from dbgpt.core.interface.message import (
     _MultiRoundMessageMapper,
     _split_messages_by_round,
 )
-from dbgpt.util.i18n_utils import _
 
 logger = logging.getLogger(__name__)
 

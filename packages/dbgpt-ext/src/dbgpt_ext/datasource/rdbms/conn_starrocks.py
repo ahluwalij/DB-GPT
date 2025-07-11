@@ -13,7 +13,6 @@ from dbgpt.core.awel.flow import (
     auto_register_resource,
 )
 from dbgpt.datasource.rdbms.base import RDBMSConnector, RDBMSDatasourceParameters
-from dbgpt.util.i18n_utils import _
 
 from .dialect.starrocks.sqlalchemy import *  # noqa
 

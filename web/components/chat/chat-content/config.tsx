@@ -254,7 +254,7 @@ const basicComponents: MarkdownComponent = {
   ol({ children }) {
     return <ol className='py-1'>{children}</ol>;
   },
-  li({ children, ordered }) {
+  li({ children, ordered, ...props }: any) {
     return (
       <li
         className={`text-sm leading-7 ml-5 pl-2 text-gray-600 dark:text-gray-300 ${
@@ -407,7 +407,13 @@ const extraComponents: MarkdownComponent = {
     const DataItem = {
       key: 'data',
       label: 'Data',
-      children: <Table dataSource={data?.data} columns={columns} scroll={{ x: true }} virtual={true} />,
+      children: <Table 
+        dataSource={data?.data} 
+        columns={columns} 
+        scroll={{ x: true }} 
+        virtual={true}
+        rowKey={(record) => JSON.stringify(record)}
+      />,
     };
     const TabItems: TabsProps['items'] =
       data?.type === 'response_table' ? [DataItem, SqlItem] : [ChartItem, SqlItem, DataItem];

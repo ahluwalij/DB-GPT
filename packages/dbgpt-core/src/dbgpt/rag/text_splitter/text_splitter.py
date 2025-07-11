@@ -7,7 +7,6 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, TypedDict, Uni
 
 from dbgpt.core import Chunk, Document
 from dbgpt.core.awel.flow import Parameter, ResourceCategory, register_resource
-from dbgpt.util.i18n_utils import _
 
 logger = logging.getLogger(__name__)
 

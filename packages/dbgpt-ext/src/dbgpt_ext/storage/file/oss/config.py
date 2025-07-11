@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from dbgpt.core.interface.file import StorageBackend, StorageBackendConfig
-from dbgpt.util.i18n_utils import _
 
 
 @dataclass

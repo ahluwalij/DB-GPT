@@ -89,7 +89,7 @@ function ChunkList() {
     {
       manual: true,
       onSuccess: async () => {
-        message.success('添加成功');
+        message.success('Added successfully');
         setIsModalOpen(false);
         await fetchChunks();
       },
@@ -220,11 +220,11 @@ function ChunkList() {
                     onClick={async () => {
                       const formVal = form.getFieldsValue();
                       if (!formVal.questions) {
-                        message.warning(t('enter_question_first'));
+                        message.warning('Please enter a question first');
                         return;
                       }
                       if (formVal.questions?.filter(Boolean).length === 0) {
-                        message.warning(t('enter_question_first'));
+                        message.warning('Please enter a question first');
                         return;
                       }
                       const questions = formVal.questions?.filter(Boolean).map((item: any) => item.question);
@@ -232,7 +232,7 @@ function ChunkList() {
                     }}
                     loading={addLoading}
                   >
-                    {t('save')}
+                    Save
                   </Button>
                 }
               >

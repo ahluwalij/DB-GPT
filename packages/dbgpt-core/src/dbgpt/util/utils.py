@@ -7,7 +7,6 @@ from dataclasses import dataclass, field
 from typing import Any, List, Optional, cast
 
 from dbgpt.configs.model_config import resolve_root_path
-from dbgpt.util.i18n_utils import _
 from dbgpt.util.parameter_utils import BaseParameters
 
 try:
@@ -38,7 +37,7 @@ class LoggingParameters(BaseParameters):
     level: Optional[str] = field(
         default="${env:DBGPT_LOG_LEVEL:-INFO}",
         metadata={
-            "help": _(
+            "help": (
                 "Logging level, just support FATAL, ERROR, WARNING, INFO, DEBUG, NOTSET"
             ),
             "valid_values": [
@@ -55,7 +54,7 @@ class LoggingParameters(BaseParameters):
     file: Optional[str] = field(
         default=None,
         metadata={
-            "help": _("The filename to store logs"),
+            "help": "The filename to store logs",
         },
     )
 

@@ -83,11 +83,11 @@ def process_function(function):
     # for param in function_params:
     for i in range(len(function_params)):
         param = function_params[i]
-        # 如果参数部分是一个标识符（字段名）
+        # If the parameter part is an identifier (field name)
         if isinstance(param, sqlparse.sql.Identifier):
-            # 判断是否需要替换字段值
+            # Check if field value needs to be replaced
             # if is_chinese(param.value):
-            # 替换字段值
+            # Replace field value
             new_value = get_new_value(param.value)
             # new_parameter = sqlparse.sql.Identifier(f'[{param.value}]')
             function_params[i].tokens = [
@@ -98,7 +98,7 @@ def process_function(function):
 
 def is_chinese(text):
     for char in text:
-        if "\u4e00" <= char <= "\u9fa5":  # BMP中的常用汉字范围
+        if "\u4e00" <= char <= "\u9fa5":  # Common Chinese character range in BMP
             return True
     return False
 
@@ -384,7 +384,7 @@ AND dc.schema_name = 'main';
             old_column_name = col_transform["old_column_name"]
             new_column_name = col_transform["new_column_name"]
             new_column_type = old_col_name_to_type[old_column_name]
-            old_column_name = f'"{old_column_name}"'  # 使用双引号括起列名
+            old_column_name = f'"{old_column_name}"'  # Use double quotes to wrap column name
             select_sql_list.append(f"{old_column_name} AS {new_column_name}")
             create_columns.append(f"{new_column_name} {new_column_type}")
 

@@ -574,7 +574,7 @@ async def flow_file_path(
     try:
         return Result.succ(await service.get_flow_files(flow_uid))
     except Exception as e:
-        return Result.failed(f"获取Flow文件异常！{str(e)}")
+        return Result.failed(f"Failed to get Flow file! {str(e)}")
 
 
 # @router.get(

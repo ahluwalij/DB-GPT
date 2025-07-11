@@ -1,18 +1,17 @@
 import { ChatContext } from '@/app/chat-context';
 import { DarkSvg, SunnySvg } from '@/components/icons';
 import UserBar from '@/new-components/layout/UserBar';
-import { STORAGE_LANG_KEY, STORAGE_THEME_KEY, STORAGE_USERINFO_KEY } from '@/utils/constants/index';
-import Icon, { GlobalOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { STORAGE_THEME_KEY, STORAGE_USERINFO_KEY, STORAGE_LANG_KEY } from '@/utils/constants/index';
+import Icon, { MenuFoldOutlined, MenuUnfoldOutlined, GlobalOutlined } from '@ant-design/icons';
 import { Popover, Tooltip } from 'antd';
 import type { MenuProps } from 'antd';
 import cls from 'classnames';
-import moment from 'moment';
-import 'moment/locale/zh-cn';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import moment from 'moment';
 
 type SettingItem = {
   key: string;
@@ -52,7 +51,6 @@ function SideBar() {
   //   useContext(ChatContext);
   const { isMenuExpand, setIsMenuExpand, mode, setMode, adminList } = useContext(ChatContext);
   const { pathname } = useRouter();
-  const { t, i18n } = useTranslation();
   const [logo, setLogo] = useState<string>('/uagi-logo.svg');
 
   const hasAdmin = useMemo(() => {
@@ -119,18 +117,12 @@ function SideBar() {
     localStorage.setItem(STORAGE_THEME_KEY, theme);
   }, [mode, setMode]);
 
-  const handleChangeLang = useCallback(() => {
-    const language = i18n.language === 'en' ? 'zh' : 'en';
-    i18n.changeLanguage(language);
-    if (language === 'zh') moment.locale('zh-cn');
-    if (language === 'en') moment.locale('en');
-    localStorage.setItem(STORAGE_LANG_KEY, language);
-  }, [i18n]);
+
   const settings = useMemo(() => {
     const items: SettingItem[] = [
       {
         key: 'theme',
-        name: t('Theme'),
+        name: 'Theme',
         icon: mode === 'dark' ? <Icon component={DarkSvg} /> : <Icon component={SunnySvg} />,
         items: [
           {
@@ -138,7 +130,7 @@ function SideBar() {
             label: (
               <div className='py-1 flex justify-between gap-8 '>
                 <span className='flex gap-2 items-center'>
-                  <Image src='/pictures/theme_light.png' alt='english' width={38} height={32}></Image>
+                  <Image src='/pictures/theme_light.png' alt='light theme' width={38} height={32}></Image>
                   <span>Light</span>
                 </span>
                 <span
@@ -157,7 +149,7 @@ function SideBar() {
             label: (
               <div className='py-1 flex justify-between gap-8 '>
                 <span className='flex gap-2 items-center'>
-                  <Image src='/pictures/theme_dark.png' alt='english' width={38} height={32}></Image>
+                  <Image src='/pictures/theme_dark.png' alt='dark theme' width={38} height={32}></Image>
                   <span>Dark</span>
                 </span>
                 <span
@@ -182,75 +174,21 @@ function SideBar() {
         placement: 'topLeft',
       },
       {
-        key: 'language',
-        name: t('language'),
-        icon: <GlobalOutlined />,
-        items: [
-          {
-            key: 'en',
-            label: (
-              <div className='py-1 flex justify-between gap-8 '>
-                <span className='flex gap-2'>
-                  <Image src='/icons/english.png' alt='english' width={21} height={21}></Image>
-                  <span>English</span>
-                </span>
-                <span
-                  className={cls({
-                    block: i18n.language === 'en',
-                    hidden: i18n.language !== 'en',
-                  })}
-                >
-                  ✓
-                </span>
-              </div>
-            ),
-          },
-          {
-            key: 'zh',
-            label: (
-              <div className='py-1 flex justify-between gap-8 '>
-                <span className='flex gap-2'>
-                  <Image src='/icons/zh.png' alt='english' width={21} height={21}></Image>
-                  <span>简体中文</span>
-                </span>
-                <span
-                  className={cls({
-                    block: i18n.language === 'zh',
-                    hidden: i18n.language !== 'zh',
-                  })}
-                >
-                  ✓
-                </span>
-              </div>
-            ),
-          },
-        ],
-        onSelect: ({ key }: { key: string }) => {
-          if (i18n.language === key) return;
-          i18n.changeLanguage(key);
-          if (key === 'zh') moment.locale('zh-cn');
-          if (key === 'en') moment.locale('en');
-          localStorage.setItem(STORAGE_LANG_KEY, key);
-        },
-        onClick: handleChangeLang,
-        defaultSelectedKeys: [i18n.language],
-      },
-      {
         key: 'fold',
-        name: t(isMenuExpand ? 'Close_Sidebar' : 'Show_Sidebar'),
+        name: isMenuExpand ? 'Close Sidebar' : 'Show Sidebar',
         icon: isMenuExpand ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />,
         onClick: handleToggleMenu,
         noDropdownItem: true,
       },
     ];
     return items;
-  }, [t, mode, handleToggleTheme, i18n, handleChangeLang, isMenuExpand, handleToggleMenu, setMode]);
+  }, [mode, handleToggleTheme, isMenuExpand, handleToggleMenu, setMode]);
 
   const functions = useMemo(() => {
     const items: RouteItem[] = [
       {
         key: 'chat',
-        name: t('chat_online'),
+        name: 'Chat',
         icon: (
           <Image
             key='image_chat'
@@ -265,7 +203,7 @@ function SideBar() {
       },
       {
         key: 'explore',
-        name: t('explore'),
+        name: 'Explore',
         isActive: pathname === '/',
         icon: (
           <Image
@@ -280,7 +218,7 @@ function SideBar() {
       },
       {
         key: 'construct',
-        name: t('construct'),
+        name: 'Construct',
         isActive: pathname.startsWith('/construct'),
         icon: (
           <Image
@@ -297,7 +235,7 @@ function SideBar() {
     if (hasAdmin) {
       items.push({
         key: 'evaluation',
-        name: '场景评测',
+        name: 'Evaluation',
         icon: (
           <Image
             key='image_construct'
@@ -312,7 +250,7 @@ function SideBar() {
       });
     }
     return items;
-  }, [t, pathname, hasAdmin]);
+  }, [pathname, hasAdmin]);
 
   // TODO: unused function
   // const dropDownRoutes: MenuProps['items'] = useMemo(() => {
@@ -402,11 +340,7 @@ function SideBar() {
   //   queryDialogueList();
   // }, [queryDialogueList]);
 
-  useEffect(() => {
-    const language = i18n.language;
-    if (language === 'zh') moment.locale('zh-cn');
-    if (language === 'en') moment.locale('en');
-  }, []);
+
 
   useEffect(() => {
     // Keep the same logo for both light and dark mode since it's SVG
@@ -423,7 +357,13 @@ function SideBar() {
       >
         <div>
           <Link href='/' className='flex justify-center items-center pb-4'>
-            <Image src='/uagi-icon.svg' alt='UAGI' width={40} height={40} />
+            <Image 
+              src='/uagi-icon.svg' 
+              alt='UAGI' 
+              width={56} 
+              height={27} 
+              style={{ width: '40px', height: 'auto' }}
+            />
           </Link>
           <div className='flex flex-col gap-4 items-center'>
             {functions.map(i => (
@@ -459,7 +399,14 @@ function SideBar() {
       <div>
         {/* LOGO */}
         <Link href='/' className='flex items-center justify-center p-2 pb-4'>
-          <Image src='/uagi-logo.svg' alt='UAGI' width={180} height={40} />
+          <Image 
+            src='/uagi-logo.svg' 
+            alt='UAGI' 
+            width={256} 
+            height={27} 
+            style={{ width: '180px', height: 'auto' }}
+            priority
+          />
         </Link>
         {/* functions */}
         <div className='flex flex-col gap-4'>
@@ -476,7 +423,7 @@ function SideBar() {
                 key={item.key}
               >
                 <div className='mr-3'>{item.icon}</div>
-                <span className='text-sm'>{t(item.name as any)}</span>
+                <span className='text-sm'>{item.name}</span>
               </Link>
             );
           })}
@@ -485,11 +432,6 @@ function SideBar() {
 
       {/* Settings */}
       <div className='pt-4'>
-        <span className={cls('flex items-center w-full h-12 px-4 bg-[#F1F5F9] dark:bg-theme-dark rounded-xl')}>
-          <div className='mr-3 w-full'>
-            <UserBar />
-          </div>
-        </span>
         <div className='flex items-center justify-around py-4 mt-2 border-t border-dashed border-gray-200 dark:border-gray-700'>
           {settings.map(item => (
             <div key={item.key}>

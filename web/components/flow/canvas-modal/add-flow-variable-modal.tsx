@@ -6,7 +6,6 @@ import { Button, Cascader, Form, Input, InputNumber, Modal, Select, Space } from
 import { DefaultOptionType } from 'antd/es/cascader';
 import { uniqBy } from 'lodash';
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const { Option } = Select;
 const VALUE_TYPES = ['str', 'int', 'float', 'bool', 'ref'] as const;
@@ -18,7 +17,6 @@ type Props = {
 };
 
 export const AddFlowVariableModal: React.FC<Props> = ({ flowInfo, setFlowInfo }) => {
-  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [controlTypes, setControlTypes] = useState<ValueType[]>(['str']);
@@ -171,7 +169,7 @@ export const AddFlowVariableModal: React.FC<Props> = ({ flowInfo, setFlowInfo })
       />
 
       <Modal
-        title={t('Add_Global_Variable_of_Flow')}
+        title='Add Global Variable'
         width={1000}
         open={isModalOpen}
         styles={{
@@ -187,10 +185,10 @@ export const AddFlowVariableModal: React.FC<Props> = ({ flowInfo, setFlowInfo })
         onCancel={() => setIsModalOpen(false)}
         footer={[
           <Button key='cancel' onClick={() => setIsModalOpen(false)}>
-            {t('cancel')}
+            Cancel
           </Button>,
           <Button key='submit' type='primary' onClick={() => form.submit()}>
-            {t('verify')}
+            Save
           </Button>,
         ]}
       >
@@ -211,13 +209,13 @@ export const AddFlowVariableModal: React.FC<Props> = ({ flowInfo, setFlowInfo })
                     <Form.Item
                       {...restField}
                       name={[name, 'name']}
-                      label={`参数 ${index + 1} 名称`}
+                      label={`Parameter ${index + 1} Name`}
                       style={{ width: 140 }}
                       rules={[
                         { required: true, message: 'Missing parameter name' },
                         {
                           pattern: /^[a-zA-Z0-9]+(_[a-zA-Z0-9]+)*$/,
-                          message: '名称必须是字母、数字或下划线，并使用下划线分隔多个单词',
+                          message: 'Name must be letters, numbers or underscores, separated by underscores',
                         },
                       ]}
                     >
@@ -227,7 +225,7 @@ export const AddFlowVariableModal: React.FC<Props> = ({ flowInfo, setFlowInfo })
                     <Form.Item
                       {...restField}
                       name={[name, 'label']}
-                      label='标题'
+                      label='Label'
                       style={{ width: 130 }}
                       rules={[{ required: true, message: 'Missing parameter label' }]}
                     >
@@ -237,7 +235,7 @@ export const AddFlowVariableModal: React.FC<Props> = ({ flowInfo, setFlowInfo })
                     <Form.Item
                       {...restField}
                       name={[name, 'value_type']}
-                      label='类型'
+                      label='Type'
                       style={{ width: 100 }}
                       rules={[{ required: true, message: 'Missing parameter type' }]}
                     >
@@ -253,14 +251,14 @@ export const AddFlowVariableModal: React.FC<Props> = ({ flowInfo, setFlowInfo })
                     <Form.Item
                       {...restField}
                       name={[name, 'value']}
-                      label='值'
+                      label='Value'
                       style={{ width: 320 }}
                       rules={[{ required: true, message: 'Missing parameter value' }]}
                     >
                       {renderVariableValue(controlTypes[index], index)}
                     </Form.Item>
 
-                    <Form.Item {...restField} name={[name, 'description']} label='描述' style={{ width: 170 }}>
+                    <Form.Item {...restField} name={[name, 'description']} label='Description' style={{ width: 170 }}>
                       <Input placeholder='Parameter Description' />
                     </Form.Item>
 
@@ -274,7 +272,7 @@ export const AddFlowVariableModal: React.FC<Props> = ({ flowInfo, setFlowInfo })
 
                 <Form.Item>
                   <Button type='dashed' onClick={() => add()} block icon={<PlusOutlined />}>
-                    {t('Add_Parameter')}
+                    Add Parameter
                   </Button>
                 </Form.Item>
               </>

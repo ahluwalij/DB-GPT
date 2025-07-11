@@ -12,7 +12,6 @@ from dbgpt.rag.embedding.embeddings import (
     OpenAPIEmbeddingDeployModelParameters,
     _handle_request_result,
 )
-from dbgpt.util.i18n_utils import _
 
 
 @dataclass

@@ -2,8 +2,6 @@ import { format } from 'sql-formatter';
 
 /** Theme */
 export const STORAGE_THEME_KEY = '__db_gpt_theme_key';
-/** Language */
-export const STORAGE_LANG_KEY = '__db_gpt_lng_key';
 /** Init Message */
 export const STORAGE_INIT_MESSAGE_KET = '__db_gpt_im_key';
 /** Flow nodes */
@@ -59,8 +57,20 @@ export const parseResourceValue = (value: any): any[] => {
   }
 
   try {
-    // If the value is a string, try to parse it as JSON
-    let resourceData = typeof value === 'string' ? JSON.parse(value) : value;
+    let resourceData;
+    
+    // If the value is a string, check if it's valid JSON before parsing
+    if (typeof value === 'string') {
+      // Quick check if string looks like JSON (starts with [ or {)
+      if (value.trim().startsWith('[') || value.trim().startsWith('{')) {
+        resourceData = JSON.parse(value);
+      } else {
+        // It's a plain string (like "postgres"), return empty array
+        return [];
+      }
+    } else {
+      resourceData = value;
+    }
 
     // If resourceData is not an array but an object, convert it to array format
     if (resourceData && !Array.isArray(resourceData) && typeof resourceData === 'object') {
@@ -124,6 +134,10 @@ export const parseResourceValue = (value: any): any[] => {
 
     return resourceData;
   } catch (error) {
+    // Don't log errors for plain strings that aren't JSON
+    if (typeof value === 'string' && (!value.trim().startsWith('[') && !value.trim().startsWith('{'))) {
+      return [];
+    }
     console.error('Parse resourceValue error:', error);
     return [];
   }

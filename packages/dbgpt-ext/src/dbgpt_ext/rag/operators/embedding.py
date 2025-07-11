@@ -11,7 +11,6 @@ from dbgpt.rag.retriever.embedding import EmbeddingRetriever
 from dbgpt.rag.retriever.rerank import Ranker
 from dbgpt.rag.retriever.rewrite import QueryRewrite
 from dbgpt.storage.base import IndexStoreBase
-from dbgpt.util.i18n_utils import _
 from dbgpt_ext.rag.chunk_manager import ChunkParameters
 
 from ..assembler.embedding import EmbeddingAssembler

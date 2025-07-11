@@ -7,12 +7,10 @@ import { IFlow, IFlowUpdateParam } from '@/types/flow';
 import { PlusOutlined } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
 import { Button, Checkbox, Form, Input, Modal, Pagination, Popconfirm, Spin, Tag, message } from 'antd';
-import { t } from 'i18next';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import qs from 'querystring';
 import { useContext, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 function Flow() {
   const router = useRouter();
@@ -59,8 +57,6 @@ function Flow() {
       throttleWait: 300,
     },
   );
-
-  const { i18n } = useTranslation();
 
   // 触底加载更多
   // const loadMoreData = useCallback(() => {
@@ -141,7 +137,7 @@ function Flow() {
     };
     const [err] = await apiInterceptors(addFlow(data));
     if (!err) {
-      messageApi.success(t('save_flow_success'));
+      messageApi.success('Flow saved successfully');
       setShowModal(false);
       getFlowListRun({});
     }
@@ -172,7 +168,7 @@ function Flow() {
                   router.push('/construct/flow/canvas');
                 }}
               >
-                {t('create_flow')}
+                Create Flow
               </Button>
             </div>
           </div>
@@ -203,7 +199,7 @@ function Flow() {
                                 handleCopy(flow);
                               }}
                             >
-                              {t('Copy_Btn')}
+                              Copy
                             </span>
                           ),
                         },
@@ -211,7 +207,7 @@ function Flow() {
                           key: 'del',
                           label: (
                             <Popconfirm title='Are you sure to delete this flow?' onConfirm={() => deleteFlow(flow)}>
-                              <span className='text-red-400'>{t('Delete_Btn')}</span>
+                              <span className='text-red-400'>Delete</span>
                             </Popconfirm>
                           ),
                         },
@@ -231,10 +227,10 @@ function Flow() {
                   </div>
                 }
                 LeftBottom={
-                  <div key={i18n.language + 'flow'} className='flex gap-2'>
+                  <div className='flex gap-2'>
                     <span>{flow?.nick_name}</span>
                     <span>•</span>
-                    {flow?.gmt_modified && <span>{moment(flow?.gmt_modified).fromNow() + ' ' + t('update')}</span>}
+                    {flow?.gmt_modified && <span>{moment(flow?.gmt_modified).fromNow() + ' Updated'}</span>}
                   </div>
                 }
                 RightBottom={
@@ -242,7 +238,7 @@ function Flow() {
                     onClick={() => {
                       handleChat(flow);
                     }}
-                    text={t('start_chat')}
+                    text='Start Chat'
                   />
                 }
               />
@@ -300,7 +296,7 @@ function Flow() {
           </Form.Item>
           <div className='flex justify-end'>
             <Button type='primary' htmlType='submit'>
-              {t('Submit')}
+              Submit
             </Button>
           </div>
         </Form>

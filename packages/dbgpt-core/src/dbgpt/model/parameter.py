@@ -12,7 +12,6 @@ from dbgpt.core.interface.parameter import (
 )
 from dbgpt.datasource.parameter import BaseDatasourceParameters
 from dbgpt.util.configure.manager import RegisterParameters
-from dbgpt.util.i18n_utils import _
 from dbgpt.util.parameter_utils import BaseParameters
 
 

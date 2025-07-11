@@ -3,7 +3,6 @@ import CanvasWrapper from '@/pages/construct/flow/canvas/index';
 import type { TableProps } from 'antd';
 import { Button, Modal, Space, Table } from 'antd';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type Props = {
   isFlowTemplateModalOpen: boolean;
@@ -19,7 +18,6 @@ interface DataType {
 }
 
 export const FlowTemplateModal: React.FC<Props> = ({ isFlowTemplateModalOpen, setIsFlowTemplateModalOpen }) => {
-  const { t } = useTranslation();
   const [dataSource, setDataSource] = useState([]);
 
   const onTemplateImport = (record: DataType) => {
@@ -32,25 +30,25 @@ export const FlowTemplateModal: React.FC<Props> = ({ isFlowTemplateModalOpen, se
 
   const columns: TableProps<DataType>['columns'] = [
     {
-      title: t('Template_Name'),
+      title: 'Template Name',
       dataIndex: 'name',
       key: 'name',
       width: '30%',
     },
     {
-      title: t('Template_Label'),
+      title: 'Template Label',
       dataIndex: 'label',
       key: 'label',
       width: '30%',
     },
     {
-      title: t('Template_Description'),
+      title: 'Template Description',
       dataIndex: 'description',
       key: 'description',
       width: '30%',
     },
     {
-      title: t('Template_Action'),
+      title: 'Action',
       key: 'action',
       width: '10%',
       render: (_, record) => (
@@ -62,7 +60,7 @@ export const FlowTemplateModal: React.FC<Props> = ({ isFlowTemplateModalOpen, se
             }}
             block
           >
-            {t('Import_From_Template')}
+            Import
           </Button>
         </Space>
       ),
@@ -80,7 +78,7 @@ export const FlowTemplateModal: React.FC<Props> = ({ isFlowTemplateModalOpen, se
     <>
       <Modal
         className='w-[900px]'
-        title={t('Import_From_Template')}
+        title='Import From Template'
         open={isFlowTemplateModalOpen}
         onCancel={() => setIsFlowTemplateModalOpen(false)}
         cancelButtonProps={{ className: 'hidden' }}

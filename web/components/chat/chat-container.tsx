@@ -6,7 +6,7 @@ import { getInitMessage } from '@/utils';
 import { useAsyncEffect } from 'ahooks';
 import classNames from 'classnames';
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState, useRef } from 'react';
 import Chart from '../chart';
 import MyEmpty from '../common/MyEmpty';
 import MuiLoading from '../common/loading';
@@ -91,6 +91,14 @@ const ChatContainer = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [chartsData, setChartsData] = useState<Array<ChartData>>();
+  
+  // Use ref to store the latest history to avoid stale closures
+  const historyRef = useRef<ChatHistoryResponse>([]);
+  
+  // Update the ref whenever history changes
+  useEffect(() => {
+    historyRef.current = history;
+  }, [history]);
 
   const getHistory = async () => {
     setLoading(true);
@@ -146,41 +154,47 @@ const ChatContainer = () => {
   const handleChat = useCallback(
     (content: string, data?: Record<string, any>) => {
       return new Promise<void>(resolve => {
+        // Use the current history from the ref to avoid stale closures
+        const currentHistory = historyRef.current;
         const tempHistory: ChatHistoryResponse = [
-          ...history,
+          ...currentHistory,
           { role: 'human', context: content, model_name: model, order: 0, time_stamp: 0 },
           { role: 'view', context: '', model_name: model, order: 0, time_stamp: 0 },
         ];
         const index = tempHistory.length - 1;
+        
+        // Use ref to track the current tempHistory to avoid stale closures
+        const tempHistoryRef = { current: tempHistory };
+        
         setHistory([...tempHistory]);
         chat({
           data: { ...data, chat_mode: scene || 'chat_normal', model_name: model, user_input: content },
           chatId,
           onMessage: message => {
             if (data?.incremental) {
-              tempHistory[index].context += message;
+              tempHistoryRef.current[index].context += message;
             } else {
-              tempHistory[index].context = message;
+              tempHistoryRef.current[index].context = message;
             }
-            setHistory([...tempHistory]);
+            setHistory([...tempHistoryRef.current]);
           },
           onDone: () => {
-            getChartsData(tempHistory);
+            getChartsData(tempHistoryRef.current);
             resolve();
           },
           onClose: () => {
-            getChartsData(tempHistory);
+            getChartsData(tempHistoryRef.current);
             resolve();
           },
           onError: message => {
-            tempHistory[index].context = message;
-            setHistory([...tempHistory]);
+            tempHistoryRef.current[index].context = message;
+            setHistory([...tempHistoryRef.current]);
             resolve();
           },
         });
       });
     },
-    [history, chat, chatId, model, agent, scene],
+    [chat, chatId, model, scene], // Removed 'history' from dependencies
   );
 
   return (

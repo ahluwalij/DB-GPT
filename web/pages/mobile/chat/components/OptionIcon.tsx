@@ -9,7 +9,7 @@ interface IProps {
   className?: string;
 }
 const OptionIcon: React.FC<IProps> = ({ width, height, src, label }) => {
-  return <Image width={width || 14} height={height || 14} src={src} alt={label || 'db-icon'} priority />;
+  return <Image width={width || 14} height={height || 14} src={src} alt={label || 'db-icon'} />;
 };
 
 export default memo(OptionIcon);

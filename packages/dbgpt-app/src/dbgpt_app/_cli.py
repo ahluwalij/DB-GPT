@@ -7,7 +7,6 @@ import click
 from dbgpt.configs.model_config import LOGDIR
 from dbgpt.model.cli import add_start_server_options
 from dbgpt.util.command_utils import _run_current_with_daemon, _stop_service
-from dbgpt.util.i18n_utils import _
 
 _GLOBAL_CONFIG: str = ""
 

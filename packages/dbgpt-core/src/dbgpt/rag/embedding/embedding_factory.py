@@ -10,7 +10,6 @@ from dbgpt.core import Embeddings, RerankEmbeddings
 from dbgpt.core.awel import DAGVar
 from dbgpt.core.awel.flow import ResourceCategory, register_resource
 from dbgpt.core.interface.parameter import EmbeddingDeployModelParameters
-from dbgpt.util.i18n_utils import _
 
 logger = logging.getLogger(__name__)
 

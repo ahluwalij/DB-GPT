@@ -13,7 +13,6 @@ from dbgpt.core.awel.flow import (
     ViewMetadata,
     ui,
 )
-from dbgpt.util.i18n_utils import _
 from dbgpt_serve.rag.retriever.knowledge_space import KnowledgeSpaceRetriever
 
 from .llm import HOContextBody

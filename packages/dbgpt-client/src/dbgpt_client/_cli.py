@@ -15,7 +15,6 @@ from dbgpt.core.awel.dag.dag_manager import DAGMetadata, _parse_metadata
 from dbgpt.core.awel.flow.flow_factory import FlowFactory
 from dbgpt.util import get_or_create_event_loop
 from dbgpt.util.console import CliLogger
-from dbgpt.util.i18n_utils import _
 
 from .client import Client
 from .flow import list_flow

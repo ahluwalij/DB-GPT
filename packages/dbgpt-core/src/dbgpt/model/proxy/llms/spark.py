@@ -17,7 +17,6 @@ from dbgpt.model.proxy.base import (
     register_proxy_model_adapter,
 )
 from dbgpt.model.proxy.llms.proxy_model import ProxyModel, parse_model_request
-from dbgpt.util.i18n_utils import _
 
 from .chatgpt import OpenAICompatibleDeployModelParameters
 
@@ -96,13 +95,13 @@ class SparkLLMClient(ProxyLLMClient):
         executor: Optional[Executor] = None,
     ):
         """
-        星火大模型API当前有Lite、Pro、Pro-128K、Max、Max-32K和4.0 Ultra六个版本
-        Spark4.0 Ultra 请求地址，对应的domain参数为4.0Ultra
-        Spark Max-32K请求地址，对应的domain参数为max-32k
-        Spark Max请求地址，对应的domain参数为generalv3.5
-        Spark Pro-128K请求地址，对应的domain参数为pro-128k：
-        Spark Pro请求地址，对应的domain参数为generalv3：
-        Spark Lite请求地址，对应的domain参数为lite：
+        Spark API currently has six versions: Lite, Pro, Pro-128K, Max, Max-32K and 4.0 Ultra
+        Spark4.0 Ultra request address, corresponding domain parameter is 4.0Ultra
+        Spark Max-32K request address, corresponding domain parameter is max-32k
+        Spark Max request address, corresponding domain parameter is generalv3.5
+        Spark Pro-128K request address, corresponding domain parameter is pro-128k：
+        Spark Pro request address, corresponding domain parameter is generalv3：
+        Spark Lite request address, corresponding domain parameter is lite：
         https://www.xfyun.cn/doc/spark/HTTP%E8%B0%83%E7%94%A8%E6%96%87%E6%A1%A3.html#_3-%E8%AF%B7%E6%B1%82%E8%AF%B4%E6%98%8E
         """
         self._model = model or os.getenv("XUNFEI_SPARK_API_MODEL")
@@ -174,7 +173,7 @@ class SparkLLMClient(ProxyLLMClient):
             ) from e
 
         data = {
-            "model": self._model,  # 指定请求的模型
+            "model": self._model,  # Specify the requested model
             "messages": messages,
             "temperature": request.temperature,
             "stream": True,

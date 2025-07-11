@@ -16,7 +16,6 @@ from dbgpt.configs.model_config import (
     STATIC_MESSAGE_IMG_PATH,
 )
 from dbgpt.util.fastapi import create_app, replace_router
-from dbgpt.util.i18n_utils import _, set_default_language
 from dbgpt.util.parameter_utils import _get_dict_from_obj
 from dbgpt.util.system_utils import get_system_info
 from dbgpt.util.tracer import SpanType, SpanTypeRunName, initialize_tracer, root_tracer

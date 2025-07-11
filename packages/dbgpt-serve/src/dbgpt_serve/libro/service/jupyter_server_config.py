@@ -1,14 +1,14 @@
 c = get_config()  # noqa
-# 为了 dbgpt 页面能 iframe 能正确加载显示 libro 页面
-c.ServerApp.tornado_settings = {
-    "headers": {"Content-Security-Policy": "frame-ancestors 'self' *"}
-}
-# 默认启动 libro 不自动打开新的页面
+# For dbgpt page iframe to correctly load and display libro page
+c.ServerApp.disable_check_xsrf = True
+
+# Default startup libro does not automatically open new page
 c.ServerApp.open_browser = False
 
-# 默认启动 libro 时的固定端口
-c.ServerApp.port = 5671
-# 禁用自动寻找空闲端口
+# Default fixed port when starting libro
+c.ServerApp.port = 9999
+
+# Disable automatic search for idle ports
 c.ServerApp.port_retries = 0
 c.ContentsManager.allow_hidden = True
 c.ServerApp.token = ""

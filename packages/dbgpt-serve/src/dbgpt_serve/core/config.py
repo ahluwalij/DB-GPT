@@ -4,7 +4,6 @@ from typing import List, Optional, Type
 
 from dbgpt.component import AppConfig, SystemApp
 from dbgpt.util import BaseParameters, RegisterParameters
-from dbgpt.util.i18n_utils import _
 
 
 @dataclass

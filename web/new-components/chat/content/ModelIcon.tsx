@@ -16,7 +16,6 @@ const ModelIcon: React.FC<{ width?: number; height?: number; model?: string }> =
       height={height || 24}
       src={iconSrc}
       alt='llm'
-      priority
     />
   );
 };

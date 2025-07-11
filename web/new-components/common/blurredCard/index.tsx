@@ -122,7 +122,7 @@ const ChatButton: React.FC<{
   text?: string;
 }> = ({ onClick, Icon = '/pictures/card_chat.png', text = t('start_chat') }) => {
   if (typeof Icon === 'string') {
-    Icon = <Image src={Icon as string} alt={Icon as string} width={17} height={15} />;
+    Icon = <Image src={Icon as string} alt={Icon as string} width={17} height={15} style={{ height: 'auto' }} />;
   }
 
   return (

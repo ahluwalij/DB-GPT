@@ -12,7 +12,6 @@ from dbgpt.core.awel import (
 )
 from dbgpt.core.awel.flow import IOField, OperatorCategory, OperatorType, ViewMetadata
 from dbgpt.rag.knowledge.base import Knowledge
-from dbgpt.util.i18n_utils import _
 
 
 class KnowledgeProcessBranchOperator(BranchOperator[Knowledge, Knowledge]):

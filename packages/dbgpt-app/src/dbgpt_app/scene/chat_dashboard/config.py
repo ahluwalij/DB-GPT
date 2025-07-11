@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 
-from dbgpt.util.i18n_utils import _
 from dbgpt_app.scene import ChatScene
 from dbgpt_serve.core.config import GPTsAppCommonConfig
 

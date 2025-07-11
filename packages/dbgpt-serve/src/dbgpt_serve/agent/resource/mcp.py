@@ -4,7 +4,6 @@ from typing import Any, List, Optional, Type, Union, cast
 
 from dbgpt.agent.resource import MCPToolPack, PackResourceParameters
 from dbgpt.util import ParameterDescription
-from dbgpt.util.i18n_utils import _
 
 logger = logging.getLogger(__name__)
 

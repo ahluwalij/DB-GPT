@@ -10,8 +10,7 @@ from dbgpt_app.scene.chat_db.professional_qa.out_parser import NormalChatOutputP
 
 CFG = Config()
 
-
-_DEFAULT_TEMPLATE_EN = """
+_DEFAULT_TEMPLATE = """
 Provide professional answers to requests and questions. If you can't get an answer \
 from what you've provided, say: "Insufficient information in the knowledge base is \
 available to answer this question." Feel free to fudge information.
@@ -23,25 +22,7 @@ user question:
 think step by step.
 """
 
-_DEFAULT_TEMPLATE_ZH = """
-根据要求和问题，提供专业的答案。如果无法从提供的内容中获取答案，请说：\
-“知识库中提供的信息不足以回答此问题。” 禁止随意捏造信息。
-
-使用以下表结构信息: 
-{table_info}
-
-问题:
-{input}
-一步步思考。
-"""
-
-_DEFAULT_TEMPLATE = (
-    _DEFAULT_TEMPLATE_EN if CFG.LANGUAGE == "en" else _DEFAULT_TEMPLATE_ZH
-)
-
-
 PROMPT_NEED_STREAM_OUT = True
-
 
 prompt = ChatPromptTemplate(
     messages=[
@@ -58,7 +39,6 @@ prompt_adapter = AppScenePromptTemplateAdapter(
     output_parser=NormalChatOutputParser(),
 )
 
-
 CFG.prompt_template_registry.register(
-    prompt_adapter, language=CFG.LANGUAGE, is_default=True
+    prompt_adapter, is_default=True
 )

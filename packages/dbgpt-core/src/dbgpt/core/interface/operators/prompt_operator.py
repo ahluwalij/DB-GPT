@@ -30,7 +30,6 @@ from dbgpt.core.interface.prompt import (
     SystemPromptTemplate,
 )
 from dbgpt.util.function_utils import rearrange_args_by_type
-from dbgpt.util.i18n_utils import _
 
 
 @register_resource(

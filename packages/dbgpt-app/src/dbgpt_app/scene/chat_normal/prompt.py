@@ -8,15 +8,9 @@ from dbgpt.core import (
 from dbgpt_app.scene import AppScenePromptTemplateAdapter, ChatScene
 from dbgpt_app.scene.chat_normal.out_parser import NormalChatOutputParser
 
-PROMPT_SCENE_DEFINE_EN = "You are a helpful AI assistant."
-PROMPT_SCENE_DEFINE_ZH = "你是一个有用的 AI 助手。"
+PROMPT_SCENE_DEFINE = "You are a helpful AI assistant."
 
 CFG = Config()
-
-PROMPT_SCENE_DEFINE = (
-    PROMPT_SCENE_DEFINE_ZH if CFG.LANGUAGE == "zh" else PROMPT_SCENE_DEFINE_EN
-)
-
 
 prompt = ChatPromptTemplate(
     messages=[
@@ -35,5 +29,5 @@ prompt_adapter = AppScenePromptTemplateAdapter(
 )
 
 CFG.prompt_template_registry.register(
-    prompt_adapter, language=CFG.LANGUAGE, is_default=True
+    prompt_adapter, is_default=True
 )

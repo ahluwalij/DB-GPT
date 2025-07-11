@@ -6,7 +6,6 @@ from dbgpt.core.awel.flow import (
     ResourceCategory,
     auto_register_resource,
 )
-from dbgpt.util.i18n_utils import _
 from dbgpt_serve.core import BaseServeConfig
 
 APP_NAME = "evaluate"

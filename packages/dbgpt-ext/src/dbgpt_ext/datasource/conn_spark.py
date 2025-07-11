@@ -11,7 +11,6 @@ from dbgpt.core.awel.flow import (
 )
 from dbgpt.datasource.base import BaseConnector
 from dbgpt.datasource.parameter import BaseDatasourceParameters
-from dbgpt.util.i18n_utils import _
 
 if TYPE_CHECKING:
     from pyspark.sql import SparkSession

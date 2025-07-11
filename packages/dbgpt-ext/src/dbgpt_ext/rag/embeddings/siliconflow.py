@@ -5,7 +5,6 @@ from dbgpt._private.pydantic import BaseModel, ConfigDict, Field
 from dbgpt.core import EmbeddingModelMetadata, Embeddings
 from dbgpt.core.interface.parameter import EmbeddingDeployModelParameters
 from dbgpt.model.adapter.base import register_embedding_adapter
-from dbgpt.util.i18n_utils import _
 
 
 @dataclass

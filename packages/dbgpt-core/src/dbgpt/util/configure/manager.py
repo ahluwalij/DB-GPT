@@ -20,7 +20,6 @@ from typing import (
     get_type_hints,
 )
 
-from ..i18n_utils import _
 from ..parameter_utils import BaseParameters, ParameterDescription
 
 try:
@@ -100,7 +99,7 @@ class HookConfig:
 
     path: str = field(
         metadata={
-            "help": _(
+            "help": (
                 "Hook path, it can be a class path or a function path. "
                 "eg: 'dbgpt.config.hooks.env_var_hook'"
             )
@@ -109,7 +108,7 @@ class HookConfig:
     init_params: Dict[str, Any] = field(
         default_factory=dict,
         metadata={
-            "help": _(
+            "help": (
                 "Hook init params to pass to the hook constructor(Just for class "
                 "hook), must be key-value pairs"
             )
@@ -118,12 +117,12 @@ class HookConfig:
     params: Dict[str, Any] = field(
         default_factory=dict,
         metadata={
-            "help": _("Hook params to pass to the hook, must be key-value pairs")
+            "help": "Hook params to pass to the hook, must be key-value pairs"
         },
     )
     enabled: bool = field(
         default=True,
-        metadata={"help": _("Whether the hook is enabled, default is True")},
+        metadata={"help": "Whether the hook is enabled, default is True"},
     )
 
 
@@ -768,7 +767,6 @@ class ConfigurationManager:
             if fd.name in parent_descriptions:
                 parent_tags = parent_descriptions[fd.name].ext_metadata
             if description and CHECK_I18N_PARAMETER_DESC:
-                from ..i18n_utils import is_i18n_string
 
                 if not is_i18n_string(description):
                     raise ValueError(

@@ -7,7 +7,6 @@ import type { CollapseProps } from 'antd';
 import { Badge, Collapse, Input, Layout, Space, Switch } from 'antd';
 import classnames from 'classnames';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import StaticNodes from './static-nodes';
 
 const { Search } = Input;
@@ -36,7 +35,6 @@ const zeroWidthTriggerDefaultStyle: React.CSSProperties = {
 };
 
 const AddNodesSider: React.FC = () => {
-  const { t } = useTranslation();
   const { mode } = useContext(ChatContext);
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>('');
@@ -55,6 +53,7 @@ const AddNodesSider: React.FC = () => {
     const [_, data] = await apiInterceptors(getFlowNodes(tags));
 
     if (data && data.length > 0) {
+      // Store nodes data directly (no translation needed, everything is English-only)
       localStorage.setItem(FLOW_NODES_KEY, JSON.stringify(data));
       const operatorNodes = data.filter(node => node.flow_type === 'operator');
       const resourceNodes = data.filter(node => node.flow_type === 'resource');
@@ -197,12 +196,12 @@ const AddNodesSider: React.FC = () => {
       <Space direction='vertical' className='w-[280px] pt-4 px-4 overflow-hidden overflow-y-auto scrollbar-default'>
         <div className='flex justify-between align-middle'>
           <p className='w-full text-base font-semibold text-[#1c2533] dark:text-[rgba(255,255,255,0.85)] line-clamp-1'>
-            {t('add_node')}
+            Add Node
           </p>
 
           <Switch
-            checkedChildren='高阶'
-            unCheckedChildren='全部'
+            checkedChildren='Advanced'
+            unCheckedChildren='All'
             onClick={onModeChange}
             className={classnames('w-20', { 'bg-zinc-400': isAllNodesVisible })}
             defaultChecked
@@ -211,7 +210,7 @@ const AddNodesSider: React.FC = () => {
 
         <Search placeholder='Search node' onSearch={searchNode} allowClear />
 
-        <h2 className='font-semibold'>{t('operators')}</h2>
+        <h2 className='font-semibold'>Operators</h2>
         <Collapse
           size='small'
           bordered={false}
@@ -220,7 +219,7 @@ const AddNodesSider: React.FC = () => {
           items={operatorItems}
         />
 
-        <h2 className='font-semibold'>{t('resource')}</h2>
+        <h2 className='font-semibold'>Resources</h2>
         <Collapse
           size='small'
           bordered={false}

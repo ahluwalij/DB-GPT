@@ -9,7 +9,6 @@ from dbgpt.core.awel.flow import Parameter, ResourceCategory, register_resource
 from dbgpt.rag.extractor.base import Extractor
 from dbgpt.rag.knowledge.base import ChunkStrategy, Knowledge
 from dbgpt.rag.text_splitter import TextSplitter
-from dbgpt.util.i18n_utils import _
 
 
 class SplitterType(str, Enum):

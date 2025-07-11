@@ -23,7 +23,6 @@ from dbgpt.core.interface.message import ModelMessageRoleType
 
 # TODO: Don't dependent on MixinLLMOperator
 from dbgpt.model.operators.llm_operator import MixinLLMOperator
-from dbgpt.util.i18n_utils import _
 
 from .... import ActionOutput
 from ....resource.manage import get_resource_manager

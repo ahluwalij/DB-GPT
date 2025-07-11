@@ -4,12 +4,11 @@ import { ChatContentContext } from '@/pages/chat';
 import { IDB } from '@/types/chat';
 import { dbMapper } from '@/utils';
 import { ExperimentOutlined, FolderAddOutlined } from '@ant-design/icons';
-import { useAsyncEffect, useRequest } from 'ahooks';
 import type { UploadFile } from 'antd';
 import { Select, Tooltip, Upload } from 'antd';
 import classNames from 'classnames';
 import { useSearchParams } from 'next/navigation';
-import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
+import React, { memo, useCallback, useContext, useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const Resource: React.FC<{
@@ -30,6 +29,7 @@ const Resource: React.FC<{
 
   // dataBase
   const [dbs, setDbs] = useState<IDB[]>([]);
+  const [dbsLoading, setDbsLoading] = useState(false);
 
   // 左边工具栏动态可用key
   const paramKey: string[] = useMemo(() => {
@@ -50,20 +50,26 @@ const Resource: React.FC<{
 
   const resource = useMemo(() => appInfo.param_need?.find(i => i.type === 'resource'), [appInfo.param_need]);
 
-  // 获取db
-  const { run, loading } = useRequest(async () => await apiInterceptors(postChatModeParamsList(scene as string)), {
-    manual: true,
-    onSuccess: data => {
-      const [, res] = data;
-      setDbs(res ?? []);
-    },
-  });
-
-  useAsyncEffect(async () => {
+  // Fetch database options
+  const fetchDbs = useCallback(async () => {
     if ((isDataBase || isKnowledge) && !resource?.bind_value) {
-      await run();
+      setDbsLoading(true);
+      try {
+        const [, res] = await apiInterceptors(postChatModeParamsList(scene as string));
+        setDbs(res ?? []);
+      } catch (error) {
+        console.error('Failed to fetch database list:', error);
+        setDbs([]);
+      } finally {
+        setDbsLoading(false);
+      }
     }
-  }, [isDataBase, isKnowledge, resource]);
+  }, [isDataBase, isKnowledge, resource?.bind_value, scene]);
+
+  // Effect to fetch databases when needed
+  useEffect(() => {
+    fetchDbs();
+  }, [fetchDbs]);
 
   const dbOpts = useMemo(
     () =>
@@ -86,6 +92,13 @@ const Resource: React.FC<{
       }),
     [dbs],
   );
+
+  // Set default resource value when dbOpts are available
+  useEffect(() => {
+    if (!resourceValue && dbOpts?.length > 0) {
+      setResourceValue(dbOpts[0].value);
+    }
+  }, [resourceValue, dbOpts, setResourceValue]);
 
   // 上传
   const onUpload = useCallback(async () => {
@@ -175,9 +188,6 @@ const Resource: React.FC<{
     case 'knowledge':
     case 'plugin':
     case 'awel_flow':
-      if (!resourceValue) {
-        setResourceValue(dbOpts?.[0]?.value);
-      }
       return (
         <Select
           value={resourceValue}
@@ -186,7 +196,7 @@ const Resource: React.FC<{
             setResourceValue(val);
           }}
           disabled={!!resource?.bind_value}
-          loading={loading}
+          loading={dbsLoading}
           options={dbOpts}
         />
       );

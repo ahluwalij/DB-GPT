@@ -9,7 +9,6 @@ from dbgpt.core.awel.flow import (
     auto_register_resource,
 )
 from dbgpt.model.proxy.llms.proxy_model import ProxyModel, parse_model_request
-from dbgpt.util.i18n_utils import _
 
 from ..base import (
     AsyncGenerateStreamFunction,

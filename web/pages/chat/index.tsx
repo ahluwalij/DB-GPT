@@ -196,11 +196,14 @@ const Chat: React.FC = () => {
         const initMessage = getInitMessage();
         const ctrl = new AbortController();
         setReplyLoading(true);
+        
+        let currentOrder = order.current;
         if (history && history.length > 0) {
           const viewList = history?.filter(item => item.role === 'view');
           const humanList = history?.filter(item => item.role === 'human');
-          order.current = (viewList[viewList.length - 1]?.order || humanList[humanList.length - 1]?.order) + 1;
+          currentOrder = (viewList[viewList.length - 1]?.order || humanList[humanList.length - 1]?.order) + 1;
         }
+        
         // Process the content based on its type
         let formattedDisplayContent: string = '';
 
@@ -243,26 +246,31 @@ const Chat: React.FC = () => {
           }
         }
 
-        const tempHistory: ChatHistoryResponse = [
-          ...(initMessage && initMessage.id === chatId ? [] : history),
+        // Add initial messages to history
+        const newMessages = [
           {
-            role: 'human',
+            role: 'human' as const,
             context: formattedDisplayContent,
             model_name: data?.model_name || modelValue,
-            order: order.current,
+            order: currentOrder,
             time_stamp: 0,
           },
           {
-            role: 'view',
+            role: 'view' as const,
             context: '',
             model_name: data?.model_name || modelValue,
-            order: order.current,
+            order: currentOrder,
             time_stamp: 0,
             thinking: true,
           },
         ];
-        const index = tempHistory.length - 1;
-        setHistory([...tempHistory]);
+
+        // Update history with initial messages
+        setHistory(prevHistory => {
+          const baseHistory = initMessage && initMessage.id === chatId ? [] : prevHistory;
+          return [...baseHistory, ...newMessages];
+        });
+
         // Create data object with all fields
         const apiData: Record<string, any> = {
           chat_mode: scene,
@@ -290,14 +298,22 @@ const Chat: React.FC = () => {
           chatId,
           onMessage: message => {
             setCanAbort(true);
-            if (data?.incremental) {
-              tempHistory[index].context += message;
-              tempHistory[index].thinking = false;
-            } else {
-              tempHistory[index].context = message;
-              tempHistory[index].thinking = false;
-            }
-            setHistory([...tempHistory]);
+            // Use functional update to avoid closure dependency issues
+            setHistory(prevHistory => {
+              const newHistory = [...prevHistory];
+              const lastIndex = newHistory.length - 1;
+              
+              if (lastIndex >= 0 && newHistory[lastIndex].role === 'view') {
+                if (data?.incremental) {
+                  newHistory[lastIndex].context += message;
+                } else {
+                  newHistory[lastIndex].context = message;
+                }
+                newHistory[lastIndex].thinking = false;
+              }
+              
+              return newHistory;
+            });
           },
           onDone: () => {
             setReplyLoading(false);
@@ -312,15 +328,24 @@ const Chat: React.FC = () => {
           onError: message => {
             setReplyLoading(false);
             setCanAbort(false);
-            tempHistory[index].context = message;
-            tempHistory[index].thinking = false;
-            setHistory([...tempHistory]);
+            // Use functional update for error handling too
+            setHistory(prevHistory => {
+              const newHistory = [...prevHistory];
+              const lastIndex = newHistory.length - 1;
+              
+              if (lastIndex >= 0 && newHistory[lastIndex].role === 'view') {
+                newHistory[lastIndex].context = message;
+                newHistory[lastIndex].thinking = false;
+              }
+              
+              return newHistory;
+            });
             resolve();
           },
         });
       });
     },
-    [chatId, history, modelValue, chat, scene],
+    [chatId, modelValue, chat, scene], // Removed 'history' from dependencies
   );
 
   useAsyncEffect(async () => {

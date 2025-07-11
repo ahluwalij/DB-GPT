@@ -9,56 +9,55 @@ from dbgpt.core.awel.flow import (
     Parameter,
     ViewMetadata,
 )
-from dbgpt.util.i18n_utils import _
 
 _INPUTS_STRING = IOField.build_from(
-    _("String"),
+    "String",
     "string",
     str,
-    description=_("The string to be converted to other types."),
+    description="The string to be converted to other types.",
 )
 _INPUTS_INTEGER = IOField.build_from(
-    _("Integer"),
+    "Integer",
     "integer",
     int,
-    description=_("The integer to be converted to other types."),
+    description="The integer to be converted to other types.",
 )
 _INPUTS_FLOAT = IOField.build_from(
-    _("Float"),
+    "Float",
     "float",
     float,
-    description=_("The float to be converted to other types."),
+    description="The float to be converted to other types.",
 )
 _INPUTS_BOOLEAN = IOField.build_from(
-    _("Boolean"),
+    "Boolean",
     "boolean",
     bool,
-    description=_("The boolean to be converted to other types."),
+    description="The boolean to be converted to other types.",
 )
 
 _OUTPUTS_STRING = IOField.build_from(
-    _("String"),
+    "String",
     "string",
     str,
-    description=_("The string converted from other types."),
+    description="The string converted from other types.",
 )
 _OUTPUTS_INTEGER = IOField.build_from(
-    _("Integer"),
+    "Integer",
     "integer",
     int,
-    description=_("The integer converted from other types."),
+    description="The integer converted from other types.",
 )
 _OUTPUTS_FLOAT = IOField.build_from(
-    _("Float"),
+    "Float",
     "float",
     float,
-    description=_("The float converted from other types."),
+    description="The float converted from other types.",
 )
 _OUTPUTS_BOOLEAN = IOField.build_from(
-    _("Boolean"),
+    "Boolean",
     "boolean",
     bool,
-    description=_("The boolean converted from other types."),
+    description="The boolean converted from other types.",
 )
 
 
@@ -66,9 +65,9 @@ class StringToInteger(MapOperator[str, int]):
     """Converts a string to an integer."""
 
     metadata = ViewMetadata(
-        label=_("String to Integer"),
+        label="String to Integer",
         name="default_converter_string_to_integer",
-        description=_("Converts a string to an integer."),
+        description="Converts a string to an integer.",
         category=OperatorCategory.TYPE_CONVERTER,
         parameters=[],
         inputs=[_INPUTS_STRING],
@@ -85,9 +84,9 @@ class StringToFloat(MapOperator[str, float]):
     """Converts a string to a float."""
 
     metadata = ViewMetadata(
-        label=_("String to Float"),
+        label="String to Float",
         name="default_converter_string_to_float",
-        description=_("Converts a string to a float."),
+        description="Converts a string to a float.",
         category=OperatorCategory.TYPE_CONVERTER,
         parameters=[],
         inputs=[_INPUTS_STRING],
@@ -104,18 +103,18 @@ class StringToBoolean(MapOperator[str, bool]):
     """Converts a string to a boolean."""
 
     metadata = ViewMetadata(
-        label=_("String to Boolean"),
+        label="String to Boolean",
         name="default_converter_string_to_boolean",
-        description=_("Converts a string to a boolean, true: 'true', '1', 'y'"),
+        description="Converts a string to a boolean, true: 'true', '1', 'y'",
         category=OperatorCategory.TYPE_CONVERTER,
         parameters=[
             Parameter.build_from(
-                _("True Values"),
+                "True Values",
                 "true_values",
                 str,
                 optional=True,
                 default="true,1,y",
-                description=_("Comma-separated values that should be treated as True."),
+                description="Comma-separated values that should be treated as True.",
             )
         ],
         inputs=[_INPUTS_STRING],
@@ -134,9 +133,9 @@ class IntegerToString(MapOperator[int, str]):
     """Converts an integer to a string."""
 
     metadata = ViewMetadata(
-        label=_("Integer to String"),
+        label="Integer to String",
         name="default_converter_integer_to_string",
-        description=_("Converts an integer to a string."),
+        description="Converts an integer to a string.",
         category=OperatorCategory.TYPE_CONVERTER,
         parameters=[],
         inputs=[_INPUTS_INTEGER],
@@ -153,9 +152,9 @@ class FloatToString(MapOperator[float, str]):
     """Converts a float to a string."""
 
     metadata = ViewMetadata(
-        label=_("Float to String"),
+        label="Float to String",
         name="default_converter_float_to_string",
-        description=_("Converts a float to a string."),
+        description="Converts a float to a string.",
         category=OperatorCategory.TYPE_CONVERTER,
         parameters=[],
         inputs=[_INPUTS_FLOAT],
@@ -172,9 +171,9 @@ class BooleanToString(MapOperator[bool, str]):
     """Converts a boolean to a string."""
 
     metadata = ViewMetadata(
-        label=_("Boolean to String"),
+        label="Boolean to String",
         name="default_converter_boolean_to_string",
-        description=_("Converts a boolean to a string."),
+        description="Converts a boolean to a string.",
         category=OperatorCategory.TYPE_CONVERTER,
         parameters=[],
         inputs=[_INPUTS_BOOLEAN],
@@ -191,13 +190,13 @@ class ModelOutputToDict(MapOperator[ModelOutput, dict]):
     """Converts a model output to a dictionary."""
 
     metadata = ViewMetadata(
-        label=_("Model Output to Dict"),
+        label="Model Output to Dict",
         name="default_converter_model_output_to_dict",
-        description=_("Converts a model output to a dictionary."),
+        description="Converts a model output to a dictionary.",
         category=OperatorCategory.TYPE_CONVERTER,
         parameters=[],
-        inputs=[IOField.build_from(_("Model Output"), "model_output", ModelOutput)],
-        outputs=[IOField.build_from(_("Dictionary"), "dict", dict)],
+        inputs=[IOField.build_from("Model Output", "model_output", ModelOutput)],
+        outputs=[IOField.build_from("Dictionary", "dict", dict)],
         tags={"order": TAGS_ORDER_HIGH},
     )
 

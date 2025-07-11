@@ -30,7 +30,6 @@ from dbgpt.model.proxy.base import (
 )
 from dbgpt.model.proxy.llms.chatgpt import OpenAICompatibleDeployModelParameters
 from dbgpt.model.proxy.llms.proxy_model import ProxyModel, parse_model_request
-from dbgpt.util.i18n_utils import _
 
 if TYPE_CHECKING:
     from anthropic import AsyncAnthropic, ProxiesTypes

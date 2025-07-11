@@ -20,7 +20,6 @@ from dbgpt.core.awel.flow import (
     ui,
 )
 from dbgpt.util.code.server import get_code_server
-from dbgpt.util.i18n_utils import _
 
 logger = logging.getLogger(__name__)
 

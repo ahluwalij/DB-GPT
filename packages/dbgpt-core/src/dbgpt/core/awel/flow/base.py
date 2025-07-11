@@ -24,7 +24,6 @@ from dbgpt.core.awel.util.parameter_util import (
 )
 from dbgpt.core.interface.serialization import Serializable
 from dbgpt.util.executor_utils import DefaultExecutorFactory, blocking_func_to_async
-from dbgpt.util.i18n_utils import LazyTranslatedString
 
 from .exceptions import FlowMetadataException, FlowParameterMetadataException
 from .ui import UIComponent
@@ -343,7 +342,7 @@ class Parameter(BaseDynamic, TypeMetadata, Serializable):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    label: Union[str, LazyTranslatedString] = Field(
+    label: str = Field(
         ..., description="The label to display in UI", examples=["OpenAI API Key"]
     )
     name: str = Field(
@@ -373,7 +372,7 @@ class Parameter(BaseDynamic, TypeMetadata, Serializable):
     placeholder: Optional[DefaultParameterType] = Field(
         None, description="The placeholder of the parameter"
     )
-    description: Optional[Union[str, LazyTranslatedString]] = Field(
+    description: Optional[str] = Field(
         None, description="The description of the parameter"
     )
     options: Optional[Union[BaseDynamicOptions, List[OptionValue]]] = Field(
@@ -674,7 +673,7 @@ class BaseResource(Serializable, BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    label: Union[str, LazyTranslatedString] = Field(
+    label: str = Field(
         ...,
         description="The label to display in UI",
         examples=["LLM Operator", "OpenAI LLM Client"],
@@ -689,7 +688,7 @@ class BaseResource(Serializable, BaseModel):
         description="The name of the operator",
         examples=["llm_operator", "openai_llm_client"],
     )
-    description: Union[str, LazyTranslatedString] = Field(
+    description: str = Field(
         ...,
         description="The description of the field",
         examples=["The LLM operator.", "OpenAI LLM Client"],

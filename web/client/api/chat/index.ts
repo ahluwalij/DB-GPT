@@ -9,31 +9,31 @@ import {
 import { GET, POST } from '../index';
 
 /**
- * 查询推荐问题
+ * Get recommended questions
  */
 export const getRecommendQuestions = (data?: RecommendQuestionParams) => {
   return GET<RecommendQuestionParams, RecommendQuestionResponse[]>(`/api/v1/question/list`, data);
 };
 /**
- * 拉踩原因类型
+ * Get feedback reason types
  */
 export const getFeedbackReasons = () => {
   return GET<null, FeedbackReasonsResponse[]>(`/api/v1/conv/feedback/reasons`);
 };
 /**
- * 点赞/踩
+ * Like/dislike feedback
  */
 export const feedbackAdd = (data: FeedbackAddParams) => {
   return POST<FeedbackAddParams, Record<string, any>>(`/api/v1/conv/feedback/add`, data);
 };
 /**
- * 取消反馈
+ * Cancel feedback
  */
 export const cancelFeedback = (data: CancelFeedbackAddParams) => {
   return POST<CancelFeedbackAddParams, Record<string, any>>(`/api/v1/conv/feedback/cancel`, data);
 };
 /**
- * 终止话题
+ * Stop topic
  */
 export const stopTopic = (data: StopTopicParams) => {
   return POST<StopTopicParams, null>(

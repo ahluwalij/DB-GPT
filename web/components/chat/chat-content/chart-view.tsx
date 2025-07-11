@@ -27,7 +27,12 @@ function ChartView({ data, type, sql }: { data: Datum[]; type: BackEndChartType;
   const DataItem = {
     key: 'data',
     label: 'Data',
-    children: <Table dataSource={data} columns={columns} scroll={{ x: 'auto' }} />,
+    children: <Table 
+      dataSource={data} 
+      columns={columns} 
+      scroll={{ x: 'auto' }}
+              rowKey={(record) => JSON.stringify(record)}
+    />,
   };
   const TabItems: TabsProps['items'] = type === 'response_table' ? [DataItem, SqlItem] : [ChartItem, SqlItem, DataItem];
 

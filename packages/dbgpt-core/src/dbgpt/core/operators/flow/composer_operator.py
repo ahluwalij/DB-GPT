@@ -29,7 +29,6 @@ from dbgpt.core.interface.operators.message_operator import (
 from dbgpt.core.interface.operators.prompt_operator import HistoryPromptBuilderOperator
 from dbgpt.core.interface.prompt import ChatPromptTemplate
 from dbgpt.core.interface.storage import StorageInterface
-from dbgpt.util.i18n_utils import _
 
 
 class ConversationComposerOperator(MapOperator[CommonLLMHttpRequestBody, ModelRequest]):

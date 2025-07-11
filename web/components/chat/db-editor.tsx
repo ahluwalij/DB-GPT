@@ -136,7 +136,13 @@ function DbEditorContent({ layout = 'LR', editorValue, chartData, tableData, tab
       </div>
       <div className='flex-1 h-full overflow-auto bg-white dark:bg-theme-dark-container rounded p-4'>
         {tableData?.values.length ? (
-          <Table bordered scroll={{ x: 'auto' }} rowKey={columns[0].key} columns={columns} dataSource={dataSource} />
+          <Table 
+            bordered 
+            scroll={{ x: 'auto' }} 
+            rowKey={(record) => JSON.stringify(record)}
+            columns={columns} 
+            dataSource={dataSource} 
+          />
         ) : (
           <div className='h-full flex justify-center items-center'>
             <MyEmpty />

@@ -182,7 +182,7 @@ async def db_connect_list(
     results = CFG.local_db_manager.get_db_list(
         db_name=db_name, user_id=user_info.user_id
     )
-    # 排除部分数据库不允许用户访问
+    # Exclude databases that users are not allowed to access
     if results and len(results):
         results = [
             d

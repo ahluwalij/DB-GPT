@@ -7,7 +7,6 @@ import click
 
 from dbgpt.configs.model_config import ROOT_PATH
 from dbgpt.util.console import CliLogger
-from dbgpt.util.i18n_utils import _
 
 _DEFAULT_PATH = os.path.join(
     ROOT_PATH, "packages", "dbgpt-serve", "src", "dbgpt_serve", "flow", "compat"

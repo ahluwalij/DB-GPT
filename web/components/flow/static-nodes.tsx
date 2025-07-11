@@ -1,11 +1,8 @@
 import { IFlowNode } from '@/types/flow';
 import { Avatar, Empty, List } from 'antd';
 import React, { DragEvent } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const StaticNodes: React.FC<{ nodes: IFlowNode[] }> = ({ nodes }) => {
-  const { t } = useTranslation();
-
   function onDragStart(event: DragEvent, node: IFlowNode) {
     event.dataTransfer.setData('application/reactflow', JSON.stringify(node));
     event.dataTransfer.effectAllowed = 'move';
@@ -35,7 +32,7 @@ const StaticNodes: React.FC<{ nodes: IFlowNode[] }> = ({ nodes }) => {
       />
     );
   } else {
-    return <Empty className='px-2' description={t('no_node')} />;
+    return <Empty className='px-2' description='No nodes available' />;
   }
 };
 

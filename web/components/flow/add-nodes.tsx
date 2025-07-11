@@ -4,7 +4,6 @@ import { FLOW_NODES_KEY } from '@/utils';
 import { PlusOutlined } from '@ant-design/icons';
 import { Badge, Button, Collapse, CollapseProps, Input, Popover } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import StaticNodes from './static-nodes';
 
 const { Search } = Input;
@@ -12,7 +11,6 @@ const { Search } = Input;
 type GroupType = { category: string; categoryLabel: string; nodes: IFlowNode[] };
 
 const AddNodes: React.FC = () => {
-  const { t } = useTranslation();
   const [operators, setOperators] = useState<Array<IFlowNode>>([]);
   const [resources, setResources] = useState<Array<IFlowNode>>([]);
   const [operatorsGroup, setOperatorsGroup] = useState<GroupType[]>([]);
@@ -26,6 +24,7 @@ const AddNodes: React.FC = () => {
   async function getNodes() {
     const [_, data] = await apiInterceptors(getFlowNodes());
     if (data && data.length > 0) {
+      // Store nodes data directly (no translation needed, everything is English-only)
       localStorage.setItem(FLOW_NODES_KEY, JSON.stringify(data));
       const operatorNodes = data.filter(node => node.flow_type === 'operator');
       const resourceNodes = data.filter(node => node.flow_type === 'resource');
@@ -122,10 +121,10 @@ const AddNodes: React.FC = () => {
       trigger={['click']}
       content={
         <div className='w-[320px] overflow-hidden overflow-y-auto scrollbar-default'>
-          <p className='my-2 font-bold'>{t('add_node')}</p>
+          <p className='my-2 font-bold'>Add Node</p>
           <Search placeholder='Search node' onSearch={searchNode} />
 
-          <h2 className='my-2 ml-2 font-semibold'>{t('operators')}</h2>
+          <h2 className='my-2 ml-2 font-semibold'>Operators</h2>
           <Collapse
             className='max-h-[300px] overflow-hidden overflow-y-auto scrollbar-default'
             size='small'
@@ -133,7 +132,7 @@ const AddNodes: React.FC = () => {
             items={operatorItems}
           />
 
-          <h2 className='my-2 ml-2 font-semibold'>{t('resource')}</h2>
+          <h2 className='my-2 ml-2 font-semibold'>Resources</h2>
           <Collapse
             className='max-h-[300px] overflow-hidden overflow-y-auto scrollbar-default'
             size='small'

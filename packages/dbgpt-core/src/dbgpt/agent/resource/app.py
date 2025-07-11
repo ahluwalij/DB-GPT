@@ -7,7 +7,6 @@ from typing import Any, Dict, List, Optional, Tuple, Type, cast
 from dbgpt._private.pydantic import BaseModel
 from dbgpt.agent import AgentMessage, ConversableAgent
 from dbgpt.util import ParameterDescription
-from dbgpt.util.i18n_utils import _
 
 from .base import Resource, ResourceParameters, ResourceType
 

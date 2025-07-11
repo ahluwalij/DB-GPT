@@ -8,7 +8,6 @@ from typing import Dict, List, Optional, Type, Union
 
 from starlette.requests import Request
 
-from dbgpt.util.i18n_utils import _
 
 from ..flow import IOField, OperatorCategory, OperatorType, Parameter, ViewMetadata
 from ..operators.common_operator import MapOperator
@@ -28,21 +27,21 @@ class RequestHttpTrigger(HttpTrigger):
     """Request http trigger for AWEL."""
 
     metadata = ViewMetadata(
-        label=_("Request Http Trigger"),
+        label="Request Http Trigger",
         name="request_http_trigger",
         category=OperatorCategory.TRIGGER,
         operator_type=OperatorType.INPUT,
-        description=_(
+        description=(
             "Trigger your workflow by http request, and parse the request body"
             " as a starlette Request"
         ),
         inputs=[],
         outputs=[
             IOField.build_from(
-                _("Request Body"),
+                "Request Body",
                 "request_body",
                 Request,
-                description=_(
+                description=(
                     "The request body of the API endpoint, parse as a starlette Request"
                 ),
             ),
@@ -89,58 +88,58 @@ class DictHTTPSender(MapOperator[Dict, Dict]):
     """HTTP Sender operator for AWEL."""
 
     metadata = ViewMetadata(
-        label=_("HTTP Sender"),
+        label="HTTP Sender",
         name="awel_dict_http_sender",
         category=OperatorCategory.SENDER,
-        description=_("Send a HTTP request to a specified endpoint"),
+        description="Send a HTTP request to a specified endpoint",
         inputs=[
             IOField.build_from(
-                _("Request Body"),
+                "Request Body",
                 "request_body",
                 dict,
-                description=_("The request body to send"),
+                description="The request body to send",
             )
         ],
         outputs=[
             IOField.build_from(
-                _("Response Body"),
+                "Response Body",
                 "response_body",
                 dict,
-                description=_("The response body of the HTTP request"),
+                description="The response body of the HTTP request",
             )
         ],
         parameters=[
             Parameter.build_from(
-                _("HTTP Address"),
-                _("address"),
+                "HTTP Address",
+                "address",
                 type=str,
-                description=_("The address to send the HTTP request to"),
+                description="The address to send the HTTP request to",
             ),
             _PARAMETER_METHODS_ALL.new(),
             _PARAMETER_STATUS_CODE.new(),
             Parameter.build_from(
-                _("Timeout"),
+                "Timeout",
                 "timeout",
                 type=int,
                 optional=True,
                 default=60,
-                description=_("The timeout of the HTTP request in seconds"),
+                description="The timeout of the HTTP request in seconds",
             ),
             Parameter.build_from(
-                _("Token"),
+                "Token",
                 "token",
                 type=str,
                 optional=True,
                 default=None,
-                description=_("The token to use for the HTTP request"),
+                description="The token to use for the HTTP request",
             ),
             Parameter.build_from(
-                _("Cookies"),
+                "Cookies",
                 "cookies",
                 type=str,
                 optional=True,
                 default=None,
-                description=_("The cookies to use for the HTTP request"),
+                description="The cookies to use for the HTTP request",
             ),
         ],
     )

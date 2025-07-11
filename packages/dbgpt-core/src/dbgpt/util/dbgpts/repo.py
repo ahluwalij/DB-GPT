@@ -12,7 +12,6 @@ from typing import List, Tuple
 from rich.table import Table
 
 from ..console import CliLogger
-from ..i18n_utils import _
 from .base import (
     DBGPTS_METADATA_FILE,
     DBGPTS_REPO_HOME,

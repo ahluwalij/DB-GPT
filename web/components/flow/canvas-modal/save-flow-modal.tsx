@@ -4,7 +4,6 @@ import { mapHumpToUnderline } from '@/utils/flow';
 import { Button, Checkbox, Form, Input, Modal, message } from 'antd';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { ReactFlowInstance } from 'reactflow';
 
 const { TextArea } = Input;
@@ -22,7 +21,6 @@ export const SaveFlowModal: React.FC<Props> = ({
   flowInfo,
   setIsSaveFlowModalOpen,
 }) => {
-  const { t } = useTranslation();
   const router = useRouter();
   const [form] = Form.useForm<IFlowUpdateParam>();
   const [messageApi, contextHolder] = message.useMessage();
@@ -76,7 +74,7 @@ export const SaveFlowModal: React.FC<Props> = ({
       );
 
       if (res?.success) {
-        messageApi.success(t('save_flow_success'));
+        messageApi.success('Flow saved successfully');
       } else if (res?.err_msg) {
         messageApi.error(res?.err_msg);
       }
@@ -94,7 +92,7 @@ export const SaveFlowModal: React.FC<Props> = ({
       );
 
       if (res?.uid) {
-        messageApi.success(t('save_flow_success'));
+        messageApi.success('Flow saved successfully');
         router.push(`/construct/flow/canvas?id=${res.uid}`, undefined, { shallow: true });
       }
     }
@@ -104,15 +102,15 @@ export const SaveFlowModal: React.FC<Props> = ({
   return (
     <>
       <Modal
-        title={t('flow_modal_title')}
+        title='Save Flow'
         open={isSaveFlowModalOpen}
         onCancel={() => setIsSaveFlowModalOpen(false)}
         footer={[
           <Button key='cancel' onClick={() => setIsSaveFlowModalOpen(false)}>
-            {t('cancel')}
+            Cancel
           </Button>,
           <Button key='submit' type='primary' onClick={() => form.submit()}>
-            {t('verify')}
+            Save
           </Button>,
         ]}
       >

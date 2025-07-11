@@ -20,7 +20,6 @@ from dbgpt.model.proxy.base import (
 )
 from dbgpt.model.proxy.llms.proxy_model import ProxyModel, parse_model_request
 from dbgpt.model.utils.chatgpt_utils import OpenAIParameters
-from dbgpt.util.i18n_utils import _
 
 if TYPE_CHECKING:
     from httpx._types import ProxiesTypes, ProxyTypes

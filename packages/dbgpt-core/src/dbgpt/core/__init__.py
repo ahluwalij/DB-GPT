@@ -1,5 +1,15 @@
 """The core module contains the core interfaces and classes for dbgpt."""
 
+# Add a simple no-op translation function to replace the removed i18n system
+def _(text):
+    """No-op translation function - just returns English text as-is."""
+    return text
+
+# Make it available globally
+import builtins
+builtins._ = _
+
+from dbgpt.component import BaseComponent, SystemApp  # noqa: F401
 from dbgpt.core.interface.cache import (  # noqa: F401
     CacheClient,
     CacheConfig,

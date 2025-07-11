@@ -22,7 +22,6 @@ from pydantic import field_validator
 
 from dbgpt._private.pydantic import BaseModel, model_to_dict
 from dbgpt.core import Chunk
-from dbgpt.util.i18n_utils import _
 from dbgpt.util.parameter_utils import BaseParameters, _get_parameter_descriptions
 
 P = TypeVar("P", bound="ResourceParameters")

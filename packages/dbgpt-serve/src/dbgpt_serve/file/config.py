@@ -7,7 +7,6 @@ from dbgpt.core.awel.flow import (
     auto_register_resource,
 )
 from dbgpt.core.interface.file import StorageBackendConfig
-from dbgpt.util.i18n_utils import _
 from dbgpt.util.module_utils import ScannerConfig
 from dbgpt_serve.core import BaseServeConfig
 

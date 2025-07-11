@@ -4,7 +4,6 @@ from typing import Dict, Type
 
 from dbgpt.core.awel.flow import ResourceCategory, register_resource
 from dbgpt.core.interface.serialization import Serializable, Serializer
-from dbgpt.util.i18n_utils import _
 
 JSON_ENCODING = "utf-8"
 
@@ -20,10 +19,10 @@ class JsonSerializable(Serializable, ABC):
 
 
 @register_resource(
-    label=_("Json Serializer"),
+    label="Json Serializer",
     name="json_serializer",
     category=ResourceCategory.SERIALIZER,
-    description=_("The serializer for serializing data with json format."),
+    description="The serializer for serializing data with json format.",
 )
 class JsonSerializer(Serializer):
     """The serializer abstract class for serializing cache keys and values."""

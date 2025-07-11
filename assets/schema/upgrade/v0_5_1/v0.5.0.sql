@@ -344,13 +344,13 @@ use EXAMPLE_1;
 CREATE TABLE IF NOT EXISTS `users`
 (
     `id`       int         NOT NULL AUTO_INCREMENT,
-    `username` varchar(50) NOT NULL COMMENT '用户名',
-    `password` varchar(50) NOT NULL COMMENT '密码',
-    `email`    varchar(50) NOT NULL COMMENT '邮箱',
-    `phone`    varchar(20) DEFAULT NULL COMMENT '电话',
+    `username` varchar(50) NOT NULL COMMENT 'Username',
+    `password` varchar(50) NOT NULL COMMENT 'Password',
+    `email`    varchar(50) NOT NULL COMMENT 'Email',
+    `phone`    varchar(20) DEFAULT NULL COMMENT 'Phone',
     PRIMARY KEY (`id`),
-    KEY        `idx_username` (`username`) COMMENT '索引：按用户名查询'
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='聊天用户表';
+    KEY        `idx_username` (`username`) COMMENT 'Index: query by username'
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='Chat user table';
 
 INSERT INTO users (username, password, email, phone)
 VALUES ('user_1', 'password_1', 'user_1@example.com', '12345678901');

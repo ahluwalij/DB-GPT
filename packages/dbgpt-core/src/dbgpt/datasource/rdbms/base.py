@@ -33,7 +33,6 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy.schema import CreateTable
 
 from dbgpt.datasource.base import BaseConnector
-from dbgpt.util.i18n_utils import _
 from dbgpt_ext.datasource.schema import DBType
 
 from ..parameter import BaseDatasourceParameters

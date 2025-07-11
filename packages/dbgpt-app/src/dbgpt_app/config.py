@@ -8,7 +8,6 @@ from dbgpt.model.parameter import (
 )
 from dbgpt.storage.cache.manager import ModelCacheParameters
 from dbgpt.util.configure import HookConfig
-from dbgpt.util.i18n_utils import _
 from dbgpt.util.parameter_utils import BaseParameters
 from dbgpt.util.tracer import TracerParameters
 from dbgpt.util.utils import LoggingParameters

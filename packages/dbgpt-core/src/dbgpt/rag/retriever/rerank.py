@@ -6,7 +6,6 @@ from typing import Callable, List, Optional
 from dbgpt.core import Chunk, RerankEmbeddings
 from dbgpt.core.awel.flow import Parameter, ResourceCategory, register_resource
 from dbgpt.util.executor_utils import blocking_func_to_async_no_executor
-from dbgpt.util.i18n_utils import _
 
 RANK_FUNC = Callable[[List[Chunk]], List[Chunk]]
 

@@ -11,7 +11,6 @@ from dbgpt.storage.graph_store.base import GraphStoreConfig
 from dbgpt.storage.knowledge_graph.base import ParagraphChunk
 from dbgpt.storage.vector_store.base import VectorStoreConfig
 from dbgpt.storage.vector_store.filters import MetadataFilters
-from dbgpt.util.i18n_utils import _
 from dbgpt_ext.rag.retriever.graph_retriever.graph_retriever import GraphRetriever
 from dbgpt_ext.rag.transformer.community_summarizer import CommunitySummarizer
 from dbgpt_ext.rag.transformer.graph_embedder import GraphEmbedder

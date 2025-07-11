@@ -13,7 +13,6 @@ from dbgpt.core.awel.flow import (
     ViewMetadata,
 )
 from dbgpt.core.operators import BaseLLM, BaseLLMOperator, BaseStreamingLLMOperator
-from dbgpt.util.i18n_utils import _
 
 logger = logging.getLogger(__name__)
 

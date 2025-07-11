@@ -210,7 +210,14 @@ const ChatSider: React.FC<{
             item={{
               label: t('assistant'),
               key: 'default',
-              icon: <Image src='/uagi-icon.svg' alt='UAGI' width={24} height={24} className='flex-1' />,
+              icon: <Image 
+                src='/uagi-icon.svg' 
+                alt='UAGI' 
+                width={56} 
+                height={27} 
+                style={{ width: '24px', height: 'auto' }}
+                className='flex-1' 
+              />,
               default: true,
             }}
             order={order}

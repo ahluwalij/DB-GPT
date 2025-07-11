@@ -10,7 +10,6 @@ from typing import List
 from dbgpt.core.awel.flow import Parameter, ResourceCategory, register_resource
 from dbgpt.storage.graph_store.base import GraphStoreBase, GraphStoreConfig
 from dbgpt.storage.graph_store.graph import GraphElemType
-from dbgpt.util.i18n_utils import _
 from dbgpt_ext.datasource.conn_tugraph import TuGraphConnector
 
 logger = logging.getLogger(__name__)

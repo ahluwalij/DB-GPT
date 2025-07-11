@@ -2,35 +2,35 @@
 export type IApp = {
   app_code: string;
   /**
-   * 应用名
+   * Application name
    */
   app_name: string;
   /**
-   * 应用描述信息/简介
+   * Application description/introduction
    */
   app_describe: string;
   /**
-   * 语言/prompt关联
+   * Language/prompt association
    */
   language: 'en' | 'zh';
   /**
-   * 组织模式（AutoPlan/LayOut）
+   * Team mode (AutoPlan/LayOut)
    */
   team_mode: string;
   /**
-   * 组织上下文/ None
+   * Team context/ None
    */
   team_context: Record<string, any>;
   /**
-   * 应用节点信息
+   * Application node information
    */
   details?: IDetail[];
   /**
-   * 是否已收藏
+   * Whether it has been collected
    */
   is_collected: string;
   /**
-   * 是否已发布
+   * Whether it has been published
    */
   updated_at: string;
   hot_value: number;
@@ -54,19 +54,19 @@ export type AgentParams = {
   agent_name: string;
   node_id: string;
   /**
-   * Agent绑定的资源
+   * Resources bound to the Agent
    */
   resources: string;
   /**
-   * Agent的绑定模板
+   * Agent's bound template
    */
   prompt_template: string;
   /**
-   * llm的使用策略，默认是priority
+   * LLM usage strategy, default is priority
    */
   llm_strategy: string;
   /**
-   * 策略包含的参数
+   * Parameters contained in the strategy
    */
   llm_strategy_value: string;
 };

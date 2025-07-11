@@ -18,7 +18,6 @@ from dbgpt.core.awel.flow import (
     register_resource,
 )
 from dbgpt.util import ParameterDescription
-from dbgpt.util.i18n_utils import _
 
 CFG = Config()
 
