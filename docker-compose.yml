@@ -1,5 +1,6 @@
-# To run current docker compose file, you should prepare the silliconflow api key in your environment.
-# SILICONFLOW_API_KEY=${SILICONFLOW_API_KEY} docker compose up -d
+# To run current docker compose file, you should prepare the OpenAI API key in your environment.
+# This version includes PostgreSQL support for datasource connections.
+# OPENAI_API_KEY=${OPENAI_API_KEY} docker compose up -d
 services:
   db:
     image: mysql/mysql-server
@@ -29,6 +30,7 @@ services:
     environment:
       - SILICONFLOW_API_KEY=${SILICONFLOW_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LLM_MODEL_NAME=${LLM_MODEL_NAME:-gpt-4o}
       - MYSQL_PASSWORD=aa123456
       - MYSQL_HOST=db
       - MYSQL_PORT=3306
@@ -41,6 +43,7 @@ services:
       - ./models:/app/models
       - dbgpt-data:/app/pilot/data
       - dbgpt-message:/app/pilot/message
+      - ./pilot/meta_data:/app/pilot/meta_data
     depends_on:
       - db
     ports:

@@ -1,0 +1,28 @@
+FROM eosphorosai/dbgpt-openai:latest
+
+# Install PostgreSQL dependencies as root
+USER root
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python PostgreSQL dependencies as root
+RUN pip install psycopg2-binary
+
+# Create all necessary directories with proper permissions
+RUN mkdir -p /.dbgpts && chown -R 1001:1001 /.dbgpts
+RUN mkdir -p /app/logs && chown -R 1001:1001 /app/logs
+RUN mkdir -p /app/plugins && chown -R 1001:1001 /app/plugins
+RUN mkdir -p /app/pilot/data && chown -R 1001:1001 /app/pilot/data
+RUN mkdir -p /app/pilot/message && chown -R 1001:1001 /app/pilot/message
+RUN mkdir -p /app/pilot/logs && chown -R 1001:1001 /app/pilot/logs
+RUN mkdir -p /app/models && chown -R 1001:1001 /app/models
+RUN mkdir -p /app/static && chown -R 1001:1001 /app/static
+RUN mkdir -p /root/.dbgpts && chown -R 1001:1001 /root/.dbgpts
+
+# Switch back to app user
+USER 1001
+
+# Set working directory
+WORKDIR /app 

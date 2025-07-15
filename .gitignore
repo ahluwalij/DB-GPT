@@ -190,3 +190,4 @@ configs/my
 .devcontainer/dev.toml
 test_docs
 AWS.pem
+data/
