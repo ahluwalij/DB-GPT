@@ -2,6 +2,7 @@ import { ChatContext } from '@/app/chat-context';
 import {
   addPrompt,
   apiInterceptors,
+  getDbList,
   llmOutVerify,
   promptTemplateLoad,
   promptTypeTarget,
@@ -10,6 +11,7 @@ import {
 import useUser from '@/hooks/use-user';
 import ModelIcon from '@/new-components/chat/content/ModelIcon';
 import { DebugParams, OperatePromptParams } from '@/types/prompt';
+import { DbListResponse } from '@/types/db';
 import { getUserId } from '@/utils';
 import { HEADER_USER_ID_KEY } from '@/utils/constants/index';
 import { LeftOutlined } from '@ant-design/icons';
@@ -36,24 +38,7 @@ const mdParser = new MarkdownIt();
 
 const MarkdownContext = dynamic(() => import('@/new-components/common/MarkdownContext'), { ssr: false });
 
-const TypeOptions = [
-  {
-    value: 'Agent',
-    label: 'AGENT',
-  },
-  {
-    value: 'Scene',
-    label: 'SCENE',
-  },
-  {
-    value: 'Normal',
-    label: 'NORMAL',
-  },
-  {
-    value: 'Evaluate',
-    label: 'EVALUATE',
-  },
-];
+// TypeOptions removed - always using Scene type
 
 interface BottomFormProps {
   model: string;
@@ -119,6 +104,8 @@ const AddOrEditPrompt: React.FC = () => {
   const [bottomForm] = Form.useForm<BottomFormProps>();
   // 验证错误信息
   const [errorMessage, setErrorMessage] = useState<Record<string, any>>();
+  // Connected PostgreSQL databases
+  const [postgresDbList, setPostgresDbList] = useState<DbListResponse>([]);
 
   const promptType = Form.useWatch('prompt_type', topForm);
 
@@ -145,7 +132,6 @@ const AddOrEditPrompt: React.FC = () => {
   const {
     data,
     run: getTargets,
-    loading,
   } = useRequest(async (type: string) => await promptTypeTarget(type), {
     manual: true,
   });
@@ -187,7 +173,7 @@ const AddOrEditPrompt: React.FC = () => {
     {
       manual: true,
       onSuccess: () => {
-        message.success(`${type === 'add' ? t('Add') : t('update')}${t('success')}`);
+        message.success(`${type === 'add' ? t('Add') : t('update')} ${t('Success')}`);
         router.replace('/construct/prompt');
       },
     },
@@ -343,6 +329,30 @@ const AddOrEditPrompt: React.FC = () => {
     });
   }, [data]);
 
+  // Auto-load template for Scene + chat_with_db_execute when targets are loaded for new context
+  useEffect(() => {
+    if (type === 'add' && promptType === 'Scene' && targetOptions && targetOptions.length > 0) {
+      const hasDbExecute = targetOptions.some(option => option.value === 'chat_with_db_execute');
+      if (hasDbExecute) {
+        // Always load the chat_with_db_execute template for new contexts
+        getTemplate('chat_with_db_execute');
+      }
+    }
+  }, [type, promptType, targetOptions, getTemplate]);
+
+  // Load PostgreSQL databases
+  useEffect(() => {
+    const loadPostgresDbList = async () => {
+      const [, data] = await apiInterceptors(getDbList());
+      if (data) {
+        // Filter for PostgreSQL databases only
+        const postgresOnly = data.filter(db => db.type?.toLowerCase() === 'postgresql');
+        setPostgresDbList(postgresOnly);
+      }
+    };
+    loadPostgresDbList();
+  }, []);
+
   // 编辑进入填充内容
   useEffect(() => {
     if (type === 'edit') {
@@ -359,8 +369,16 @@ const AddOrEditPrompt: React.FC = () => {
         model: editData.model,
         prompt_language: editData.prompt_language,
       });
+    } else if (type === 'add') {
+      // Set default values for new context creation - always use Scene and chat_with_db_execute
+      topForm.setFieldsValue({
+        prompt_type: 'Scene',
+        target: 'chat_with_db_execute',
+      });
+      // Immediately load targets and template for Scene
+      getTargets('Scene');
     }
-  }, [bottomForm, topForm, type]);
+  }, [bottomForm, topForm, type, getTargets]);
 
   return (
     <div
@@ -375,7 +393,7 @@ const AddOrEditPrompt: React.FC = () => {
               router.replace('/construct/prompt');
             }}
           />
-          <span className='font-medium text-sm'>{type === 'add' ? t('Add') : t('Edit')} Prompt</span>
+          <span className='font-medium text-sm'>{type === 'add' ? 'Add' : 'Edit'} Context</span>
         </Space>
         <Space>
           <Button type='primary' onClick={operateFn} loading={operateLoading}>
@@ -413,33 +431,14 @@ const AddOrEditPrompt: React.FC = () => {
         <div className='flex flex-col w-2/5 pb-8 overflow-y-auto'>
           <Card className='mb-4'>
             <Form form={topForm}>
-              <div className='flex w-full gap-1 justify-between'>
-                <Form.Item
-                  label='Type'
-                  name='prompt_type'
-                  className='w-2/5'
-                  rules={[{ required: true, message: t('select_type') }]}
-                >
-                  <Select options={TypeOptions} placeholder={t('select_type')} allowClear />
-                </Form.Item>
-                <Form.Item name='target' className='w-3/5' rules={[{ required: true, message: t('select_scene') }]}>
-                  <Select
-                    loading={loading}
-                    placeholder={t('select_scene')}
-                    allowClear
-                    showSearch
-                    onChange={async value => {
-                      await getTemplate(value);
-                    }}
-                  >
-                    {targetOptions?.map(option => (
-                      <Select.Option key={option.value} title={option.desc}>
-                        {option.label}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </div>
+              {/* Hidden field for prompt_type - always set to Scene */}
+              <Form.Item name='prompt_type' style={{ display: 'none' }}>
+                <Input value='Scene' />
+              </Form.Item>
+              {/* Hidden field for target - always set to chat_with_db_execute */}
+              <Form.Item name='target' style={{ display: 'none' }}>
+                <Input value='chat_with_db_execute' />
+              </Form.Item>
               {type === 'edit' && (
                 <Form.Item label='Code' name='prompt_code'>
                   <Input disabled />
@@ -455,30 +454,56 @@ const AddOrEditPrompt: React.FC = () => {
               </Form.Item>
             </Form>
           </Card>
-          <Card title={t('input_parameter')} className='mb-4'>
+          <Card title="Business Context Configuration" className='mb-4'>
             <Form form={midForm}>
-              {variables.length > 0 &&
-                variables
-                  .filter(item => item !== 'out_schema')
-                  .map(item => (
-                    <Form.Item key={item} label={item} name={item} rules={[{ message: `${t('Please_Input')}${item}` }]}>
-                      <Input placeholder={t('Please_Input')} />
-                    </Form.Item>
-                  ))}
+              <Form.Item
+                label="Select Database"
+                name="db_name"
+                rules={[{ required: true, message: 'Please select a database' }]}
+              >
+                <Select
+                  placeholder="Choose your PostgreSQL database"
+                  options={postgresDbList.map(db => ({
+                    value: (db.params as any)?.database || db.id,
+                    label: `${(db.params as any)?.database || 'Database'} (${(db.params as any)?.host || 'localhost'})`,
+                  }))}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Business Context Description"
+                name="business_context"
+                rules={[{ required: true, message: 'Please provide business context' }]}
+              >
+                <Input.TextArea
+                  rows={6}
+                  placeholder="Describe your business context here. Include:&#10;• Key Performance Indicators (KPIs) you want to track&#10;• Important business terms and definitions&#10;• Common questions you ask about your data&#10;• Preferred ways to visualize results&#10;&#10;Example: 'Our company tracks monthly recurring revenue (MRR), customer acquisition cost (CAC), and churn rate. We often analyze sales performance by region and want to see trends over time using line charts.'"
+                />
+              </Form.Item>
+
+              {/* Hidden technical fields - auto-populated */}
+              <Form.Item name="dialect" style={{ display: 'none' }}>
+                <Input value="postgresql" />
+              </Form.Item>
+              <Form.Item name="display_type" style={{ display: 'none' }}>
+                <Input value="Table,Line Chart,Bar Chart,Pie Chart" />
+              </Form.Item>
+              <Form.Item name="table_info" style={{ display: 'none' }}>
+                <Input value="{table_info}" />
+              </Form.Item>
+              <Form.Item name="top_k" style={{ display: 'none' }}>
+                <Input value="50" />
+              </Form.Item>
+              <Form.Item name="response" style={{ display: 'none' }}>
+                <Input value='{"thoughts": "Business insights and explanation for the user", "sql": "SQL Query to analyze the data (hidden from user)", "display_type": "Best visualization method for the results"}' />
+              </Form.Item>
+              <Form.Item name="user_input" style={{ display: 'none' }}>
+                <Input value="{user_input}" />
+              </Form.Item>
             </Form>
           </Card>
-          <Card title={t('output_structure')} className='flex flex-col flex-1'>
-            <JsonView
-              style={{ ...theme, width: '100%', padding: 4 }}
-              className={classNames({
-                'bg-[#fafafa]': mode === 'light',
-              })}
-              value={responseTemplate}
-              enableClipboard={false}
-              displayDataTypes={false}
-              objectSortKeys={false}
-            />
-            <div className='flex flex-col mt-4'>
+          <Card title="Preview & Test" className='flex flex-col flex-1'>
+            <div className='flex flex-col'>
               <Form
                 form={bottomForm}
                 initialValues={{
@@ -487,34 +512,38 @@ const AddOrEditPrompt: React.FC = () => {
                   prompt_language: 'en',
                 }}
               >
-                <Form.Item label={t('model')} name='model'>
-                  <Select className='h-8 rounded-3xl' options={modelOptions} allowClear showSearch />
+                {/* Hide technical configuration, only show test input */}
+                <Form.Item name='model' style={{ display: 'none' }}>
+                  <Select options={modelOptions} />
                 </Form.Item>
-                <Form.Item label={t('temperature')} name='temperature'>
+                <Form.Item name='temperature' style={{ display: 'none' }}>
                   <TemperatureItem />
                 </Form.Item>
-                <Form.Item label={t('language')} name='prompt_language'>
+                <Form.Item name='prompt_language' style={{ display: 'none' }}>
                   <Select
                     options={[
                       {
-                        label: t('English'),
+                        label: 'English',
                         value: 'en',
                       },
                       {
-                        label: t('Chinese'),
+                        label: 'Chinese',
                         value: 'zh',
                       },
                     ]}
                   />
                 </Form.Item>
-                <Form.Item label={t('User_input')} name='user_input'>
-                  <Input placeholder={t('Please_Input')} />
+                <Form.Item label="Ask a Question to Test" name='user_input'>
+                  <Input.TextArea 
+                    rows={3}
+                    placeholder="Type a business question to test your context. For example: 'What was our revenue last month?' or 'Show me the top 10 customers by sales'"
+                  />
                 </Form.Item>
               </Form>
             </div>
             <Space className='flex justify-between'>
               <Button type='primary' onClick={onLLMTest} loading={llmLoading}>
-                {t('LLM_test')}
+                Test Context
               </Button>
               <Button
                 type='primary'
@@ -525,7 +554,7 @@ const AddOrEditPrompt: React.FC = () => {
                   await run();
                 }}
               >
-                {t('Output_verification')}
+                Validate Response
               </Button>
             </Space>
           </Card>

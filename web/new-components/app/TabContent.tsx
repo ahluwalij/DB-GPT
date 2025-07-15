@@ -1,12 +1,11 @@
 import { ChatContext } from '@/app/chat-context';
-import { apiInterceptors, collectApp, newDialogue, unCollectApp } from '@/client/api';
+import { apiInterceptors, newDialogue } from '@/client/api';
 import BlurredCard from '@/new-components/common/blurredCard';
 import { IApp } from '@/types/app';
-import { StarFilled, StarOutlined } from '@ant-design/icons';
 import { Avatar, Empty, Spin } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import IconFont from '../common/Icon';
 
 const TabContent: React.FC<{ apps: IApp[]; loading: boolean; refresh: () => void; type: 'used' | 'recommend' }> = ({
@@ -15,17 +14,21 @@ const TabContent: React.FC<{ apps: IApp[]; loading: boolean; refresh: () => void
   loading,
   type,
 }) => {
-  const collect = async (data: Record<string, any>) => {
-    const [error] = await apiInterceptors(
-      data.is_collected === 'true'
-        ? unCollectApp({ app_code: data.app_code })
-        : collectApp({ app_code: data.app_code }),
-    );
-    if (error) return;
-    refresh();
-  };
   const { setAgent: setAgentToChat, model, setCurrentDialogInfo } = useContext(ChatContext);
   const router = useRouter();
+
+  // Filter apps to only show those with specific chat scenes
+  const filteredApps = useMemo(() => {
+    const allowedScenes = ['chat_excel', 'chat_dashboard', 'chat_with_db_execute'];
+    return apps.filter(app => {
+      // For native apps, check the chat_scene in team_context
+      if (app.team_mode === 'native_app' && app.team_context?.chat_scene) {
+        return allowedScenes.includes(app.team_context.chat_scene);
+      }
+      // For custom apps, include all since they use chat_agent
+      return false; // Only show native apps with specific scenes
+    });
+  }, [apps]);
 
   const toChat = async (data: IApp) => {
     // 原生应用跳转
@@ -72,61 +75,14 @@ const TabContent: React.FC<{ apps: IApp[]; loading: boolean; refresh: () => void
   }
   return (
     <div className='flex flex-wrap mt-4 w-full overflow-y-auto '>
-      {apps?.length > 0 ? (
-        apps.map(item => (
+      {filteredApps?.length > 0 ? (
+        filteredApps.map(item => (
           <BlurredCard
             key={item.app_code}
             name={item.app_name}
             description={item.app_describe}
             onClick={() => toChat(item)}
-            RightTop={
-              item.is_collected === 'true' ? (
-                <StarFilled
-                  onClick={e => {
-                    e.stopPropagation();
-                    collect(item);
-                  }}
-                  style={{
-                    height: '21px',
-                    cursor: 'pointer',
-                    color: '#f9c533',
-                  }}
-                />
-              ) : (
-                <StarOutlined
-                  onClick={e => {
-                    e.stopPropagation();
-                    collect(item);
-                  }}
-                  style={{
-                    height: '21px',
-                    cursor: 'pointer',
-                  }}
-                />
-              )
-            }
-            LeftBottom={
-              <div className='flex gap-8 items-center text-gray-500 text-sm'>
-                {item.owner_name && (
-                  <div className='flex gap-1 items-center'>
-                    <Avatar
-                      src={item?.owner_avatar_url}
-                      className='bg-gradient-to-tr from-[#31afff] to-[#1677ff] cursor-pointer'
-                    >
-                      {item.owner_name}
-                    </Avatar>
-                    <span>{item.owner_name}</span>
-                  </div>
-                )}
-                {/* 最近使用不展示热度值 */}
-                {type !== 'used' && (
-                  <div className='flex items-start gap-1'>
-                    <IconFont type='icon-hot' className='text-lg' />
-                    <span className='text-[#878c93]'>{item.hot_value}</span>
-                  </div>
-                )}
-              </div>
-            }
+
             scene={item?.team_context?.chat_scene || 'chat_agent'}
           />
         ))

@@ -1,90 +1,58 @@
 import { ChatContext } from '@/app/chat-context';
-import { apiInterceptors, getAppList, newDialogue, recommendApps } from '@/client/api';
+import { apiInterceptors, newDialogue } from '@/client/api';
 import { getRecommendQuestions } from '@/client/api/chat';
-import TabContent from '@/new-components/app/TabContent';
 import ChatInput from '@/new-components/chat/input/ChatInput';
 import { STORAGE_INIT_MESSAGE_KET } from '@/utils';
 import { useRequest } from 'ahooks';
-import { ConfigProvider, Segmented, SegmentedProps } from 'antd';
+import { ConfigProvider, Card } from 'antd';
 import { t } from 'i18next';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
+import AppDefaultIcon from '@/new-components/common/AppDefaultIcon';
 
 function ChatDefault() {
   const { setCurrentDialogInfo, model } = useContext(ChatContext);
-
   const router = useRouter();
-  const [apps, setApps] = useState<any>({
-    app_list: [],
-    total_count: 0,
-  });
-  const [activeKey, setActiveKey] = useState('recommend');
-  const getAppListWithParams = (params: Record<string, string>) =>
-    apiInterceptors(
-      getAppList({
-        ...params,
-        page_no: '1',
-        page_size: '6',
-      }),
-    );
-  const getHotAppList = (params: Record<string, string>) =>
-    apiInterceptors(
-      recommendApps({
-        page_no: '1',
-        page_size: '6',
-        ...params,
-      }),
-    );
-  // 获取应用列表
-  const {
-    run: getAppListFn,
-    loading,
-    refresh,
-  } = useRequest(
-    async (app_name?: string) => {
-      switch (activeKey) {
-        case 'recommend':
-          return await getHotAppList({});
-        case 'used':
-          return await getAppListWithParams({
-            is_recent_used: 'true',
-            need_owner_info: 'true',
-            ...(app_name && { app_name }),
-          });
-        default:
-          return [];
-      }
-    },
-    {
-      manual: true,
-      onSuccess: res => {
-        const [_error, data] = res;
-        if (activeKey === 'recommend') {
-          return setApps({
-            app_list: data,
-            total_count: data?.length || 0,
-          });
-        }
-        setApps(data || {});
-      },
-      debounceWait: 500,
-    },
-  );
-  useEffect(() => {
-    getAppListFn();
-  }, [activeKey, getAppListFn]);
 
-  const items: SegmentedProps['options'] = [
+  const chatModes = [
+    // {
+    //   key: 'chat_excel',
+    //   name: 'Chat Excel',
+    //   description: 'Analyze and chat with Excel files',
+    //   scene: 'chat_excel'
+    // },
     {
-      value: 'recommend',
-      label: t('recommend_apps'),
+      key: 'chat_dashboard', 
+      name: 'Chat Dashboard',
+      description: 'Create interactive dashboards and visualizations',
+      scene: 'chat_dashboard'
     },
     {
-      value: 'used',
-      label: t('used_apps'),
-    },
+      key: 'chat_with_db_execute',
+      name: 'Chat Data',
+      description: 'Query and analyze your data with natural language',
+      scene: 'chat_with_db_execute'
+    }
   ];
+
+  const startChat = async (chatMode: string) => {
+    const [, res] = await apiInterceptors(newDialogue({ chat_mode: chatMode, model }));
+    if (res) {
+      setCurrentDialogInfo?.({
+        chat_scene: res.chat_mode,
+        app_code: '',
+      });
+      localStorage.setItem(
+        'cur_dialog_info',
+        JSON.stringify({
+          chat_scene: res.chat_mode,
+          app_code: '',
+        }),
+      );
+      router.push(`/chat?scene=${chatMode}&id=${res.conv_uid}${model ? `&model=${model}` : ''}`);
+    }
+  };
 
   // 获取推荐问题
   const { data: helps } = useRequest(async () => {
@@ -99,49 +67,41 @@ function ChatDefault() {
           Button: {
             defaultBorderColor: 'white',
           },
-          Segmented: {
-            itemSelectedBg: '#2867f5',
-            itemSelectedColor: 'white',
+          Card: {
+            borderRadius: 16,
           },
         },
       }}
     >
       <div className='px-28 py-10 h-full flex flex-col justify-between'>
         <div>
-          <div className='flex justify-between'>
-            <Segmented
-              className='backdrop-filter h-10 backdrop-blur-lg bg-white bg-opacity-30 border border-white rounded-lg shadow p-1 dark:border-[#6f7f95] dark:bg-[#6f7f95] dark:bg-opacity-60'
-              options={items}
-              value={activeKey}
-              onChange={value => {
-                setActiveKey(value as string);
-              }}
-            />
-            <span className='flex items-center text-gray-500 gap-1 dark:text-slate-300'>
-              <span>{t('app_in_mind')}</span>
-              <span
-                className='flex items-center cursor-pointer'
-                onClick={() => {
-                  router.push('/');
-                }}
-              >
-                <Image
-                  key='image_explore'
-                  src={'/pictures/explore_active.png'}
-                  alt='construct_image'
-                  width={24}
-                  height={24}
-                />
-                <span className='text-default'>{t('explore')}</span>
-              </span>
-              <span>{t('Discover_more')}</span>
-            </span>
+          <div className='flex justify-center mb-8'>
+            <h1 className='text-3xl font-bold text-gray-800 dark:text-white'>Choose Your Chat Mode</h1>
           </div>
-          <TabContent apps={apps?.app_list || []} loading={loading} refresh={refresh} type={activeKey as any} />
+          
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mt-8'>
+            {chatModes.map(mode => (
+              <Card
+                key={mode.key}
+                hoverable
+                className='text-center cursor-pointer backdrop-filter backdrop-blur-lg bg-white bg-opacity-80 border border-white dark:bg-[#6f7f95] dark:bg-opacity-60 dark:border-[#6f7f95]'
+                onClick={() => startChat(mode.scene)}
+              >
+                <div className='flex flex-col items-center p-4'>
+                  <div className='mb-4'>
+                    <AppDefaultIcon scene={mode.scene} width={12} height={12} />
+                  </div>
+                  <h3 className='text-xl font-semibold mb-2 text-gray-800 dark:text-white'>{mode.name}</h3>
+                  <p className='text-gray-600 dark:text-gray-300'>{mode.description}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+
           {helps && helps.length > 0 && (
-            <div>
-              <h2 className='font-medium text-xl my-4'>{t('help')}</h2>
-              <div className='flex justify-start gap-4'>
+            <div className='mt-12'>
+              <h2 className='font-medium text-xl my-4 text-center text-gray-800 dark:text-white'>Quick Help</h2>
+              <div className='flex justify-center gap-4 flex-wrap'>
                 {helps.map(help => (
                   <span
                     key={help.id}

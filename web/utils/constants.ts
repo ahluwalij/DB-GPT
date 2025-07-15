@@ -213,6 +213,11 @@ export function getModelIcon(modelId: string): string {
 }
 
 export const dbMapper: Record<DBType, { label: string; icon: string; desc: string }> = {
+  postgresql: {
+    label: 'PostgreSQL',
+    icon: '/icons/postgresql.png',
+    desc: 'Powerful, reliable, and feature-rich open-source relational database system.',
+  },
   mysql: {
     label: 'MySQL',
     icon: '/icons/mysql.png',
@@ -293,7 +298,7 @@ export const dbMapper: Record<DBType, { label: string; icon: string; desc: strin
   postgresql: {
     label: 'PostgreSQL',
     icon: '/icons/postgresql.png',
-    desc: 'Powerful open-source relational database with extensibility and SQL standards.',
+    desc: 'Powerful open-source relational database with extensibility and SQL standards. After connecting, consider creating business context for better data insights.',
   },
   gaussdb: {
     label: 'GaussDB',

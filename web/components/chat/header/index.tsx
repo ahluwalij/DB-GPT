@@ -24,6 +24,7 @@ function Header({ refreshHistory, modelChange }: Props) {
       {/* DB Selector */}
       <DBSelector />
       {/* Excel Upload */}
+      {/* Commented out to hide chat excel functionality
       {scene === 'chat_excel' && (
         <ChatExcel
           onComplete={() => {
@@ -32,6 +33,7 @@ function Header({ refreshHistory, modelChange }: Props) {
           }}
         />
       )}
+      */}
       {/* Agent Selector */}
       {scene === 'chat_agent' && <AgentSelector />}
       <ModeTab />

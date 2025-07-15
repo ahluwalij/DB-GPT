@@ -8,6 +8,7 @@ import {
   CodeOutlined,
   CopyOutlined,
   LoadingOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { GPTVis } from '@antv/gpt-vis';
 import { message } from 'antd';
@@ -20,23 +21,10 @@ import Feedback from './Feedback';
 import RobotIcon from './RobotIcon';
 
 const UserIcon: React.FC = () => {
-  const user = JSON.parse(localStorage.getItem(STORAGE_USERINFO_KEY) ?? '');
-
-  if (!user.avatar_url) {
-    return (
-      <div className='flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-tr from-[#31afff] to-[#1677ff] text-xs text-white'>
-        {user?.nick_name}
-      </div>
-    );
-  }
   return (
-    <Image
-      className='rounded-full border border-gray-200 object-contain bg-white inline-block'
-      width={32}
-      height={32}
-      src={user?.avatar_url}
-      alt={user?.nick_name}
-    />
+    <div className='flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-tr from-[#31afff] to-[#1677ff] text-white'>
+      <UserOutlined className='text-sm' />
+    </div>
   );
 };
 

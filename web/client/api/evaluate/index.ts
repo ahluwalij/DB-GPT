@@ -120,7 +120,7 @@ export const getStorageTypes = () => {
 
 //create evaluations
 export const createEvaluations = (data: createEvaluationsRequest) => {
-  return POST<createEvaluationsRequest, Record<string, any>>(`/api/v1/evaluate/start`, data, {
+  return POST<createEvaluationsRequest, Record<string, any>>(`/api/v1/evaluate/evaluations`, data, {
     headers: {
       'user-id': userId,
     },

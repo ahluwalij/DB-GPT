@@ -293,7 +293,6 @@ def load_config(config_file: str = None) -> ApplicationConfig:
     cfg = ConfigurationManager.from_file(config_file)
     sys_config = cfg.parse_config(SystemParameters, prefix="system")
     # Must set default language before any i18n usage
-    set_default_language(sys_config.language)
     _CFG = Config()
     _CFG.LANGUAGE = sys_config.language
 

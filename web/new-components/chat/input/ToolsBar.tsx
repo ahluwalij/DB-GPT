@@ -10,10 +10,8 @@ import { useTranslation } from 'react-i18next';
 
 import { parseResourceValue, transformFileUrl } from '@/utils';
 
-import MaxNewTokens from './MaxNewTokens';
 import ModelSwitcher from './ModelSwitcher';
 import Resource from './Resource';
-import Temperature from './Temperature';
 
 interface ToolsConfig {
   icon: React.ReactNode;
@@ -35,11 +33,7 @@ const ToolsBar: React.FC<{
     replyLoading,
     currentDialogue,
     appInfo,
-    temperatureValue,
-    maxNewTokensValue,
     resourceValue,
-    setTemperatureValue,
-    setMaxNewTokensValue,
     refreshHistory,
     setCanAbort,
     setReplyLoading,
@@ -82,8 +76,8 @@ const ToolsBar: React.FC<{
           const lastHuman = history.filter(i => i.role === 'human')?.slice(-1)?.[0];
           handleChat(lastHuman?.context || '', {
             app_code: appInfo.app_code,
-            ...(paramKey.includes('temperature') && { temperature: temperatureValue }),
-            ...(paramKey.includes('max_new_tokens') && { max_new_tokens: maxNewTokensValue }),
+            ...(paramKey.includes('temperature') && { temperature: 0.6 }),
+            ...(paramKey.includes('max_new_tokens') && { max_new_tokens: 4000 }),
             ...(paramKey.includes('resource') && {
               select_param:
                 typeof resourceValue === 'string'
@@ -132,7 +126,6 @@ const ToolsBar: React.FC<{
     handleChat,
     appInfo.app_code,
     paramKey,
-    temperatureValue,
     resourceValue,
     currentDialogue.select_param,
     currentDialogue.conv_uid,
@@ -234,8 +227,6 @@ const ToolsBar: React.FC<{
         <div className='flex gap-3 text-lg'>
           <ModelSwitcher />
           <Resource fileList={fileList} setFileList={setFileList} setLoading={setLoading} fileName={fileName} />
-          <Temperature temperatureValue={temperatureValue} setTemperatureValue={setTemperatureValue} />
-          <MaxNewTokens maxNewTokensValue={maxNewTokensValue} setMaxNewTokensValue={setMaxNewTokensValue} />
         </div>
         <div className='flex gap-1'>{returnTools(rightToolsConfig)}</div>
       </div>

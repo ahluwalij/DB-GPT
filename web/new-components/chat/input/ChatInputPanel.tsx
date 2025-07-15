@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { UserChatContent } from '@/types/chat';
 import { parseResourceValue } from '@/utils';
 import ToolsBar from './ToolsBar';
+import ContextSelector from '@/components/common/context-selector';
 
 const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortController }> = ({ ctrl }, ref) => {
   const { t } = useTranslation();
@@ -91,8 +92,22 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
     setUserInput,
   }));
 
+  const handleContextSelect = (context: any) => {
+    // Store the selected context for use in chat
+    const chatId = searchParams?.get('id') || '';
+    localStorage.setItem(`dbgpt_prompt_code_${chatId}`, context.prompt_code);
+  };
+
   return (
     <div className='flex flex-col w-5/6 mx-auto pt-4 pb-6 bg-transparent'>
+      {/* Context Selector - positioned above the input panel */}
+      <div className='mb-3 flex justify-between items-center'>
+        <ContextSelector
+          onContextSelect={handleContextSelect}
+          chat_scene={scene}
+        />
+      </div>
+      
       <div
         className={`flex flex-1 flex-col bg-white dark:bg-[rgba(255,255,255,0.16)] px-5 py-4 pt-2 rounded-xl relative border-t border-b border-l border-r dark:border-[rgba(255,255,255,0.6)] ${
           isFocus ? 'border-[#0c75fc]' : ''
@@ -101,7 +116,7 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
       >
         <ToolsBar ctrl={ctrl} />
         <Input.TextArea
-          placeholder={t('input_tips')}
+          placeholder="Ask a question or request data analysis..."
           className='w-full h-20 resize-none border-0 p-0 focus:shadow-none dark:bg-transparent'
           value={userInput}
           onKeyDown={e => {
@@ -147,7 +162,7 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
           {replyLoading ? (
             <Spin spinning={replyLoading} indicator={<LoadingOutlined className='text-white' />} />
           ) : (
-            t('sent')
+            'Send'
           )}
         </Button>
       </div>

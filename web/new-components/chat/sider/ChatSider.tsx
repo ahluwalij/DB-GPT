@@ -203,7 +203,7 @@ const ChatSider: React.FC<{
     >
       <div className='flex flex-col h-full w-full bg-transparent px-4 pt-6  '>
         <div className='w-full text-base font-semibold text-[#1c2533] dark:text-[rgba(255,255,255,0.85)] mb-4 line-clamp-1'>
-          {t('dialog_list')}
+          Conversation History
         </div>
         <Flex flex={1} vertical={true} className='overflow-y-auto'>
           <MenuItem

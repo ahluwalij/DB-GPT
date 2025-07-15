@@ -89,9 +89,17 @@ class ServeDao(BaseDao[ServeEntity, EvaluateServeRequest, EvaluateServeResponse]
                 if request_dict.get("context", None)
                 else None
             ),
-            evaluate_metrics=request_dict.get("evaluate_metrics", None),
+            evaluate_metrics=(
+                json.dumps(request_dict.get("evaluate_metrics", None))
+                if request_dict.get("evaluate_metrics", None)
+                else None
+            ),
             datasets_name=request_dict.get("datasets_name", None),
-            datasets=request_dict.get("datasets", None),
+            datasets=(
+                json.dumps(request_dict.get("datasets", None))
+                if request_dict.get("datasets", None)
+                else None
+            ),
             storage_type=request_dict.get("storage_type", None),
             parallel_num=request_dict.get("parallel_num", 1),
             state=request_dict.get("state", Status.TODO.value),
@@ -121,9 +129,9 @@ class ServeDao(BaseDao[ServeEntity, EvaluateServeRequest, EvaluateServeResponse]
             scene_key=entity.scene_key,
             scene_value=entity.scene_value,
             datasets_name=entity.datasets_name,
-            datasets=entity.datasets,
+            datasets=json.loads(entity.datasets) if entity.datasets else None,
             storage_type=entity.storage_type,
-            evaluate_metrics=entity.evaluate_metrics,
+            evaluate_metrics=json.loads(entity.evaluate_metrics) if entity.evaluate_metrics else None,
             context=json.loads(entity.context) if entity.context else None,
             user_name=entity.user_name,
             user_id=entity.user_id,
@@ -150,9 +158,9 @@ class ServeDao(BaseDao[ServeEntity, EvaluateServeRequest, EvaluateServeResponse]
             scene_key=entity.scene_key,
             scene_value=entity.scene_value,
             datasets_name=entity.datasets_name,
-            datasets=entity.datasets,
+            datasets=json.loads(entity.datasets) if entity.datasets else None,
             storage_type=entity.storage_type,
-            evaluate_metrics=entity.evaluate_metrics,
+            evaluate_metrics=json.loads(entity.evaluate_metrics) if entity.evaluate_metrics else None,
             context=json.loads(entity.context) if entity.context else None,
             user_name=entity.user_name,
             user_id=entity.user_id,

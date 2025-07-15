@@ -15,6 +15,7 @@ from dbgpt.rag.evaluation import RetrieverEvaluator
 from dbgpt.rag.evaluation.answer import AnswerRelevancyMetric
 from dbgpt.rag.evaluation.retriever import RetrieverSimilarityMetric
 from dbgpt.storage.metadata import BaseDao
+from dbgpt.util.pagination_utils import PaginationResult
 from dbgpt_serve.rag.operators.knowledge_space import SpaceRetrieverOperator
 
 from ...agent.agents.controller import multi_agents
@@ -63,6 +64,7 @@ class Service(BaseService[ServeEntity, EvaluateServeRequest, EvaluateServeRespon
         Args:
             system_app (SystemApp): The system app
         """
+        self._dao = self._dao or ServeDao(self._serve_config)
         self._system_app = system_app
 
     @property
@@ -78,6 +80,33 @@ class Service(BaseService[ServeEntity, EvaluateServeRequest, EvaluateServeRespon
     def config(self) -> ServeConfig:
         """Returns the internal ServeConfig."""
         return self._serve_config
+
+    def update(self, query_request, update_request) -> EvaluateServeResponse:
+        """Update an Evaluate entity
+
+        Args:
+            query_request: The query request to find the entity
+            update_request: The request with updated data
+
+        Returns:
+            EvaluateServeResponse: The response
+        """
+        return self.dao.update(query_request, update_request=update_request)
+
+    def get_list_by_page(
+        self, request, page: int, page_size: int
+    ) -> PaginationResult[EvaluateServeResponse]:
+        """Get a list of Evaluate entities by page
+
+        Args:
+            request: The request (can be empty dict for all records)
+            page (int): The page number
+            page_size (int): The page size
+
+        Returns:
+            PaginationResult[EvaluateServeResponse]: The paginated response
+        """
+        return self.dao.get_list_page(request, page, page_size, desc_order_column="gmt_create")
 
     async def run_evaluation(
         self,
@@ -160,11 +189,13 @@ class Service(BaseService[ServeEntity, EvaluateServeRequest, EvaluateServeRespon
                     ).create()
                     llm_client = DefaultLLMClient(worker_manager=worker_manager)
                     prompt = self.prompt_service.get_template(context.get("prompt"))
+                    # Use a default template if the prompt is not found
+                    prompt_template = prompt.template if prompt else "Please evaluate the relevance of the answer to the question."
                     metrics.append(
                         AnswerRelevancyMetric(
                             llm_client=llm_client,
                             model_name=context.get("model"),
-                            prompt_template=prompt.template,
+                            prompt_template=prompt_template,
                         )
                     )
                     for dataset in datasets:

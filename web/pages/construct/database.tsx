@@ -10,6 +10,7 @@ import { useAsyncEffect } from 'ahooks';
 import { Badge, Button, Card, Drawer, Empty, Modal, Spin, message } from 'antd';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/router';
 
 type DBItem = DbListResponse[0];
 
@@ -19,7 +20,7 @@ export function isFileDb(dbTypeList: DBOption[], dbType: DBType) {
 let getFromRenderData: any = [];
 function Database() {
   // const { setCurrentDialogInfo } = useContext(ChatContext);  // unused
-  // const router = useRouter(); // unused
+  const router = useRouter();
   const { t } = useTranslation();
 
   const [dbList, setDbList] = useState<DbListResponse>([]);
@@ -53,17 +54,22 @@ function Database() {
   };
 
   const dbTypeList = useMemo(() => {
-    const supportDbList = dbSupportList.map(item => {
-      const db_type = item?.name;
-      return { ...dbMapper[db_type], value: db_type, isFileDb: true, parameters: item.parameters };
-    }) as DBOption[];
+    const supportDbList = dbSupportList
+      .filter(item => item?.name === 'postgresql') // Only show PostgreSQL
+      .map(item => {
+        const db_type = item?.name;
+        return { ...dbMapper[db_type], value: db_type, isFileDb: true, parameters: item.parameters };
+      }) as DBOption[];
+    
+    // Only show PostgreSQL even if unsupported
     const unSupportDbList = Object.keys(dbMapper)
-      .filter(item => !supportDbList.some(db => db.value === item))
+      .filter(item => item === 'postgresql' && !supportDbList.some(db => db.value === item))
       .map(item => ({
         ...dbMapper[item],
         value: dbMapper[item].label,
         disabled: true,
       })) as DBOption[];
+    
     return [...supportDbList, ...unSupportDbList];
   }, [dbSupportList]);
 
@@ -147,6 +153,50 @@ function Database() {
     return parts[parts.length - 1];
   };
 
+  // Show business context guidance after PostgreSQL connection
+  const showBusinessContextGuidance = () => {
+    const isNewConnection = !modal.info; // Check if it's a new connection (not edit)
+    
+    if (isNewConnection) {
+      Modal.confirm({
+        title: '🎯 Enhance Your Data Analysis with Business Context',
+        width: 600,
+        content: (
+          <div className="py-4">
+            <p className="mb-4">
+              <strong>Great! Your PostgreSQL database is now connected.</strong>
+            </p>
+            <p className="mb-4">
+              To get the most out of your data analysis, we recommend creating a <strong>Business Context</strong> that includes:
+            </p>
+            <ul className="list-disc pl-6 mb-4 space-y-2">
+              <li><strong>Key Performance Indicators (KPIs)</strong> - Define your important business metrics</li>
+              <li><strong>Internal Business Terms</strong> - Explain company-specific terminology</li>
+              <li><strong>Example Business Questions</strong> - Common analysis patterns your team uses</li>
+              <li><strong>Data Visualization Preferences</strong> - How you like to see your data displayed</li>
+            </ul>
+            <p className="mb-2">
+              This helps the AI provide more relevant and business-focused insights from your data.
+            </p>
+          </div>
+        ),
+        okText: '📝 Create Business Context',
+        cancelText: '✅ Continue Without Context',
+        onOk() {
+          // Navigate to context creation page
+          router.push('/construct/prompt/add');
+        },
+        onCancel() {
+          // User chooses to continue without context
+          message.success('✅ Database connected successfully! You can add business context later from the Context tab.');
+        }
+      });
+    } else {
+      // For edit operations, just show success message
+      message.success('Database connection updated successfully!');
+    }
+  };
+
   return (
     <ConstructLayout>
       <div className='relative min-h-full overflow-y-auto px-6 max-h-[90vh]'>
@@ -201,6 +251,8 @@ function Database() {
           onSuccess={() => {
             setModal({ open: false });
             refreshDbList();
+            // Show business context guidance for PostgreSQL connections
+            showBusinessContextGuidance();
           }}
           onClose={() => {
             setModal({ open: false });

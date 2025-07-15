@@ -4,8 +4,7 @@ import ConstructLayout from '@/new-components/layout/Construct';
 import { IPrompt, PromptListResponse } from '@/types/prompt';
 import { PlusOutlined } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
-import type { SegmentedProps } from 'antd';
-import { App, Button, Popconfirm, Segmented, Space, Table, Typography } from 'antd';
+import { App, Button, Popconfirm, Space, Table, Typography } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { TFunction } from 'i18next';
 import { useRouter } from 'next/router';
@@ -52,7 +51,6 @@ const DeleteBtn: React.FC<{ record: IPrompt; refresh: () => void }> = ({ record,
 const Prompt = () => {
   const router = useRouter();
   const { t } = useTranslation();
-  const [promptType, setPromptType] = useState<string>('common');
   const [promptList, setPromptList] = useState<PromptListResponse>();
 
   const {
@@ -134,54 +132,19 @@ const Prompt = () => {
 
   useEffect(() => {
     getPrompts();
-  }, [promptType]);
-
-  const items: SegmentedProps['options'] = [
-    {
-      value: 'common',
-      label: 'Public Prompts',
-    },
-    // {
-    //   value: 'private',
-    //   label: 'Private Prompts',
-    // },
-  ];
+  }, [getPrompts]);
 
   return (
     <ConstructLayout>
       <div className={`px-6 py-2 ${styles['prompt-container']} md:p-6 h-[90vh] overflow-y-auto`}>
-        <div className='flex justify-between items-center mb-6'>
-          <div className='flex items-center gap-4'>
-            <Segmented
-              className='backdrop-filter backdrop-blur-lg bg-white bg-opacity-30 border-2 border-white rounded-lg shadow p-1 dark:border-[#6f7f95] dark:bg-[#6f7f95] dark:bg-opacity-60'
-              options={items}
-              onChange={type => {
-                setPromptType(type as string);
-              }}
-              value={promptType}
-            />
-            {/* <Input
-              variant="filled"
-              prefix={<SearchOutlined />}
-              placeholder={t('please_enter_the_keywords')}
-              allowClear
-              className="w-[230px] h-[40px] border-1 border-white backdrop-filter backdrop-blur-lg bg-white bg-opacity-30 dark:border-[#6f7f95] dark:bg-[#6f7f95] dark:bg-opacity-60"
-            /> */}
-          </div>
-          <div className='flex items-center gap-4 h-10'>
-            {/* {promptType === 'common' && (
-              <Button className="border-none  h-full" icon={<PlusOutlined />} disabled>
-                {t('Add')} Prompts {t('template')}
-              </Button>
-            )} */}
-            <Button
-              className='border-none text-white bg-button-gradient h-full'
-              onClick={handleAddBtn}
-              icon={<PlusOutlined />}
-            >
-              Add Prompts
-            </Button>
-          </div>
+        <div className='flex justify-end items-center mb-6'>
+          <Button
+            className='border-none text-white bg-button-gradient h-10'
+            onClick={handleAddBtn}
+            icon={<PlusOutlined />}
+          >
+            Add Context
+          </Button>
         </div>
         <Table
           columns={getColumns(t, handleEditBtn)}

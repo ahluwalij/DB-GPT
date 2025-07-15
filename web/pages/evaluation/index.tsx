@@ -89,7 +89,10 @@ const Evaluation = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isAddDataSet, setIsAddDataSet] = useState(true);
   const [evaluationShowData, setEvaluationShowData] = useState<Record<string, string>[]>([{}]);
-  const [storageTypeOptions, _] = useState<{ label: string; value: string }[]>();
+  const [storageTypeOptions, setStorageTypeOptions] = useState<{ label: string; value: string }[]>([
+    { label: 'Database', value: 'db' },
+    { label: 'Object Storage', value: 'oss' }
+  ]);
   const [dataSetsList, setDataSetsList] = useState<DataSetItemType[]>([]);
   const [currentEvaluationCode, setCurrentEvaluationCode] = useState<string>('');
   const [dataSetModalLoading, setDataSetModalLoading] = useState(false);
@@ -115,8 +118,24 @@ const Evaluation = () => {
     {
       manual: true,
       onSuccess: data => {
+        const sceneKey = form.getFieldValue('scene_key');
+        let filteredData = data;
+        
+        // Filter metrics based on scene type
+        if (sceneKey === 'app') {
+          // For app scene, only AnswerRelevancyMetric is supported
+          filteredData = data?.filter((i: Record<string, string>) => 
+            i.name === 'AnswerRelevancyMetric'
+          );
+        } else if (sceneKey === 'recall') {
+          // For recall scene, use retriever metrics
+          filteredData = data?.filter((i: Record<string, string>) => 
+            i.name.includes('Retriever')
+          );
+        }
+        
         setMetricOptions(
-          data?.map((i: Record<string, string>) => {
+          filteredData?.map((i: Record<string, string>) => {
             return { label: i.describe, value: i.name };
           }),
         );
@@ -660,10 +679,35 @@ const Evaluation = () => {
               const values = await form.validateFields();
               setEvaluationModalLoading(true);
               if (values) {
+                let evaluationData = { ...values };
+                
+                // Ensure evaluate_metrics is always an array
+                if (evaluationData.evaluate_metrics && !Array.isArray(evaluationData.evaluate_metrics)) {
+                  evaluationData.evaluate_metrics = [evaluationData.evaluate_metrics];
+                }
+                
+                // Handle inline datasets for app scene
+                if (values.scene_key === 'app' && values.inline_datasets) {
+                  try {
+                    const inlineDatasets = JSON.parse(values.inline_datasets);
+                    evaluationData.datasets = inlineDatasets;
+                    delete evaluationData.inline_datasets;
+                    
+                    // Add required context for app evaluation
+                    evaluationData.context = {
+                      top_k: 5,
+                      model: "zhipu_proxyllm",
+                      prompt: "40207dcb3dfb4b9eb55d795620267b49"
+                    };
+                  } catch (error) {
+                    message.error('数据集格式错误，请输入有效的JSON数组');
+                    setEvaluationModalLoading(false);
+                    return;
+                  }
+                }
+                
                 const [, , res] = await apiInterceptors(
-                  createEvaluations({
-                    ...values,
-                  }),
+                  createEvaluations(evaluationData),
                 );
                 if (res?.success) {
                   message.success('发起成功');
@@ -703,11 +747,12 @@ const Evaluation = () => {
                     //getSceneValueOptions
                     setSceneValueOptionLoading(true);
                     form.setFieldValue('scene_value', '');
+                    form.setFieldValue('evaluate_metrics', ''); // Clear metrics when scene changes
                     if (value === 'recall') {
                       const res = await getSpaceList();
                       if (res.data.success) {
                         setSceneValueOptions(
-                          res.data.data.map(i => ({
+                          res.data.data.items.map((i: any) => ({
                             label: i.name,
                             value: i.id.toString(),
                           })),
@@ -746,9 +791,28 @@ const Evaluation = () => {
               <Form.Item name='parallel_num' label='并行参数' rules={[{ required: true }]} initialValue={1}>
                 <Input></Input>
               </Form.Item>
-              <Form.Item name='datasets' label='数据集' rules={[{ required: true }]}>
-                <Select options={dataSetsOptions}></Select>
-              </Form.Item>
+              {useWatch('scene_key', form) === 'app' ? (
+                <Form.Item name='inline_datasets' label='测试数据集' rules={[{ required: true }]}>
+                  <TextArea 
+                    rows={8} 
+                    placeholder={`Enter datasets as JSON array:
+[
+  {
+    "query": "What tables are in the database?",
+    "doc_name": "database_schema"
+  },
+  {
+    "query": "Show me the structure of tables",
+    "doc_name": "table_structure"  
+  }
+]`}
+                  />
+                </Form.Item>
+              ) : (
+                <Form.Item name='datasets' label='数据集' rules={[{ required: true }]}>
+                  <Select options={dataSetsOptions}></Select>
+                </Form.Item>
+              )}
               <Form.Item
                 name='evaluate_metrics'
                 label='评测指标'
@@ -796,7 +860,7 @@ const Evaluation = () => {
                   } else if (storageType === 'db') {
                     uploadDataSetsContent({
                       dataset_name: values.dataset_name,
-                      members: values.members.join(','),
+                      members: values.members ? values.members.join(',') : '',
                       content: values.content,
                     })
                       .then(res => {

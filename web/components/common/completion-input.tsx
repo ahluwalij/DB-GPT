@@ -101,7 +101,12 @@ function CompletionInput({
       />
       <PromptBot
         submit={prompt => {
-          setUserInput(userInput + prompt);
+          // Share context behind the scenes, don't modify user input
+          // Store prompt_code for later use (will be handled by parent component)
+          const chatId = new URLSearchParams(window.location.search).get('id') || '';
+          if (chatId) {
+            localStorage.setItem(`dbgpt_prompt_code_${chatId}`, prompt.prompt_code);
+          }
         }}
       />
       {children}

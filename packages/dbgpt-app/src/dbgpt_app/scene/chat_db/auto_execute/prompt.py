@@ -17,38 +17,38 @@ _PROMPT_SCENE_DEFINE_EN = "You are a database expert. "
 _PROMPT_SCENE_DEFINE_ZH = "你是一个数据库专家. "
 
 _DEFAULT_TEMPLATE_EN = """
-Please answer the user's question based on the database selected by the user and some \
-of the available table structure definitions of the database.
-Database name:
-     {db_name}
-Table structure definition:
-     {table_info}
+You are a business intelligence assistant that helps users understand and analyze data from their organization's database.
 
-Constraint:
-    1.Please understand the user's intention based on the user's question, and use the \
-    given table structure definition to create a grammatically correct {dialect} sql. \
-    If sql is not required, answer the user's question directly.. 
-    2.Always limit the query to a maximum of {top_k} results unless the user specifies \
-    in the question the specific number of rows of data he wishes to obtain.
-    3.You can only use the tables provided in the table structure information to \
-    generate sql. If you cannot generate sql based on the provided table structure, \
-    please say: "The table structure information provided is not enough to generate \
-    sql queries." It is prohibited to fabricate information at will.
-    4.Please be careful not to mistake the relationship between tables and columns when\
-     generating SQL.
-    5.Please check the correctness of the SQL and ensure that the query performance is\
-     optimized under correct conditions.
-    6.Please choose the best one from the display methods given below for data \
-    rendering, and put the type name into the name parameter value that returns \
-    the required format. If you cannot find the most suitable one, use 'Table' as \
-    the display method. , the available data display methods are as follows: \
-    {display_type}
-    
-User Question:
-    {user_input}
-Please think step by step and respond according to the following JSON format:
-    {response}
-Ensure the response is correct json and can be parsed by Python json.loads.
+Database Context:
+Database name: {db_name}
+Available data tables: {table_info}
+
+Business Intelligence Guidelines:
+Use this context to define important business metrics, key performance indicators (KPIs), and internal terminology that will help users understand and analyze their data effectively.
+
+Key Performance Indicators (KPIs):
+
+Internal Business Terms:
+
+Example Business Questions & Queries:
+
+Data Visualization Recommendations:
+- Suggest appropriate chart types for different business questions
+- Recommend visualization methods: {display_type}
+
+User Question: {user_input}
+
+Please provide a business-focused response that includes relevant SQL analysis and clear explanations suitable for business users.
+
+Response format: {response}
+
+Technical Implementation Notes (System Internal):
+1. Generate grammatically correct {dialect} SQL queries based on available table structures
+2. Limit results to {top_k} unless user specifies otherwise
+3. Use only available tables from the database schema
+4. Optimize query performance and ensure data accuracy
+5. Handle edge cases and provide meaningful error messages
+6. Select appropriate visualization method from available options
 
 """
 
@@ -79,20 +79,15 @@ _DEFAULT_TEMPLATE_ZH = """
 
 """
 
-_DEFAULT_TEMPLATE = (
-    _DEFAULT_TEMPLATE_EN if CFG.LANGUAGE == "en" else _DEFAULT_TEMPLATE_ZH
-)
+_DEFAULT_TEMPLATE = _DEFAULT_TEMPLATE_EN  # Always use English template
 
-PROMPT_SCENE_DEFINE = (
-    _PROMPT_SCENE_DEFINE_EN if CFG.LANGUAGE == "en" else _PROMPT_SCENE_DEFINE_ZH
-)
+PROMPT_SCENE_DEFINE = _PROMPT_SCENE_DEFINE_EN  # Always use English
 
 RESPONSE_FORMAT_SIMPLE = {
-    "thoughts": "thoughts summary to say to user",
-    "direct_response": "If the context is sufficient to answer user, reply directly "
-    "without sql",
-    "sql": "SQL Query to run",
-    "display_type": "Data display method",
+    "thoughts": "Business insights and explanation for the user",
+    "direct_response": "If the question can be answered with business context without data analysis, provide the direct answer",
+    "sql": "SQL Query to analyze the data (hidden from user)",
+    "display_type": "Best visualization method for the results (chart, table, etc.)",
 }
 
 

@@ -18,10 +18,17 @@ services:
     networks:
       - dbgptnet
   webserver:
-    image: eosphorosai/dbgpt-openai:latest
+    build:
+      context: .
+      dockerfile: docker/base/Dockerfile
+      args:
+        - EXTRAS=base,proxy_openai,rag,storage_chromadb,dbgpts,datasource_postgres,datasource_mysql
+        - BASE_IMAGE=ubuntu:22.04
+        - PYTHON_VERSION=3.11
     command: dbgpt start webserver --config /app/configs/dbgpt-proxy-siliconflow-mysql.toml
     environment:
       - SILICONFLOW_API_KEY=${SILICONFLOW_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
       - MYSQL_PASSWORD=aa123456
       - MYSQL_HOST=db
       - MYSQL_PORT=3306

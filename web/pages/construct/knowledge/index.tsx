@@ -45,7 +45,7 @@ const Knowledge = () => {
     setLoading(true);
     const [_, data] = await apiInterceptors(getSpaceList({ ...params }));
     setLoading(false);
-    setSpaceList(data);
+    setSpaceList(Array.isArray(data) ? data : data?.items || []);
   }
 
   async function getSpaceConfigs() {

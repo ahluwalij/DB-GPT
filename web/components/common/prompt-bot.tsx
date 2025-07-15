@@ -1,6 +1,6 @@
 import { sendSpacePostRequest } from '@/utils/request';
 import { useRequest } from 'ahooks';
-import { ConfigProvider, FloatButton, Form, List, Popover, Select, Tooltip, message } from 'antd';
+import { ConfigProvider, FloatButton, Form, List, Popover, Select, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -31,18 +31,11 @@ const SelectTable: React.FC<SelectTableProps> = ({ data, loading, submit, close 
         rowKey={(record: any) => record.prompt_name}
         renderItem={item => (
           <List.Item key={item.prompt_name} onClick={handleClick(item)}>
-            <Tooltip title={item.content}>
-              <List.Item.Meta
-                style={{ cursor: 'copy' }}
-                title={item.prompt_name}
-                description={
-                  t('Prompt_Info_Scene') +
-                  `：${item.chat_scene}，` +
-                  t('Prompt_Info_Sub_Scene') +
-                  `：${item.sub_chat_scene}`
-                }
-              />
-            </Tooltip>
+            <List.Item.Meta
+              style={{ cursor: 'copy' }}
+              title={item.prompt_name}
+              description={`Context: ${item.chat_scene} | Type: ${item.sub_chat_scene}`}
+            />
           </List.Item>
         )}
       />
@@ -110,23 +103,26 @@ const PromptBot: React.FC<PromptBotProps> = ({ submit, chat_scene }) => {
     >
       <Popover
         title={
-          <Form.Item label={'Prompt ' + t('Type')}>
-            <Select
-              style={{ width: 150 }}
-              value={current}
-              onChange={handleChange}
-              options={[
-                {
-                  label: t('Public') + ' Prompts',
-                  value: 'common',
-                },
-                {
-                  label: t('Private') + ' Prompts',
-                  value: 'private',
-                },
-              ]}
-            />
-          </Form.Item>
+          <div>
+            <div style={{ marginBottom: 8, fontWeight: 'bold' }}>Select to Share Context</div>
+            <Form.Item label="Context Type" style={{ marginBottom: 0 }}>
+              <Select
+                style={{ width: 150 }}
+                value={current}
+                onChange={handleChange}
+                options={[
+                  {
+                    label: 'Public Contexts',
+                    value: 'common',
+                  },
+                  {
+                    label: 'Private Contexts',
+                    value: 'private',
+                  },
+                ]}
+              />
+            </Form.Item>
+          </div>
         }
         content={<SelectTable {...{ data, loading, submit, close }} />}
         placement='topRight'
@@ -134,9 +130,7 @@ const PromptBot: React.FC<PromptBotProps> = ({ submit, chat_scene }) => {
         open={open}
         onOpenChange={handleOpenChange}
       >
-        <Tooltip title={t('Click_Select') + ' Prompt'}>
-          <FloatButton className='bottom-[30%]' />
-        </Tooltip>
+        <FloatButton className='bottom-[30%]' />
       </Popover>
     </ConfigProvider>
   );

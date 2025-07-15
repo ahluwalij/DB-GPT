@@ -1,6 +1,6 @@
 import { ChatContext } from '@/app/chat-context';
 import { apiInterceptors, getAppInfo, getChatHistory, getDialogueList } from '@/client/api';
-import PromptBot from '@/components/common/prompt-bot';
+
 import useChat from '@/hooks/use-chat';
 import ChatContentContainer from '@/new-components/chat/ChatContentContainer';
 import ChatDefault from '@/new-components/chat/content/ChatDefault';
@@ -10,7 +10,7 @@ import { IApp } from '@/types/app';
 import { ChartData, ChatHistoryResponse, IChatDialogueSchema, UserChatContent } from '@/types/chat';
 import { getInitMessage, transformFileUrl } from '@/utils';
 import { useAsyncEffect, useRequest } from 'ahooks';
-import { Flex, Layout, Spin } from 'antd';
+import { Flex, Layout, Spin, message } from 'antd';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -36,8 +36,7 @@ interface ChatContentProps {
   resourceValue: any;
   modelValue: string;
   setModelValue: React.Dispatch<React.SetStateAction<string>>;
-  setTemperatureValue: React.Dispatch<React.SetStateAction<any>>;
-  setMaxNewTokensValue: React.Dispatch<React.SetStateAction<any>>;
+
   setResourceValue: React.Dispatch<React.SetStateAction<any>>;
   setAppInfo: React.Dispatch<React.SetStateAction<IApp>>;
   setAgent: React.Dispatch<React.SetStateAction<string>>;
@@ -64,8 +63,7 @@ export const ChatContentContext = createContext<ChatContentProps>({
   modelValue: '',
   setModelValue: () => {},
   setResourceValue: () => {},
-  setTemperatureValue: () => {},
-  setMaxNewTokensValue: () => {},
+
   setAppInfo: () => {},
   setAgent: () => {},
   setCanAbort: () => {},
@@ -105,14 +103,13 @@ const Chat: React.FC = () => {
   const [canAbort, setCanAbort] = useState<boolean>(false);
   const [agent, setAgent] = useState<string>('');
   const [appInfo, setAppInfo] = useState<IApp>({} as IApp);
-  const [temperatureValue, setTemperatureValue] = useState();
-  const [maxNewTokensValue, setMaxNewTokensValue] = useState();
+  // Hidden technical parameters - business users don't need to see these
+  const temperatureValue = 0.6;
+  const maxNewTokensValue = 4000;
   const [resourceValue, setResourceValue] = useState<any>();
   const [modelValue, setModelValue] = useState<string>('');
 
   useEffect(() => {
-    setTemperatureValue(appInfo?.param_need?.filter(item => item.type === 'temperature')[0]?.value || 0.6);
-    setMaxNewTokensValue(appInfo?.param_need?.filter(item => item.type === 'max_new_tokens')[0]?.value || 4000);
     setModelValue(appInfo?.param_need?.filter(item => item.type === 'model')[0]?.value || model);
     setResourceValue(
       knowledgeId || dbName || appInfo?.param_need?.filter(item => item.type === 'resource')[0]?.bind_value,
@@ -404,8 +401,7 @@ const Chat: React.FC = () => {
         modelValue,
         setModelValue,
         setResourceValue,
-        setTemperatureValue,
-        setMaxNewTokensValue,
+
         setAppInfo,
         setAgent,
         setCanAbort,
@@ -428,22 +424,7 @@ const Chat: React.FC = () => {
           />
           <Layout className='bg-transparent'>
             {contentRender()}
-            {/* Render PromptBot at the bottom right */}
-            <PromptBot
-              submit={prompt => {
-                // For chat_dashboard, only store prompt_code in localStorage
-                // The input filling will be handled by the CompletionInput's PromptBot
-                if (scene === 'chat_dashboard') {
-                  localStorage.setItem(`dbgpt_prompt_code_${chatId}`, prompt.prompt_code);
-                } else {
-                  // For other scenes, fill input and store prompt_code
-                  chatInputRef.current?.setUserInput?.(prompt.content);
-                  selectedPromptCodeRef.current = prompt.prompt_code;
-                  localStorage.setItem(`dbgpt_prompt_code_${chatId}`, prompt.prompt_code);
-                }
-              }}
-              chat_scene={scene}
-            />
+
           </Layout>
         </Layout>
       </Flex>
