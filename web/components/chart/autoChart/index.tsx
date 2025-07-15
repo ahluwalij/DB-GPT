@@ -82,7 +82,12 @@ export const AutoChart = (props: AutoChartProps) => {
       // Merge chart types recommended by model and ava
       const allAdvices = getMergedAdvices(avaAdvices);
       setAdvices(allAdvices);
-      setRenderChartType(allAdvices[0]?.type as ChartType);
+      
+      // Only set renderChartType if it's not already set or if the current selection is no longer valid
+      const currentTypeExists = allAdvices.some(advice => advice.type === renderChartType);
+      if (!renderChartType || !currentTypeExists) {
+        setRenderChartType(allAdvices[0]?.type as ChartType);
+      }
     }
   }, [JSON.stringify(data), advisor, chartType]);
 
