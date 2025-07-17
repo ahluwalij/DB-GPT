@@ -1,4 +1,3 @@
-import ChatHeader from '@/new-components/chat/header/ChatHeader';
 import { ChatContentContext } from '@/pages/chat';
 import { VerticalAlignBottomOutlined, VerticalAlignTopOutlined } from '@ant-design/icons';
 import dynamic from 'next/dynamic';
@@ -18,7 +17,6 @@ const ChatCompletion = dynamic(() => import('@/new-components/chat/content/ChatC
 // eslint-disable-next-line no-empty-pattern
 const ChatContentContainer = ({ className }: { className?: string }, ref: React.ForwardedRef<any>) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [isScrollToTop, setIsScrollToTop] = useState<boolean>(false);
   const [showScrollButtons, setShowScrollButtons] = useState<boolean>(false);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [isAtBottom, setIsAtBottom] = useState<boolean>(false);
@@ -52,12 +50,6 @@ const ChatContentContainer = ({ className }: { className?: string }, ref: React.
     // Check if we're at the bottom
     setIsAtBottom(scrollTop + clientHeight >= scrollHeight - buffer);
 
-    // Header visibility
-    if (scrollTop >= 42 + 32) {
-      setIsScrollToTop(true);
-    } else {
-      setIsScrollToTop(false);
-    }
 
     // Show scroll buttons when content is scrollable
     const isScrollable = scrollHeight > clientHeight;
@@ -172,7 +164,6 @@ const ChatContentContainer = ({ className }: { className?: string }, ref: React.
   return (
     <div className={`flex flex-1 overflow-hidden relative ${className || ''}`}>
       <div ref={scrollRef} className='h-full w-full mx-auto overflow-y-auto'>
-        <ChatHeader isScrollToTop={isScrollToTop} />
         <ChatCompletion />
       </div>
 

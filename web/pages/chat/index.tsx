@@ -1,11 +1,10 @@
 import { ChatContext } from '@/app/chat-context';
-import { apiInterceptors, getAppInfo, getChatHistory, getDialogueList } from '@/client/api';
+import { apiInterceptors, getAppInfo, getChatHistory, getDialogueList, newDialogue } from '@/client/api';
 
 import useChat from '@/hooks/use-chat';
 import ChatContentContainer from '@/new-components/chat/ChatContentContainer';
-import ChatDefault from '@/new-components/chat/content/ChatDefault';
 import ChatInputPanel from '@/new-components/chat/input/ChatInputPanel';
-import ChatSider from '@/new-components/chat/sider/ChatSider';
+// import ChatSider from '@/new-components/chat/sider/ChatSider';
 import { IApp } from '@/types/app';
 import { ChartData, ChatHistoryResponse, IChatDialogueSchema, UserChatContent } from '@/types/chat';
 import { getInitMessage, transformFileUrl } from '@/utils';
@@ -13,6 +12,7 @@ import { useAsyncEffect, useRequest } from 'ahooks';
 import { Flex, Layout, Spin, message } from 'antd';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 const DbEditor = dynamic(() => import('@/components/chat/db-editor'), {
@@ -76,7 +76,8 @@ export const ChatContentContext = createContext<ChatContentProps>({
 });
 
 const Chat: React.FC = () => {
-  const { model, currentDialogInfo } = useContext(ChatContext);
+  const router = useRouter();
+  const { model, currentDialogInfo, setCurrentDialogInfo } = useContext(ChatContext);
   const { isContract, setIsContract, setIsMenuExpand } = useContext(ChatContext);
   const { chat, ctrl } = useChat({
     app_code: currentDialogInfo.app_code || '',
@@ -124,6 +125,35 @@ const Chat: React.FC = () => {
       setIsContract(false);
     }
   }, [chatId, scene, setIsContract, setIsMenuExpand]);
+
+  // Auto-redirect to Chat Data when no chat ID or scene is present
+  useEffect(() => {
+    const shouldRedirect = !chatId && !scene;
+    if (shouldRedirect) {
+      const createChatDataSession = async () => {
+        try {
+          const [, res] = await apiInterceptors(newDialogue({ chat_mode: 'chat_with_db_execute', model }));
+          if (res) {
+            setCurrentDialogInfo?.({
+              chat_scene: res.chat_mode,
+              app_code: '',
+            });
+            localStorage.setItem(
+              'cur_dialog_info',
+              JSON.stringify({
+                chat_scene: res.chat_mode,
+                app_code: '',
+              }),
+            );
+            router.push(`/chat?scene=chat_with_db_execute&id=${res.conv_uid}${model ? `&model=${model}` : ''}`);
+          }
+        } catch (error) {
+          console.error('Failed to create chat data session:', error);
+        }
+      };
+      createChatDataSession();
+    }
+  }, [chatId, scene, model, router, setCurrentDialogInfo]);
 
   // 是否是默认小助手
   const isChatDefault = useMemo(() => {
@@ -370,7 +400,11 @@ const Chat: React.FC = () => {
     } else {
       return isChatDefault ? (
         <Content>
-          <ChatDefault />
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <p className="text-lg text-gray-600">Loading...</p>
+            </div>
+          </div>
         </Content>
       ) : (
         <Spin spinning={historyLoading} className='w-full h-full m-auto'>
@@ -415,16 +449,8 @@ const Chat: React.FC = () => {
     >
       <Flex flex={1}>
         <Layout className='bg-gradient-light bg-cover bg-center dark:bg-gradient-dark'>
-          <ChatSider
-            refresh={refreshDialogList}
-            dialogueList={dialogueList}
-            listLoading={listLoading}
-            historyLoading={historyLoading}
-            order={order}
-          />
           <Layout className='bg-transparent'>
             {contentRender()}
-
           </Layout>
         </Layout>
       </Flex>

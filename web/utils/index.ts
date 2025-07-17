@@ -1,4 +1,10 @@
 import { format } from 'sql-formatter';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 /** Theme */
 export const STORAGE_THEME_KEY = '__db_gpt_theme_key';

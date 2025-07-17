@@ -6,7 +6,7 @@ import { STORAGE_INIT_MESSAGE_KET } from '@/utils';
 import { useRequest } from 'ahooks';
 import { ConfigProvider, Card } from 'antd';
 import { t } from 'i18next';
-import Image from 'next/image';
+import SafeImage from '@/components/common/SafeImage';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
 import AppDefaultIcon from '@/new-components/common/AppDefaultIcon';
@@ -22,12 +22,6 @@ function ChatDefault() {
     //   description: 'Analyze and chat with Excel files',
     //   scene: 'chat_excel'
     // },
-    {
-      key: 'chat_dashboard', 
-      name: 'Chat Dashboard',
-      description: 'Create interactive dashboards and visualizations',
-      scene: 'chat_dashboard'
-    },
     {
       key: 'chat_with_db_execute',
       name: 'Chat Data',
@@ -129,7 +123,7 @@ function ChatDefault() {
                     }}
                   >
                     <span>{help.question}</span>
-                    <Image key='image_explore' src={'/icons/send.png'} alt='construct_image' width={20} height={20} />
+                    <SafeImage key='image_explore' src={'/icons/send.png'} alt='construct_image' width={20} height={20} />
                   </span>
                 ))}
               </div>

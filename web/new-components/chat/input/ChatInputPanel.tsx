@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { useSearchParams } from 'next/navigation';
 import React, { forwardRef, useContext, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSidebarRefresh } from '@/components/layouts/sidebar-refresh-context';
 
 import { UserChatContent } from '@/types/chat';
 import { parseResourceValue } from '@/utils';
@@ -13,6 +14,7 @@ import ContextSelector from '@/components/common/context-selector';
 
 const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortController }> = ({ ctrl }, ref) => {
   const { t } = useTranslation();
+  const { refreshSidebar } = useSidebarRefresh();
   const {
     replyLoading,
     handleChat,
@@ -84,6 +86,8 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
     // 如果应用进来第一次对话，刷新对话列表
     if (submitCountRef.current === 1) {
       await refreshDialogList();
+      // Also refresh the sidebar to show the new conversation
+      refreshSidebar();
     }
   };
 

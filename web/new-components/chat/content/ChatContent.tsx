@@ -13,7 +13,7 @@ import {
 import { GPTVis } from '@antv/gpt-vis';
 import { message } from 'antd';
 import classNames from 'classnames';
-import Image from 'next/image';
+import SafeImage from '@/components/common/SafeImage';
 import { useSearchParams } from 'next/navigation';
 import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

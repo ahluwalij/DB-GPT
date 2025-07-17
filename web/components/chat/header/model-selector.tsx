@@ -5,7 +5,7 @@
 import { ChatContext } from '@/app/chat-context';
 import { MODEL_ICON_MAP } from '@/utils/constants';
 import { Select } from 'antd';
-import Image from 'next/image';
+import SafeImage from '@/components/common/SafeImage';
 import { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -21,7 +21,7 @@ export function renderModelIcon(model?: string, props?: { width: number; height:
   if (!model) return null;
 
   return (
-    <Image
+    <SafeImage
       className='rounded-full border border-gray-200 object-contain bg-white inline-block'
       width={width || 24}
       height={height || 24}

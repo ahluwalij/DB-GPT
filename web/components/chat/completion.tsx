@@ -13,6 +13,7 @@ import { cloneDeep } from 'lodash';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSidebarRefresh } from '@/components/layouts/sidebar-refresh-context';
 
 import MyEmpty from '../common/MyEmpty';
 import CompletionInput from '../common/completion-input';
@@ -31,6 +32,7 @@ type Props = {
 const Completion = ({ messages, onSubmit, onFormatContent }: Props) => {
   const { dbParam, currentDialogue, scene, model, refreshDialogList, chatId, agent, docId } = useContext(ChatContext);
   const { t } = useTranslation();
+  const { refreshSidebar } = useSidebarRefresh();
   const searchParams = useSearchParams();
 
   const flowSelectParam = (searchParams && searchParams.get('select_param')) ?? '';
@@ -140,6 +142,7 @@ const Completion = ({ messages, onSubmit, onFormatContent }: Props) => {
     if (initMessage && initMessage.id === chatId) {
       await handleChat(initMessage.message);
       refreshDialogList();
+      refreshSidebar();
       localStorage.removeItem(STORAGE_INIT_MESSAGE_KET);
     }
   }, [chatId]);

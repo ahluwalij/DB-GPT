@@ -5,7 +5,7 @@ import { CaretLeftOutlined, CaretRightOutlined, DeleteOutlined, ShareAltOutlined
 import type { MenuProps } from 'antd';
 import { Flex, Layout, Modal, Spin, Tooltip, Typography, message } from 'antd';
 import copy from 'copy-to-clipboard';
-import Image from 'next/image';
+import SafeImage from '@/components/common/SafeImage';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -210,13 +210,12 @@ const ChatSider: React.FC<{
             item={{
               label: t('assistant'),
               key: 'default',
-              icon: <Image 
+              icon: <SafeImage 
                 src='/uagi-icon.svg' 
                 alt='UAGI' 
                 width={56} 
                 height={27} 
                 style={{ width: '24px', height: 'auto' }}
-                className='flex-1' 
               />,
               default: true,
             }}

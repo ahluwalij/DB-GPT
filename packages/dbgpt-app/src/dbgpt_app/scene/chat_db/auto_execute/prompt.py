@@ -49,6 +49,7 @@ Technical Implementation Notes (System Internal):
 4. Optimize query performance and ensure data accuracy
 5. Handle edge cases and provide meaningful error messages
 6. Select appropriate visualization method from available options
+7. **CRITICAL: ALWAYS use case-insensitive text filtering** - When filtering by text values like gender, use LOWER() functions: WHERE LOWER(gender) = LOWER('male') instead of WHERE gender = 'male'. This handles mixed case data (Male, MALE, male, etc.)
 
 """
 
@@ -65,12 +66,13 @@ _DEFAULT_TEMPLATE_ZH = """
     2. 除非用户在问题中指定了他希望获得的具体数据行数，否则始终将查询限制为最多\
      {top_k} 个结果。
     3. 只能使用表结构信息中提供的表来生成 sql，如果无法根据提供的表结构中生成 sql ，\
-    请说：“提供的表结构信息不足以生成 sql 查询。” 禁止随意捏造信息。
+    请说："提供的表结构信息不足以生成 sql 查询。" 禁止随意捏造信息。
     4. 请注意生成SQL时不要弄错表和列的关系
     5. 请检查SQL的正确性，并保证正确的情况下优化查询性能
     6.请从如下给出的展示方式种选择最优的一种用以进行数据渲染，\
     将类型名称放入返回要求格式的name参数值中，如果找不到最合适的\
     则使用'Table'作为展示方式，可用数据展示方式如下: {display_type}
+    7. 在对文本值进行过滤时，始终使用不区分大小写的比较来处理具有混合大小写格式的数据（例如，对于PostgreSQL使用ILIKE而不是LIKE，或对于精确匹配使用LOWER()函数，如WHERE LOWER(column) = LOWER('value')）
 用户问题:
     {user_input}
 请一步步思考并按照以下JSON格式回复：

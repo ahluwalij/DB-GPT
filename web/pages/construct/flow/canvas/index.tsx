@@ -50,7 +50,7 @@ const Canvas: React.FC = () => {
   const [isFlowTemplateModalOpen, setIsFlowTemplateModalOpen] = useState(false);
 
   if (localStorage.getItem('importFlowData')) {
-    const importFlowData = JSON.parse(localStorage.getItem('importFlowData') || '');
+    const importFlowData = JSON.parse(localStorage.getItem('importFlowData') || '{}');
     localStorage.removeItem('importFlowData');
     setLoading(true);
     const flowData = mapUnderlineToHump(importFlowData.flow_data);

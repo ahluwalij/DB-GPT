@@ -1,5 +1,6 @@
 import { ChatContext, ChatContextProvider } from '@/app/chat-context';
 import SideBar from '@/components/layout/side-bar';
+import { NotificationProvider } from '@/components/providers/NotificationProvider';
 import { STORAGE_USERINFO_KEY, STORAGE_USERINFO_VALID_TIME_KEY } from '@/utils/constants/index';
 import { App, ConfigProvider, MappingAlgorithm, theme } from 'antd';
 import enUS from 'antd/locale/en_US';
@@ -117,7 +118,11 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
         algorithm: mode === 'dark' ? antdDarkTheme : undefined,
       }}
     >
-      <App>{renderContent()}</App>
+      <App>
+        <NotificationProvider>
+          {renderContent()}
+        </NotificationProvider>
+      </App>
     </ConfigProvider>
   );
 }

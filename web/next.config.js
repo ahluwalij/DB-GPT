@@ -18,7 +18,10 @@ const nextConfig = {
     LOGOUT_URL: process.env.LOGOUT_URL,
   },
   trailingSlash: true,
-  images: { unoptimized: true },
+  images: { 
+    unoptimized: true,
+    domains: ['localhost'],
+  },
   skipTrailingSlashRedirect: true,
   webpack: (config, { isServer }) => {
     config.resolve.fallback = { fs: false };

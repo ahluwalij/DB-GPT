@@ -7,7 +7,7 @@ import { STORAGE_INIT_MESSAGE_KET } from '@/utils';
 import { useRequest } from 'ahooks';
 import { ConfigProvider, Segmented, SegmentedProps } from 'antd';
 import { t } from 'i18next';
-import Image from 'next/image';
+import SafeImage from '@/components/common/SafeImage';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
@@ -125,7 +125,7 @@ function Default() {
                   router.push('/');
                 }}
               >
-                <Image
+                <SafeImage
                   key='image_explore'
                   src={'/pictures/explore_active.png'}
                   alt='construct_image'
@@ -166,7 +166,7 @@ function Default() {
                     }}
                   >
                     <span>{help.question}</span>
-                    <Image key='image_explore' src={'/icons/send.png'} alt='construct_image' width={20} height={20} />
+                    <SafeImage key='image_explore' src={'/icons/send.png'} alt='construct_image' width={20} height={20} />
                   </span>
                 ))}
               </div>

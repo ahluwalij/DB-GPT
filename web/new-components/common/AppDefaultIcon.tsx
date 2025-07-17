@@ -1,7 +1,6 @@
 import {
   ColorfulChat,
   ColorfulDB,
-  ColorfulDashboard,
   ColorfulData,
   ColorfulDoc,
   ColorfulExcel,
@@ -22,8 +21,6 @@ const AppDefaultIcon: React.FC<{ scene: string; width?: number; height?: number 
       case 'chat_with_db_qa':
       case 'chat_dba':
         return ColorfulDB;
-      case 'chat_dashboard':
-        return ColorfulDashboard;
       case 'chat_agent':
         return ColorfulPlugin;
       case 'chat_normal':

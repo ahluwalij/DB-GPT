@@ -42,9 +42,8 @@ interface IChatContext {
 }
 
 function getDefaultTheme(): ThemeMode {
-  const theme = localStorage.getItem(STORAGE_THEME_KEY) as ThemeMode;
-  if (theme) return theme;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  // Always return light mode
+  return 'light';
 }
 
 const ChatContext = createContext<IChatContext>({
@@ -124,9 +123,11 @@ const ChatContextProvider = ({ children }: { children: React.ReactElement }) => 
   }, [queryAdminListRun, getUserId()]);
 
   useEffect(() => {
-    setMode(getDefaultTheme());
+    // Always set to light mode
+    setMode('light');
+    localStorage.setItem(STORAGE_THEME_KEY, 'light');
     try {
-      const dialogInfo = JSON.parse(localStorage.getItem('cur_dialog_info') || '');
+      const dialogInfo = JSON.parse(localStorage.getItem('cur_dialog_info') || '{}');
       setCurrentDialogInfo(dialogInfo);
     } catch {
       setCurrentDialogInfo({
