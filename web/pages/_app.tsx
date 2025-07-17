@@ -13,6 +13,9 @@ import { useTranslation } from 'react-i18next';
 import '../app/i18n';
 import '../nprogress.css';
 import '../styles/globals.css';
+import '../styles/auth.css';
+import { customAuthClient } from '../lib/auth/client-custom';
+import { Toaster } from 'sonner';
 // import TopProgressBar from '@/components/layout/top-progress-bar';
 
 const antdDarkTheme: MappingAlgorithm = (seedToken, mapToken) => {
@@ -60,23 +63,39 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
 
   // Login check
   const handleAuth = async () => {
+    console.log('handleAuth: Starting auth check');
     setIsLogin(false);
-    // If login info exists, show homepage directly
-    // if (localStorage.getItem(STORAGE_USERINFO_KEY)) {
-    //   setIsLogin(true);
-    //   return;
-    // }
-
-    // MOCK User info
-    const user = {
-      user_channel: `dbgpt`,
-      user_no: `001`,
-      nick_name: `dbgpt`,
-    };
-    if (user) {
-      localStorage.setItem(STORAGE_USERINFO_KEY, JSON.stringify(user));
-      localStorage.setItem(STORAGE_USERINFO_VALID_TIME_KEY, Date.now().toString());
-      setIsLogin(true);
+    
+    try {
+      // Check if user is authenticated with custom auth
+      const session = await customAuthClient.getSession();
+      console.log('handleAuth: Session result:', session);
+      
+      if (session?.user) {
+        console.log('handleAuth: User authenticated:', session.user);
+        // User is authenticated, store user info in localStorage for compatibility
+        const user = {
+          user_channel: `dbgpt`,
+          user_no: session.user.id,
+          nick_name: session.user.name,
+          email: session.user.email,
+        };
+        localStorage.setItem(STORAGE_USERINFO_KEY, JSON.stringify(user));
+        localStorage.setItem(STORAGE_USERINFO_VALID_TIME_KEY, Date.now().toString());
+        setIsLogin(true);
+      } else {
+        console.log('handleAuth: No session, redirecting to sign-in');
+        // No session, redirect to sign-in
+        if (!router.pathname.startsWith('/auth/')) {
+          router.push('/auth/sign-in');
+        }
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+      // Fallback - redirect to sign-in
+      if (!router.pathname.startsWith('/auth/')) {
+        router.push('/auth/sign-in');
+      }
     }
   };
 
@@ -84,7 +103,7 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
     handleAuth();
   }, []);
 
-  if (!isLogin) {
+  if (!isLogin && !router.pathname.startsWith('/auth/')) {
     return null;
   }
 
@@ -92,6 +111,12 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
     if (router.pathname.includes('mobile')) {
       return <>{children}</>;
     }
+    
+    // Auth pages don't need sidebar
+    if (router.pathname.startsWith('/auth/')) {
+      return <>{children}</>;
+    }
+    
     return (
       <div className='flex w-screen h-screen overflow-hidden'>
         <Head>
@@ -121,6 +146,7 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
       <App>
         <NotificationProvider>
           {renderContent()}
+          <Toaster position="top-right" />
         </NotificationProvider>
       </App>
     </ConfigProvider>

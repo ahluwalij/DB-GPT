@@ -31,20 +31,28 @@ import { useContext } from "react";
 import { ChatContext } from "@/app/chat-context";
 import { useTranslation } from "react-i18next";
 import { STORAGE_THEME_KEY, STORAGE_USERINFO_KEY } from "@/utils/constants/index";
+import { customAuthClient } from "../../lib/auth/client-custom";
+import { useRouter } from "next/router";
 
 export function AppSidebarUser() {
   const { mode, setMode } = useContext(ChatContext);
   const { t } = useTranslation();
+  const router = useRouter();
 
   // Get user info from localStorage
   const userInfo = typeof window !== 'undefined' 
     ? JSON.parse(localStorage.getItem(STORAGE_USERINFO_KEY) || '{}')
     : {};
 
-  const logout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem(STORAGE_USERINFO_KEY);
-      window.location.href = "/";
+  const logout = async () => {
+    try {
+      await customAuthClient.signOut();
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(STORAGE_USERINFO_KEY);
+        router.push("/auth/sign-in");
+      }
+    } catch (error) {
+      console.error("Sign out error:", error);
     }
   };
 
