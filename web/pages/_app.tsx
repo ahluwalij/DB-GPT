@@ -1,6 +1,5 @@
 import { ChatContext, ChatContextProvider } from '@/app/chat-context';
 import SideBar from '@/components/layout/side-bar';
-import FloatHelper from '@/new-components/layout/FloatHelper';
 import { STORAGE_USERINFO_KEY, STORAGE_USERINFO_VALID_TIME_KEY } from '@/utils/constants/index';
 import { App, ConfigProvider, MappingAlgorithm, theme } from 'antd';
 import enUS from 'antd/locale/en_US';
@@ -103,7 +102,6 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
           </div>
         )}
         <div className='flex flex-col flex-1 relative overflow-hidden'>{children}</div>
-        <FloatHelper />
       </div>
     );
   };

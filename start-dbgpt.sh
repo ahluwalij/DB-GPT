@@ -62,11 +62,11 @@ else
 fi
 
 # 4. Verify OpenAI API key is set
-if grep -q "sk-proj-" docker-compose.yml; then
+if [ -f ".env" ] && grep -q "OPENAI_API_KEY=sk-proj-" .env; then
     print_success "OpenAI API key is configured"
 else
-    print_error "OpenAI API key not found in docker-compose.yml"
-    print_error "Please ensure OPENAI_API_KEY is set in docker-compose.yml"
+    print_error "OpenAI API key not found in .env file"
+    print_error "Please ensure OPENAI_API_KEY is set in .env file"
     exit 1
 fi
 

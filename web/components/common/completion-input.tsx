@@ -6,7 +6,7 @@ import { Button, Input } from 'antd';
 import { PropsWithChildren, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import DocList from '../chat/doc-list';
 import DocUpload from '../chat/doc-upload';
-import PromptBot from './prompt-bot';
+import ContextSelector from './context-selector';
 
 type TextAreaProps = Omit<Parameters<typeof Input.TextArea>[0], 'value' | 'onPressEnter' | 'onChange' | 'onSubmit'>;
 
@@ -99,15 +99,16 @@ function CompletionInput({
           onSubmit(userInput);
         }}
       />
-      <PromptBot
-        submit={prompt => {
+      <ContextSelector
+        onContextSelect={(context) => {
           // Share context behind the scenes, don't modify user input
           // Store prompt_code for later use (will be handled by parent component)
           const chatId = new URLSearchParams(window.location.search).get('id') || '';
           if (chatId) {
-            localStorage.setItem(`dbgpt_prompt_code_${chatId}`, prompt.prompt_code);
+            localStorage.setItem(`dbgpt_prompt_code_${chatId}`, context.prompt_code);
           }
         }}
+        chat_scene={scene}
       />
       {children}
     </div>
