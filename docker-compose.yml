@@ -30,7 +30,7 @@ services:
     environment:
       - SILICONFLOW_API_KEY=${SILICONFLOW_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - LLM_MODEL_NAME=${LLM_MODEL_NAME:-gpt-4o}
+      - LLM_MODEL_NAME=${LLM_MODEL_NAME:-o3}
       - MYSQL_PASSWORD=aa123456
       - MYSQL_HOST=db
       - MYSQL_PORT=3306

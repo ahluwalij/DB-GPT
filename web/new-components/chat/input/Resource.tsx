@@ -1,5 +1,6 @@
 import { apiInterceptors, postChatModeParamsFileLoad, postChatModeParamsList } from '@/client/api';
 import DBIcon from '@/components/common/db-icon';
+import ModernDBResource from '@/components/chat/input/modern-db-resource';
 import { ChatContentContext } from '@/pages/chat';
 import { IDB } from '@/types/chat';
 import { dbMapper } from '@/utils';
@@ -185,6 +186,15 @@ const Resource: React.FC<{
       );
     }
     case 'database':
+      return (
+        <ModernDBResource
+          value={resourceValue}
+          onChange={setResourceValue}
+          databaseOptions={dbOpts}
+          disabled={!!resource?.bind_value}
+          loading={dbsLoading}
+        />
+      );
     case 'knowledge':
     case 'plugin':
     case 'awel_flow':

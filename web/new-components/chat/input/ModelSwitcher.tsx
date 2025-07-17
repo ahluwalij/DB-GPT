@@ -1,15 +1,12 @@
-import { ChatContext } from '@/app/chat-context';
 import { ChatContentContext } from '@/pages/chat';
-import { SettingOutlined } from '@ant-design/icons';
-import { Select, Tooltip } from 'antd';
+import { Badge } from 'antd';
 import React, { memo, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ModelIcon from '../content/ModelIcon';
 
 const ModelSwitcher: React.FC = () => {
-  const { modelList } = useContext(ChatContext);
-  const { appInfo, modelValue, setModelValue } = useContext(ChatContentContext);
+  const { appInfo, modelValue } = useContext(ChatContentContext);
 
   const { t } = useTranslation();
 
@@ -18,35 +15,21 @@ const ModelSwitcher: React.FC = () => {
     return appInfo.param_need?.map(i => i.type) || [];
   }, [appInfo.param_need]);
 
-  if (!paramKey.includes('model')) {
-    return (
-      <Tooltip title={t('model_tip')}>
-        <div className='flex w-8 h-8 items-center justify-center rounded-md hover:bg-[rgb(221,221,221,0.6)]'>
-          <SettingOutlined className='text-xl cursor-not-allowed opacity-30' />
-        </div>
-      </Tooltip>
-    );
+  if (!paramKey.includes('model') || !modelValue) {
+    return null;
   }
 
   return (
-    <Select
-      value={modelValue}
-      placeholder={t('choose_model')}
-      className='h-8 rounded-3xl'
-      onChange={val => {
-        setModelValue(val);
-      }}
-      popupMatchSelectWidth={300}
+    <Badge
+      count={0}
+      showZero={false}
+      className='flex items-center'
     >
-      {modelList.map(item => (
-        <Select.Option key={item}>
-          <div className='flex items-center'>
-            <ModelIcon model={item} />
-            <span className='ml-2'>{item}</span>
-          </div>
-        </Select.Option>
-      ))}
-    </Select>
+      <div className='flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm'>
+        <ModelIcon model={modelValue} />
+        <span className='ml-2 text-gray-700 dark:text-gray-300'>{modelValue}</span>
+      </div>
+    </Badge>
   );
 };
 

@@ -140,7 +140,7 @@ class OpenAILLMClient(ProxyLLMClient):
         proxies: Optional["ProxiesTypes"] = None,
         proxy: Optional["ProxyTypes"] = None,
         timeout: Optional[int] = 240,
-        model_alias: Optional[str] = "gpt-4o-mini",
+        model_alias: Optional[str] = "o3",
         context_length: Optional[int] = 8192,
         openai_client: Optional["ClientType"] = None,
         openai_kwargs: Optional[Dict[str, Any]] = None,
@@ -236,7 +236,7 @@ class OpenAILLMClient(ProxyLLMClient):
     def default_model(self) -> str:
         model = self._model
         if not model:
-            model = "gpt-35-turbo" if self._api_type == "azure" else "gpt-4o-mini"
+            model = "gpt-35-turbo" if self._api_type == "azure" else "o3"
         return model
 
     def _build_request(
@@ -245,17 +245,35 @@ class OpenAILLMClient(ProxyLLMClient):
         payload = {"stream": stream}
         model = request.model or self.default_model
         payload["model"] = model
-        # Apply openai kwargs
+        logger.info(f"🚨 _build_request CALLED: model={model}, stream={stream}")
+        logger.info(f"🚨 request.max_new_tokens={request.max_new_tokens}")
+        logger.info(f"🚨 self._openai_kwargs={self._openai_kwargs}")
+        # Apply openai kwargs, but handle max_tokens specially for reasoning models
+        logger.info(f"Processing openai_kwargs: {self._openai_kwargs}")
         for k, v in self._openai_kwargs.items():
-            payload[k] = v
+            if k == "max_tokens" and model and any(reasoning_model in model.lower() for reasoning_model in ["o1", "o3"]):
+                logger.info(f"Converting max_tokens to max_completion_tokens for reasoning model: {model}")
+                # Convert max_tokens to max_completion_tokens for reasoning models
+                payload["max_completion_tokens"] = v
+            else:
+                payload[k] = v
         if request.temperature:
             payload["temperature"] = request.temperature
         if request.max_new_tokens:
-            payload["max_tokens"] = request.max_new_tokens
+            # Use max_completion_tokens for reasoning models (o1, o3), max_tokens for others
+            logger.info(f"Processing max_new_tokens for model: {model}")
+            if model and any(reasoning_model in model.lower() for reasoning_model in ["o1", "o3"]):
+                logger.info(f"Using max_completion_tokens for reasoning model: {model}")
+                # Override any max_completion_tokens from openai_kwargs
+                payload["max_completion_tokens"] = request.max_new_tokens
+            else:
+                logger.info(f"Using max_tokens for non-reasoning model: {model}")
+                payload["max_tokens"] = request.max_new_tokens
         if request.stop:
             payload["stop"] = request.stop
         if request.top_p:
             payload["top_p"] = request.top_p
+        logger.info(f"Final payload for model {model}: {payload}")
         return payload
 
     async def generate(
@@ -317,7 +335,7 @@ class OpenAILLMClient(ProxyLLMClient):
         async for r in chat_completion:
             if len(r.choices) == 0:
                 continue
-            # Check for empty 'choices' issue in Azure GPT-4o responses
+            # Check for empty 'choices' issue in Azure o3 responses
             if r.choices[0] is not None and r.choices[0].delta is None:
                 continue
             delta_obj = r.choices[0].delta
@@ -354,23 +372,23 @@ register_proxy_model_adapter(
     supported_models=[
         ModelMetadata(
             model=[
-                "gpt-4o",
-                "gpt-4o-2024-08-06",
-                "gpt-4o-2024-11-20",
-                "gpt-4o-2024-08-06",
+                "o3",
+                "o3",
+                "o3",
+                "o3",
             ],
             context_length=128000,
             max_output_length=16384,
             description="The flagship model across audio, vision, and text by OpenAI",
-            link="https://openai.com/index/hello-gpt-4o/",
+            link="https://openai.com/index/hello-o3/",
             function_calling=True,
         ),
         ModelMetadata(
-            model=["gpt-4o-mini", "gpt-4o-mini-2024-07-18", "gpt-4o-mini-2024-07-18"],
+            model=["o3", "o3", "o3"],
             context_length=128000,
             max_output_length=16384,
             description="The flagship model across audio, vision, and text by OpenAI",
-            link="https://openai.com/index/hello-gpt-4o/",
+            link="https://openai.com/index/hello-o3/",
             function_calling=True,
         ),
         ModelMetadata(

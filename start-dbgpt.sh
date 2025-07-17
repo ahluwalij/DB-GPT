@@ -147,7 +147,7 @@ else
     print_success "Web Interface: http://localhost:5670"
 fi
 print_success "Database: MySQL (external connections) + SQLite (metadata)"
-print_success "LLM Model: OpenAI GPT-4o"
+print_success "LLM Model: OpenAI o3"
 print_success "Embeddings: OpenAI text-embedding-3-small"
 echo ""
 print_status "Useful commands:"

@@ -34,7 +34,7 @@ from dbgpt_ext.storage.knowledge_graph.knowledge_graph import (
 """
 
 llm_client = OpenAILLMClient()
-model_name = "gpt-4o-mini"
+model_name = "o3"
 
 
 @pytest.mark.asyncio

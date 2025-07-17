@@ -138,7 +138,11 @@ const ChatContextProvider = ({ children }: { children: React.ReactElement }) => 
   }, []);
 
   useEffect(() => {
-    setModel(modelList[0]);
+    if (modelList && modelList.length > 0) {
+      // Prefer o3 model if available, otherwise use the first model
+      const o3Model = modelList.find(model => model.toLowerCase().includes('o3'));
+      setModel(o3Model || modelList[0]);
+    }
   }, [modelList, modelList?.length]);
 
   const contextValue = {

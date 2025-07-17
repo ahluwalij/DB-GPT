@@ -10,7 +10,6 @@ import { useSidebarRefresh } from '@/components/layouts/sidebar-refresh-context'
 import { UserChatContent } from '@/types/chat';
 import { parseResourceValue } from '@/utils';
 import ToolsBar from './ToolsBar';
-import ContextSelector from '@/components/common/context-selector';
 
 const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortController }> = ({ ctrl }, ref) => {
   const { t } = useTranslation();
@@ -96,22 +95,8 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
     setUserInput,
   }));
 
-  const handleContextSelect = (context: any) => {
-    // Store the selected context for use in chat
-    const chatId = searchParams?.get('id') || '';
-    localStorage.setItem(`dbgpt_prompt_code_${chatId}`, context.prompt_code);
-  };
-
   return (
     <div className='flex flex-col w-5/6 mx-auto pt-4 pb-6 bg-transparent'>
-      {/* Context Selector - positioned above the input panel */}
-      <div className='mb-3 flex justify-between items-center'>
-        <ContextSelector
-          onContextSelect={handleContextSelect}
-          chat_scene={scene}
-        />
-      </div>
-      
       <div
         className={`flex flex-1 flex-col bg-white dark:bg-[rgba(255,255,255,0.16)] px-5 py-4 pt-2 rounded-xl relative border-t border-b border-l border-r dark:border-[rgba(255,255,255,0.6)] ${
           isFocus ? 'border-[#0c75fc]' : ''

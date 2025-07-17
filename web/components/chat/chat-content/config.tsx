@@ -467,7 +467,7 @@ const extraComponents: MarkdownComponent = {
       data?.type === 'response_table' ? [DataItem, SqlItem] : [ChartItem, SqlItem, DataItem];
 
     return (
-      <div>
+      <div className='overflow-x-auto'>
         <Tabs defaultActiveKey={data?.type === 'response_table' ? 'data' : 'chart'} items={TabItems} size='small' />
         {children}
       </div>

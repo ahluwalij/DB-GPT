@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     ClientType = Union[AsyncAzureOpenAI, AsyncOpenAI]
 
 
-_AIMLAPI_DEFAULT_MODEL = "gpt-4o"
+_AIMLAPI_DEFAULT_MODEL = "o3"
 
 
 @auto_register_resource(
@@ -151,11 +151,11 @@ register_proxy_model_adapter(
             function_calling=True,
         ),
         ModelMetadata(
-            model=["openai/gpt-4o", "gpt-4o-mini", "openai/gpt-4-turbo"],
+            model=["openai/o3", "o3", "openai/gpt-4-turbo"],
             context_length=128_000,
             max_output_length=16_384,
             description="GPT‑4 family (4o, 4o‑mini, 4 Turbo) via AI/ML API",
-            link="https://aimlapi.com/models#openai-gpt-4o",
+            link="https://aimlapi.com/models#openai-o3",
             function_calling=True,
         ),
         ModelMetadata(

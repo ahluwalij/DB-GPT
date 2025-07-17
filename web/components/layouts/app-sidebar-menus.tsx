@@ -7,8 +7,8 @@ import { SidebarGroup } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import SafeImage from "@/components/common/SafeImage";
 import { usePathname } from "next/navigation";
+import { MessageSquarePlus, Settings } from "lucide-react";
 
 export function AppSidebarMenus() {
   const router = useRouter();
@@ -19,15 +19,14 @@ export function AppSidebarMenus() {
   const functions = [
     {
       key: 'chat',
-      name: 'Chat',
+      name: 'New Chat',
       icon: (
-        <SafeImage
-          key='image_chat'
-          src={pathname === '/chat' || pathname === '/' ? '/pictures/chat_active.png' : '/pictures/chat.png'}
-          alt='chat_image'
-          width={24}
-          height={24}
-          priority={false}
+        <MessageSquarePlus 
+          className={`h-5 w-5 ${
+            pathname.startsWith('/chat') || pathname === '/' 
+              ? 'text-blue-700' 
+              : 'text-gray-600'
+          }`}
         />
       ),
       path: '/chat',
@@ -38,13 +37,12 @@ export function AppSidebarMenus() {
       name: 'Settings',
       isActive: pathname.startsWith('/construct'),
       icon: (
-        <SafeImage
-          key='image_construct'
-          src={pathname.startsWith('/construct') ? '/pictures/app_active.png' : '/pictures/app.png'}
-          alt='construct_image'
-          width={24}
-          height={24}
-          priority={false}
+        <Settings 
+          className={`h-5 w-5 ${
+            pathname.startsWith('/construct') 
+              ? 'text-blue-700' 
+              : 'text-gray-600'
+          }`}
         />
       ),
       path: '/construct/database',
@@ -55,46 +53,21 @@ export function AppSidebarMenus() {
     <SidebarGroup>
       <SidebarGroupContent>
         <SidebarMenu>
-          <SidebarMenuItem className="mb-1">
-            <Link
-              href="/chat"
-              onClick={(e) => {
-                e.preventDefault();
-                setOpenMobile(false);
-                router.push(`/chat`);
-                router.refresh();
-              }}
-            >
-              <SidebarMenuButton className="flex font-semibold group/new-chat bg-input/20 border border-border/40">
-                <SafeImage
-                  src="/pictures/chat.png"
-                  alt="new chat"
-                  width={16}
-                  height={16}
-                  priority={false}
-                />
-                New Chat
-                <div className="flex items-center gap-1 text-xs font-medium ml-auto opacity-0 group-hover/new-chat:opacity-100 transition-opacity">
-                  <span className="border w-5 h-5 flex items-center justify-center bg-accent rounded">
-                    ⌘
-                  </span>
-                  <span className="border w-5 h-5 flex items-center justify-center bg-accent rounded">
-                    N
-                  </span>
-                </div>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
-          
           {functions.map((item) => (
             <SidebarMenuItem key={item.key}>
               <Link href={item.path}>
                 <SidebarMenuButton 
-                  className="font-semibold" 
+                  className={`font-medium transition-all duration-200 rounded-lg px-3 py-2.5 ${
+                    item.isActive 
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm' 
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  }`}
                   isActive={item.isActive}
                 >
-                  {item.icon}
-                  {item.name}
+                  <div className="flex items-center gap-3">
+                    {item.icon}
+                    <span className="text-sm">{item.name}</span>
+                  </div>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>

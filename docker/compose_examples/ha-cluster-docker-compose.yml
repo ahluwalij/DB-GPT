@@ -89,7 +89,7 @@ services:
     environment:
       - WORKER_TYPE=llm
       - LLM_MODEL_PROVIDER=${LLM_MODEL_PROVIDER:-proxy/openai}
-      - LLM_MODEL_NAME=${LLM_MODEL_NAME:-gpt-4o}
+      - LLM_MODEL_NAME=${LLM_MODEL_NAME:-o3}
       - OPENAI_API_BASE=${OPENAI_API_BASE:-https://api.openai.com/v1}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - CONTROLLER_ADDR=http://controller-1:8000,http://controller-2:8000

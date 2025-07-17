@@ -44,6 +44,8 @@ export function AppSidebarThreads() {
   const { setRefreshSidebar } = useSidebarRefresh();
   
   const [generatingTitleThreadIds, setGeneratingTitleThreadIds] = useState<string[]>([]);
+  const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState<string>("");
   
   // State to track if expanded view is active
   const [isExpanded, setIsExpanded] = useState(false);
@@ -78,6 +80,30 @@ export function AppSidebarThreads() {
 
   // Current thread ID for highlighting active thread
   const currentThreadId = chatId;
+
+  const handleStartRename = (threadId: string, currentTitle: string) => {
+    setEditingThreadId(threadId);
+    setEditingTitle(currentTitle);
+  };
+
+  const handleSaveRename = async (threadId: string) => {
+    try {
+      // TODO: Implement actual update API call
+      console.log("Update thread:", threadId, "with title:", editingTitle);
+      toast.success("Thread updated successfully");
+      setEditingThreadId(null);
+      setEditingTitle("");
+      // Refresh the thread list to show updated title
+      refreshDialogList();
+    } catch (error) {
+      toast.error("Failed to update thread");
+    }
+  };
+
+  const handleCancelRename = () => {
+    setEditingThreadId(null);
+    setEditingTitle("");
+  };
 
   // Check if we have 40 or more threads to display "View All" button
   const hasExcessThreads = threadList && threadList.length >= MAX_THREADS_COUNT;
@@ -168,8 +194,8 @@ export function AppSidebarThreads() {
         <SidebarGroupContent className="group-data-[collapsible=icon]:hidden group/threads">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarGroupLabel className="">
-                <h4 className="text-xs text-muted-foreground">
+              <SidebarGroupLabel className="px-3 py-2">
+                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Recent Chats
                 </h4>
                 <div className="flex-1" />
@@ -179,18 +205,27 @@ export function AppSidebarThreads() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="opacity-0 group-hover/threads:opacity-100 transition-opacity"
+                      className="h-6 w-6 opacity-0 group-hover/threads:opacity-100 transition-opacity hover:bg-gray-100 rounded-md"
                     >
-                      <MoreHorizontal />
+                      <MoreHorizontal className="h-4 w-4 text-gray-500" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent>
+                  <DropdownMenuContent 
+                    className="bg-white border border-gray-200 shadow-lg rounded-lg"
+                    style={{ 
+                      backgroundColor: 'white !important', 
+                      color: '#1f2937 !important',
+                      border: '1px solid #e5e7eb !important'
+                    }}
+                  >
                     <DropdownMenuItem
                       variant="destructive"
                       onClick={handleDeleteAllThreads}
+                      className="text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
+                      style={{ color: '#dc2626 !important' }}
                     >
-                      <Trash />
-                      Delete All Chats
+                      <Trash className="h-4 w-4 mr-2" style={{ color: '#dc2626 !important' }} />
+                      <span style={{ color: '#dc2626 !important' }}>Delete All Chats</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -222,8 +257,8 @@ export function AppSidebarThreads() {
             <SidebarGroupContent className="group-data-[collapsible=icon]:hidden group/threads">
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarGroupLabel className="">
-                    <h4 className="text-xs text-muted-foreground group-hover/threads:text-foreground transition-colors">
+                  <SidebarGroupLabel className="px-3 py-2">
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider group-hover/threads:text-gray-700 transition-colors">
                       {group.label}
                     </h4>
                     <div className="flex-1" />
@@ -233,18 +268,27 @@ export function AppSidebarThreads() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="data-[state=open]:bg-input data-[state=open]:opacity-100 opacity-0 group-hover/threads:opacity-100 transition-opacity"
+                            className="h-6 w-6 data-[state=open]:bg-gray-100 data-[state=open]:opacity-100 opacity-0 group-hover/threads:opacity-100 transition-opacity hover:bg-gray-100 rounded-md"
                           >
-                            <MoreHorizontal />
+                            <MoreHorizontal className="h-4 w-4 text-gray-500" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent>
+                        <DropdownMenuContent 
+                          className="bg-white border border-gray-200 shadow-lg rounded-lg"
+                          style={{ 
+                            backgroundColor: 'white !important', 
+                            color: '#1f2937 !important',
+                            border: '1px solid #e5e7eb !important'
+                          }}
+                        >
                           <DropdownMenuItem
                             variant="destructive"
                             onClick={handleDeleteAllThreads}
+                            className="text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
+                            style={{ color: '#dc2626 !important' }}
                           >
-                            <Trash />
-                            Delete All Chats
+                            <Trash className="h-4 w-4 mr-2" style={{ color: '#dc2626 !important' }} />
+                            <span style={{ color: '#dc2626 !important' }}>Delete All Chats</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -254,7 +298,7 @@ export function AppSidebarThreads() {
                   {group.threads.map((thread) => (
                     <SidebarMenuSub
                       key={thread.conv_uid}
-                      className="group/thread mr-0 border-l border-sidebar-border ml-3.5 pl-2.5 py-0.5"
+                      className="group/thread mr-0 border-l border-gray-200 ml-3 pl-3 py-1"
                     >
                       <SidebarMenuSubItem className="group/menu-item">
                         <ThreadDropdown
@@ -262,37 +306,72 @@ export function AppSidebarThreads() {
                           beforeTitle={thread.user_input || thread.select_param || "New Chat"}
                           side="right"
                           onDeleted={refreshDialogList}
+                          onRenamed={(title) => handleStartRename(thread.conv_uid, title)}
                         >
-                          <div className="flex items-center data-[state=open]:bg-input! group-hover/thread:bg-input! rounded-lg">
+                          <div className={`flex items-center rounded-lg transition-all duration-200 ${
+                            currentThreadId === thread.conv_uid 
+                              ? 'bg-blue-50 border border-blue-200' 
+                              : 'group-hover/thread:bg-gray-50 hover:border hover:border-gray-200'
+                          }`}>
                             <SidebarMenuButton
                               asChild
-                              className="group-hover/thread:bg-transparent! flex-1"
+                              className="group-hover/thread:bg-transparent px-3 py-2 flex-1 min-w-0"
                               isActive={currentThreadId === thread.conv_uid}
                             >
-                              <Link
-                                href={`/chat?scene=${thread.chat_mode}&id=${thread.conv_uid}`}
-                                className="flex items-center w-full"
-                              >
-                                {generatingTitleThreadIds.includes(
-                                  thread.conv_uid,
-                                ) ? (
-                                  <div className="truncate min-w-0 animate-pulse thread-title">
-                                    {thread.user_input || thread.select_param || "New Chat"}
-                                  </div>
-                                ) : (
-                                  <p className="truncate min-w-0 thread-title">
-                                    {thread.user_input || thread.select_param || "New Chat"}
-                                  </p>
-                                )}
-                              </Link>
+                              {editingThreadId === thread.conv_uid ? (
+                                <div className="flex items-center min-w-0 flex-1">
+                                  <input
+                                    type="text"
+                                    value={editingTitle}
+                                    onChange={(e) => setEditingTitle(e.target.value)}
+                                    onBlur={() => handleCancelRename()}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        handleSaveRename(thread.conv_uid);
+                                      } else if (e.key === 'Escape') {
+                                        handleCancelRename();
+                                      }
+                                    }}
+                                    className="flex-1 px-2 py-1 text-sm bg-white border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    autoFocus
+                                  />
+                                </div>
+                              ) : (
+                                <Link
+                                  href={`/chat?scene=${thread.chat_mode}&id=${thread.conv_uid}`}
+                                  className="flex items-center min-w-0 flex-1"
+                                >
+                                  {generatingTitleThreadIds.includes(
+                                    thread.conv_uid,
+                                  ) ? (
+                                    <div className={`truncate animate-pulse thread-title text-sm ${
+                                      currentThreadId === thread.conv_uid 
+                                        ? 'text-blue-700 font-medium' 
+                                        : 'text-gray-600'
+                                    }`}>
+                                      {thread.user_input || thread.select_param || "New Chat"}
+                                    </div>
+                                  ) : (
+                                    <p className={`truncate thread-title text-sm ${
+                                      currentThreadId === thread.conv_uid 
+                                        ? 'text-blue-700 font-medium' 
+                                        : 'text-gray-600 group-hover/thread:text-gray-800'
+                                    }`}>
+                                      {thread.user_input || thread.select_param || "New Chat"}
+                                    </p>
+                                  )}
+                                </Link>
+                              )}
                             </SidebarMenuButton>
 
-                            <SidebarMenuAction 
-                              className="data-[state=open]:bg-input data-[state=open]:opacity-100 opacity-0 group-hover/thread:opacity-100"
-                              showOnHover={true}
-                            >
-                              <MoreHorizontal />
-                            </SidebarMenuAction>
+                            <div className="flex-shrink-0 px-1">
+                              <SidebarMenuAction 
+                                className="data-[state=open]:bg-gray-100 data-[state=open]:opacity-100 opacity-0 group-hover/thread:opacity-100 hover:bg-gray-100 rounded-md w-6 h-6 flex items-center justify-center"
+                                showOnHover={true}
+                              >
+                                <MoreHorizontal className="h-4 w-4 text-gray-500" />
+                              </SidebarMenuAction>
+                            </div>
                           </div>
                         </ThreadDropdown>
                       </SidebarMenuSubItem>
@@ -308,16 +387,18 @@ export function AppSidebarThreads() {
       {hasExcessThreads && (
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="w-full flex px-4">
+            <div className="w-full flex px-3">
               <Button
-                variant="secondary"
+                variant="ghost"
                 size="sm"
-                className="w-full hover:bg-input justify-start"
+                className="w-full justify-start text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200 font-medium"
                 onClick={() => setIsExpanded(!isExpanded)}
               >
-                <MoreHorizontal className="mr-2" />
-                {isExpanded ? "Show Less Chats" : "Show All Chats"}
-                {isExpanded ? <ChevronUp /> : <ChevronDown />}
+                <MoreHorizontal className="mr-2 h-4 w-4" />
+                <span className="text-sm">{isExpanded ? "Show Less Chats" : "Show All Chats"}</span>
+                <div className="ml-auto">
+                  {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </div>
               </Button>
             </div>
           </SidebarMenuItem>

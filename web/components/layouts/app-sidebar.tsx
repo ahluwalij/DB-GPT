@@ -61,11 +61,11 @@ export function AppSidebar() {
   }, [currentPath, isMobile]);
 
   return (
-    <Sidebar collapsible="offcanvas" className="border-r bg-bar dark:bg-[#232734]">
-      <SidebarHeader>
+    <Sidebar collapsible="offcanvas" className="border-r border-gray-200 bg-white shadow-sm">
+      <SidebarHeader className="border-b border-gray-100 bg-gray-50/50 px-4 py-3">
         <SidebarMenu>
-          <SidebarMenuItem className="flex items-center gap-0.5">
-            <SidebarMenuButton asChild className="hover:bg-transparent">
+          <SidebarMenuItem className="flex items-center justify-center">
+            <SidebarMenuButton asChild className="hover:bg-gray-100 rounded-lg transition-colors p-2">
               <Link
                 href={`/chat`}
                 onClick={(e) => {
@@ -74,7 +74,7 @@ export function AppSidebar() {
                   router.refresh();
                 }}
               >
-                <div className="flex items-center justify-center p-2">
+                <div className="flex items-center justify-center w-full">
                   <img 
                     src="/uagi-icon.svg" 
                     alt="UAGI" 
@@ -82,7 +82,7 @@ export function AppSidebar() {
                   />
                 </div>
                 <div
-                  className="ml-auto block sm:hidden"
+                  className="absolute right-2 block sm:hidden text-gray-600 hover:text-gray-800"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -97,13 +97,13 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent className="mt-2 overflow-hidden relative">
-        <div className="flex flex-col gap-2 overflow-y-auto">
+      <SidebarContent className="bg-white px-2 py-4">
+        <div className="flex flex-col gap-4 overflow-y-auto">
           <AppSidebarMenus />
           <AppSidebarThreads />
         </div>
       </SidebarContent>
-      <SidebarFooter className="flex flex-col items-stretch space-y-2">
+      <SidebarFooter className="border-t border-gray-100 bg-gray-50/30 px-2 py-3">
         <AppSidebarUser />
       </SidebarFooter>
     </Sidebar>

@@ -35,6 +35,7 @@ type Props = {
   threadId: string;
   beforeTitle?: string;
   onDeleted?: () => void;
+  onRenamed?: (newTitle: string) => void;
   side?: "top" | "bottom" | "left" | "right";
   align?: "start" | "end" | "center";
   children: React.ReactNode;
@@ -45,6 +46,7 @@ export function ThreadDropdown({
   children,
   beforeTitle,
   onDeleted,
+  onRenamed,
   side = "right",
   align = "start",
 }: Props) {
@@ -52,26 +54,8 @@ export function ThreadDropdown({
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [editTitle, setEditTitle] = useState(beforeTitle || "");
-  const [showRenameDialog, setShowRenameDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const handleUpdate = async (title: string) => {
-    try {
-      if (!title) {
-        toast.error("Title is required");
-        return;
-      }
-      
-      // TODO: Implement actual update API call
-      console.log("Update thread:", threadId, "with title:", title);
-      toast.success("Thread updated successfully");
-      setShowRenameDialog(false);
-      setOpen(false);
-    } catch (error) {
-      toast.error("Failed to update thread");
-    }
-  };
 
   const handleDelete = async () => {
     try {
@@ -107,85 +91,63 @@ export function ThreadDropdown({
         <PopoverTrigger asChild>
           {children}
         </PopoverTrigger>
-        <PopoverContent className="p-0 w-[220px]" side={side} align={align}>
-          <Command>
-            <CommandList>
-              <CommandGroup>
-                <CommandItem
-                  className="cursor-pointer p-0"
-                  onSelect={() => {
-                    setShowRenameDialog(true);
-                    setOpen(false);
-                  }}
-                >
-                  <div className="flex items-center gap-2 w-full px-2 py-1.5">
-                    <PencilLine className="h-4 w-4" />
-                    <span>Rename</span>
-                  </div>
-                </CommandItem>
-              </CommandGroup>
-              <CommandSeparator />
-              <CommandGroup>
-                <CommandItem
-                  className="cursor-pointer p-0"
-                  onSelect={() => {
-                    setShowDeleteDialog(true);
-                    setOpen(false);
-                  }}
-                >
-                  <div className="flex items-center gap-2 w-full px-2 py-1.5 text-red-600">
-                    <Trash className="h-4 w-4" />
-                    <span>Delete</span>
-                  </div>
-                </CommandItem>
-              </CommandGroup>
-            </CommandList>
-          </Command>
+        <PopoverContent 
+          className="p-0 w-[180px] bg-white border border-gray-200 shadow-lg rounded-lg text-gray-800 z-[9999]" 
+          side={side} 
+          align={align}
+          style={{ 
+            backgroundColor: 'white !important', 
+            color: '#1f2937 !important',
+            border: '1px solid #e5e7eb !important'
+          }}
+        >
+          <div className="bg-white rounded-lg p-1" style={{ backgroundColor: 'white !important' }}>
+            <div 
+              className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer transition-colors"
+              onClick={() => {
+                onRenamed?.(beforeTitle || "");
+                setOpen(false);
+              }}
+              style={{ color: '#374151 !important' }}
+            >
+              <PencilLine className="h-4 w-4 text-gray-600" style={{ color: '#4b5563 !important' }} />
+              <span className="text-sm font-medium" style={{ color: '#374151 !important' }}>Rename</span>
+            </div>
+            <div className="h-px bg-gray-200 my-1" style={{ backgroundColor: '#e5e7eb !important' }} />
+            <div 
+              className="flex items-center gap-3 px-3 py-2 text-red-600 hover:bg-red-50 rounded-md cursor-pointer transition-colors"
+              onClick={() => {
+                setShowDeleteDialog(true);
+                setOpen(false);
+              }}
+              style={{ color: '#dc2626 !important' }}
+            >
+              <Trash className="h-4 w-4" style={{ color: '#dc2626 !important' }} />
+              <span className="text-sm font-medium" style={{ color: '#dc2626 !important' }}>Delete</span>
+            </div>
+          </div>
         </PopoverContent>
       </Popover>
 
-      {/* Rename Dialog */}
-      <Dialog open={showRenameDialog} onOpenChange={setShowRenameDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Rename Thread</DialogTitle>
-            <DialogDescription>
-              Enter a new name for this conversation thread.
-            </DialogDescription>
-          </DialogHeader>
-          <Input
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            placeholder="Enter thread title"
-          />
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button onClick={() => handleUpdate(editTitle)}>
-              Save
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Delete Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
+        <DialogContent className="bg-white border border-gray-200">
           <DialogHeader>
-            <DialogTitle>Delete Thread</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-gray-800">Delete Thread</DialogTitle>
+            <DialogDescription className="text-gray-600">
               Are you sure you want to delete this conversation? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">Cancel</Button>
             </DialogClose>
             <Button 
               variant="destructive" 
               onClick={handleDelete}
               disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
             >
               {isDeleting ? (
                 <>

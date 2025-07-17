@@ -12,7 +12,7 @@ from dbgpt.agent import AgentContext, AgentMemory
 from dbgpt.model.proxy import OpenAILLMClient
 
 llm_client = OpenAILLMClient(
-    model_alias="gpt-4o",
+    model_alias="o3",
     api_base=os.getenv("OPENAI_API_BASE"),
     api_key=os.getenv("OPENAI_API_KEY"),
 )

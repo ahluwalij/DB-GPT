@@ -25,6 +25,7 @@ import {
   Sun,
   MoonStar,
   ChevronRight,
+  User,
 } from "lucide-react";
 import { useContext } from "react";
 import { ChatContext } from "@/app/chat-context";
@@ -59,71 +60,41 @@ export function AppSidebarUser() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground bg-input/30 border"
+              className="data-[state=open]:bg-gray-100 data-[state=open]:text-gray-800 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 transition-all duration-200 shadow-sm"
               size={"lg"}
             >
-              <Avatar className="rounded-full size-8 border">
-                <AvatarImage
-                  className="object-cover"
-                  src={userInfo?.avatar || "/pictures/fallback.png"}
-                  alt={userInfo?.name || "User"}
-                />
-                <AvatarFallback>{userInfo?.name?.slice(0, 1) || "U"}</AvatarFallback>
+              <Avatar className="rounded-full size-8 border border-gray-200">
+                <AvatarFallback className="bg-gray-100">
+                  <User className="size-4 text-gray-600" />
+                </AvatarFallback>
               </Avatar>
-              <span className="truncate">{userInfo?.email || userInfo?.name || "User"}</span>
-              <ChevronsUpDown className="ml-auto" />
+              <span className="truncate text-gray-700 font-medium">{userInfo?.email || userInfo?.name || "User"}</span>
+              <ChevronsUpDown className="ml-auto text-gray-400" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             side="top"
-            className="bg-background w-[--radix-dropdown-menu-trigger-width] min-w-60 rounded-lg"
+            className="bg-white border border-gray-200 shadow-lg w-[--radix-dropdown-menu-trigger-width] min-w-60 rounded-lg"
             align="center"
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-full">
-                  <AvatarImage
-                    src={userInfo?.avatar || "/pictures/fallback.png"}
-                    alt={userInfo?.name || "User"}
-                  />
-                  <AvatarFallback className="rounded-lg">
-                    {userInfo?.name?.slice(0, 1) || "U"}
+                <Avatar className="h-8 w-8 rounded-full border border-gray-200">
+                  <AvatarFallback className="rounded-lg bg-gray-100">
+                    <User className="size-4 text-gray-600" />
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{userInfo?.name || "User"}</span>
-                  <span className="truncate text-xs text-muted-foreground">
+                  <span className="truncate font-medium text-gray-800">{userInfo?.name || "User"}</span>
+                  <span className="truncate text-xs text-gray-500">
                     {userInfo?.email || "user@example.com"}
                   </span>
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => {
-                // TODO: Implement chat preferences
-                console.log("Open chat preferences");
-              }}
-            >
-              <Settings2 className="size-4 text-foreground" />
-              <span>Chat Preferences</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => {
-                // TODO: Implement keyboard shortcuts
-                console.log("Show keyboard shortcuts");
-              }}
-            >
-              <Command className="size-4 text-foreground" />
-              <span>Keyboard Shortcuts</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout} className="cursor-pointer">
-              <LogOutIcon className="size-4 text-foreground" />
+            <DropdownMenuSeparator className="bg-gray-200" />
+            <DropdownMenuItem onClick={logout} className="cursor-pointer text-red-600 hover:bg-red-50 rounded-md mx-1">
+              <LogOutIcon className="size-4 text-red-600 mr-2" />
               <span>Sign Out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

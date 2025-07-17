@@ -158,7 +158,7 @@ const ChatContent: React.FC<{
   );
 
   return (
-    <div className='flex flex-1 gap-3 mt-6'>
+    <div className={`flex gap-3 mt-6 ${isRobot ? 'max-w-4xl' : 'max-w-2xl ml-auto'}`}>
       {/* icon */}
       <div className='flex flex-shrink-0 items-start'>{isRobot ? <RobotIcon model={model_name} /> : <UserIcon />}</div>
       <div className={`flex ${scene === 'chat_agent' && !thinking ? 'flex-1' : ''} overflow-hidden`}>
@@ -218,7 +218,7 @@ const ChatContent: React.FC<{
         )}
         {/* ai回答 */}
         {isRobot && (
-          <div className='flex flex-1 flex-col w-full'>
+          <div className='flex flex-1 flex-col'>
             <div className='bg-white dark:bg-[rgba(255,255,255,0.16)] p-4 rounded-2xl rounded-tl-none mb-2'>
               {typeof context === 'object' && (
                 <div>

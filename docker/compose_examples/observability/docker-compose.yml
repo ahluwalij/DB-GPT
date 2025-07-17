@@ -53,7 +53,7 @@ services:
     image: eosphorosai/dbgpt-openai:latest
     command: dbgpt start worker --model_type proxy --model_name chatgpt_proxyllm --model_path chatgpt_proxyllm --proxy_server_url ${OPENAI_API_BASE}/chat/completions --proxy_api_key ${OPENAI_API_KEY} --controller_addr http://controller:8000
     environment:
-      # Your real openai model name, e.g. gpt-3.5-turbo, gpt-4o
+      # Your real openai model name, e.g. gpt-3.5-turbo, o3
       - PROXYLLM_BACKEND=gpt-3.5-turbo
       - TRACER_TO_OPEN_TELEMETRY=True
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://jaeger:4317

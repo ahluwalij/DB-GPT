@@ -18,7 +18,7 @@ persist_path = "pilot/data"
 
 [models]
 [[models.llms]]
-name = "${env:LLM_MODEL_NAME:-gpt-4o}"
+name = "${env:LLM_MODEL_NAME:-o3}"
 provider = "proxy/aimlapi"
 api_key = "${env:AIMLAPI_API_KEY}"
 

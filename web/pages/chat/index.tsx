@@ -111,7 +111,12 @@ const Chat: React.FC = () => {
   const [modelValue, setModelValue] = useState<string>('');
 
   useEffect(() => {
-    setModelValue(appInfo?.param_need?.filter(item => item.type === 'model')[0]?.value || model);
+    // Prefer o3 model, fall back to appInfo model or context model
+    const appModel = appInfo?.param_need?.filter(item => item.type === 'model')[0]?.value;
+    const preferredModel = (appModel && appModel.toLowerCase().includes('o3')) ? appModel : 
+                          (model && model.toLowerCase().includes('o3')) ? model :
+                          appModel || model;
+    setModelValue(preferredModel);
     setResourceValue(
       knowledgeId || dbName || appInfo?.param_need?.filter(item => item.type === 'resource')[0]?.bind_value,
     );
