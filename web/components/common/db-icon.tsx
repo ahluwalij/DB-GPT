@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import SafeImage from './SafeImage';
 
 interface IProps {
   width?: number;
@@ -10,7 +10,7 @@ interface IProps {
 
 function DBIcon({ src, label, width, height, className }: IProps) {
   return (
-    <Image
+    <SafeImage
       className={`w-11 h-11 rounded-full mr-4 border border-gray-200 object-contain bg-white ${className}`}
       width={width || 44}
       height={height || 44}

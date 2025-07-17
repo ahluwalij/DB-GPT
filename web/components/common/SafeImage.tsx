@@ -8,11 +8,11 @@ interface SafeImageProps {
   height?: number;
   style?: React.CSSProperties;
   priority?: boolean;
-  key?: string;
+  className?: string;
 }
 
 const SafeImage = forwardRef<HTMLImageElement, SafeImageProps>((props, ref) => {
-  const { src, alt, width, height, style, priority, key, ...otherProps } = props;
+  const { src, alt, width, height, style, priority, className, ...otherProps } = props;
   
   return (
     <img
@@ -22,6 +22,7 @@ const SafeImage = forwardRef<HTMLImageElement, SafeImageProps>((props, ref) => {
       width={width}
       height={height}
       style={style}
+      className={className}
       {...otherProps}
     />
   );

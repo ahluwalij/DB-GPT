@@ -4,6 +4,7 @@ import { LinkOutlined, ReadOutlined, SyncOutlined } from '@ant-design/icons';
 import { Datum } from '@antv/ava';
 import { GPTVis, withDefaultChartCode } from '@antv/gpt-vis';
 import { Image, Table, Tabs, TabsProps, Tag } from 'antd';
+import React from 'react';
 import 'katex/dist/katex.min.css';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
@@ -248,6 +249,32 @@ const codeComponents = {
 
 const basicComponents: MarkdownComponent = {
   ...codeComponents,
+  p({ children }) {
+    // Check if children contains block-level elements or chart-view components
+    const childrenArray = React.Children.toArray(children);
+    const hasBlockElements = childrenArray.some(child => {
+      if (React.isValidElement(child)) {
+        // Check for div elements or React components
+        return child.type === 'div' || 
+               (typeof child.type === 'function') ||
+               (typeof child.type === 'object' && child.type !== null);
+      }
+      return false;
+    });
+    
+    // Check if any child is a string that contains chart-view or other block elements
+    const hasChartView = childrenArray.some(child => 
+      typeof child === 'string' && child.includes('<chart-view')
+    );
+    
+    // If it contains block elements or chart-view, return fragment to avoid p > div nesting
+    if (hasBlockElements || hasChartView) {
+      return <div>{children}</div>;
+    }
+    
+    // Otherwise, return normal paragraph
+    return <p>{children}</p>;
+  },
   ul({ children }) {
     return <ul className='py-1'>{children}</ul>;
   },
@@ -385,11 +412,29 @@ const extraComponents: MarkdownComponent = {
     }
 
     const columns = data?.data?.[0]
-      ? Object.keys(data?.data?.[0])?.map(item => {
+      ? Object.keys(data?.data?.[0])?.map((item, index, array) => {
+          // Calculate width based on content length and distribute evenly
+          const minWidth = 120;
+          const maxWidth = 300;
+          const contentLength = Math.max(
+            item.length,
+            ...data.data.map(row => String(row[item] || '').length)
+          );
+          const calculatedWidth = Math.min(maxWidth, Math.max(minWidth, contentLength * 8));
+          
           return {
             title: item,
             dataIndex: item,
             key: item,
+            width: calculatedWidth,
+            ellipsis: {
+              showTitle: false,
+            },
+            render: (text: any) => (
+              <div style={{ width: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {String(text || '')}
+              </div>
+            ),
           };
         })
       : [];
@@ -410,9 +455,12 @@ const extraComponents: MarkdownComponent = {
       children: <Table 
         dataSource={data?.data} 
         columns={columns} 
-        scroll={{ x: true }} 
-        virtual={true}
+        scroll={{ x: 'max-content' }} 
+        virtual={false}
         rowKey={(record) => JSON.stringify(record)}
+        size="small"
+        tableLayout="fixed"
+        style={{ width: '100%' }}
       />,
     };
     const TabItems: TabsProps['items'] =

@@ -50,8 +50,14 @@ class DbChatOutputParser(BaseOutputParser):
     def parse_prompt_response(self, model_out_text):
         clean_str = super().parse_prompt_response(model_out_text)
         logger.info(f"clean prompt response: {clean_str}")
+        
+        # Enhanced logging for debugging non-deterministic behavior
+        logger.info(f"🔍 DEBUGGING: Raw model output length: {len(model_out_text)}")
+        logger.info(f"🔍 DEBUGGING: Clean response length: {len(clean_str)}")
+        
         # Compatible with community pure sql output model
         if self.is_sql_statement(clean_str):
+            logger.info("🔍 DEBUGGING: Detected pure SQL statement")
             return SqlAction(clean_str, "", "", "")
         else:
             try:
@@ -60,6 +66,10 @@ class DbChatOutputParser(BaseOutputParser):
                 thoughts = dict
                 display = ""
                 resp = ""
+                
+                # Enhanced logging for JSON parsing
+                logger.info(f"🔍 DEBUGGING: JSON keys found: {list(response.keys())}")
+                
                 for key in sorted(response):
                     if key.strip() == "sql":
                         sql = response[key]
@@ -69,11 +79,37 @@ class DbChatOutputParser(BaseOutputParser):
                         display = response[key]
                     if key.strip() == "direct_response":
                         resp = response[key]
+                
+                # Critical debugging: Log if SQL is empty or if direct_response contains failure message
+                if not sql or sql.strip() == "":
+                    logger.error(f"🚨 CRITICAL: Empty SQL generated! Direct response: {resp}")
+                    logger.error(f"🚨 CRITICAL: Thoughts: {thoughts}")
+                    # Check if this is a false rejection (LLM incorrectly saying insufficient info)
+                    if resp and ("not enough" in resp.lower() or "insufficient" in resp.lower()):
+                        logger.error(f"🚨 CRITICAL: False rejection detected! LLM incorrectly claimed insufficient info")
+                        # This is where we could implement retry logic in the future
+                        
+                # Use the same logging pattern as the existing logs that ARE showing up
+                logger.info(f"🔍 GENDER DEBUG: Final SQL: {sql}")
+                logger.info(f"🔍 GENDER DEBUG: Final thoughts: {thoughts}")
+                logger.info(f"🔍 GENDER DEBUG: Final display: {display}")
+                logger.info(f"🔍 GENDER DEBUG: Final response: {resp}")
+                
+                # Check specifically for gender-related queries
+                if sql and ("gender" in sql.lower() or "male" in sql.lower() or "female" in sql.lower()):
+                    logger.info(f"🚨 GENDER QUERY DETECTED: {sql}")
+                    if "lower(" not in sql.lower():
+                        logger.info(f"🚨 CASE-SENSITIVE QUERY DETECTED: SQL does not use LOWER() function!")
+                        logger.info(f"🚨 THIS IS THE ROOT CAUSE: Database has 'Male' but query uses 'male'")
+                    else:
+                        logger.info(f"✅ CASE-INSENSITIVE QUERY: SQL correctly uses LOWER() function")
+                
                 return SqlAction(
                     sql=sql, thoughts=thoughts, display=display, direct_response=resp
                 )
-            except Exception:
-                logger.error(f"json load failed:{clean_str}")
+            except Exception as e:
+                logger.error(f"🚨 CRITICAL: JSON load failed: {clean_str}")
+                logger.error(f"🚨 CRITICAL: Exception: {str(e)}")
                 return SqlAction("", clean_str, "", "")
 
     def parse_vector_data_with_pca(self, df):

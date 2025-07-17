@@ -11,6 +11,9 @@ from dbgpt_app.scene.chat_db.auto_execute.config import ChatWithDBExecuteConfig
 from dbgpt_serve.core.config import GPTsAppCommonConfig
 from dbgpt_serve.datasource.manages import ConnectorManager
 
+# CRITICAL: Import prompt module to register the template
+from dbgpt_app.scene.chat_db.auto_execute import prompt
+
 logger = logging.getLogger(__name__)
 
 
@@ -86,8 +89,29 @@ class ChatWithDbAutoExecute(BaseChat):
             "display_type": self._generate_numbered_list(),
             "chat_history": self.history_messages,
         }
+        
+        # Enhanced logging for input debugging
+        logger.info(f"🔍 INPUT DEBUG: DB name: {self.db_name}")
+        logger.info(f"🔍 INPUT DEBUG: User input: {user_input}")
+        logger.info(f"🔍 INPUT DEBUG: Dialect: {self.database.dialect}")
+        logger.info(f"🔍 INPUT DEBUG: Top K: {self.curr_config.max_num_results}")
+        logger.info(f"🔍 INPUT DEBUG: Table info length: {len(table_infos) if table_infos else 0}")
+        logger.info(f"🔍 INPUT DEBUG: Display types: {self._generate_numbered_list()}")
+        if table_infos:
+            logger.info(f"🔍 INPUT DEBUG: Table info sample: {table_infos[:500]}...")
+        
         return input_values
 
     def do_action(self, prompt_response):
         print(f"do_action:{prompt_response}")
+        # Enhanced logging for SQL generation debugging
+        logger.info(f"🔍 SQL GENERATION DEBUG: Processing prompt response")
+        logger.info(f"🔍 SQL GENERATION DEBUG: Response type: {type(prompt_response)}")
+        if hasattr(prompt_response, 'sql'):
+            logger.info(f"🔍 SQL GENERATION DEBUG: SQL present: {bool(prompt_response.sql)}")
+            logger.info(f"🔍 SQL GENERATION DEBUG: SQL content: {prompt_response.sql}")
+        if hasattr(prompt_response, 'direct_response'):
+            logger.info(f"🔍 SQL GENERATION DEBUG: Direct response: {prompt_response.direct_response}")
+        if hasattr(prompt_response, 'thoughts'):
+            logger.info(f"🔍 SQL GENERATION DEBUG: Thoughts: {prompt_response.thoughts}")
         return self.database.run_to_df

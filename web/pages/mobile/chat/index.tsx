@@ -44,7 +44,7 @@ interface MobileChatProps {
 
 export const MobileChatContext = createContext<MobileChatProps>({
   model: '',
-  temperature: 0.5,
+  temperature: 0,
   resource: null,
   setModel: () => {},
   setTemperature: () => {},
@@ -78,7 +78,7 @@ const MobileChat: React.FC = () => {
 
   const [history, setHistory] = useState<ChatHistoryResponse>([]);
   const [model, setModel] = useState<string>('');
-  const [temperature, setTemperature] = useState<number>(0.5);
+  const [temperature, setTemperature] = useState<number>(0);
   const [resource, setResource] = useState<any>(null);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   // 用户输入

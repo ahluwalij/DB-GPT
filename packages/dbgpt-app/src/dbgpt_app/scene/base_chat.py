@@ -322,14 +322,28 @@ class BaseChat(ABC):
         2. app_config.temperature(From config file)
         3. prompt_template.temperature(From prompt template)
         """
+        # Enhanced debugging for temperature selection
+        api_temp = self._chat_param.temperature
+        config_temp = self.app_config.temperature if (self._chat_param.app_config and self._chat_param.app_config.temperature is not None) else None
+        template_temp = self.prompt_template.temperature
+        
+        logger.info(f"🔍 TEMPERATURE DEBUG: API temp: {api_temp}, Config temp: {config_temp}, Template temp: {template_temp}")
+        
         if self._chat_param.temperature is not None:
-            return float(self._chat_param.temperature)
+            selected_temp = float(self._chat_param.temperature)
+            logger.info(f"🔍 TEMPERATURE DEBUG: Using API temperature: {selected_temp}")
+            return selected_temp
         elif (
             self._chat_param.app_config
             and self._chat_param.app_config.temperature is not None
         ):
-            return float(self.app_config.temperature)
-        return self.prompt_template.temperature
+            selected_temp = float(self.app_config.temperature)
+            logger.info(f"🔍 TEMPERATURE DEBUG: Using config temperature: {selected_temp}")
+            return selected_temp
+        else:
+            selected_temp = self.prompt_template.temperature
+            logger.info(f"🔍 TEMPERATURE DEBUG: Using template temperature: {selected_temp}")
+            return selected_temp
 
     def memory_config(self):
         if self._chat_param.app_config and self._chat_param.app_config.memory:
@@ -412,6 +426,14 @@ class BaseChat(ABC):
         payload = await self._build_model_request()
 
         logger.info(f"payload request: \n{payload}")
+        
+        # Enhanced logging for non-deterministic behavior debugging
+        logger.error(f"🚨 MODEL REQUEST DEBUG: Model: {payload.model}")
+        logger.error(f"🚨 MODEL REQUEST DEBUG: Temperature: {payload.temperature}")
+        logger.error(f"🚨 MODEL REQUEST DEBUG: Max tokens: {payload.max_new_tokens}")
+        logger.error(f"🚨 MODEL REQUEST DEBUG: Messages count: {len(payload.messages) if payload.messages else 0}")
+        logger.error(f"🚨 MODEL REQUEST DEBUG: Context span_id: {payload.context.span_id if payload.context else None}")
+        logger.error(f"🚨 MODEL REQUEST DEBUG: Chat mode: {payload.context.chat_mode if payload.context else None}")
         ai_response_text = ""
         span = root_tracer.start_span(
             "BaseChat.stream_call", metadata=payload.to_dict()
@@ -573,9 +595,23 @@ class BaseChat(ABC):
             model_output, text_output=False
         )
         ai_response_text = parsed_output.text if parsed_output.has_text else ""
+        
+        # Enhanced logging for final output debugging
+        logger.info(f"🔍 FINAL OUTPUT DEBUG: AI response text length: {len(ai_response_text)}")
+        logger.info(f"🔍 FINAL OUTPUT DEBUG: AI response text: {ai_response_text[:2000]}...")
+        
         prompt_define_response = (
             self.prompt_template.output_parser.parse_prompt_response(ai_response_text)
         )
+        
+        # Enhanced logging for parsed response debugging
+        logger.info(f"🔍 FINAL OUTPUT DEBUG: Parsed response type: {type(prompt_define_response)}")
+        if hasattr(prompt_define_response, 'sql'):
+            logger.info(f"🔍 FINAL OUTPUT DEBUG: Parsed SQL: {prompt_define_response.sql}")
+        if hasattr(prompt_define_response, 'direct_response'):
+            logger.info(f"🔍 FINAL OUTPUT DEBUG: Parsed direct response: {prompt_define_response.direct_response}")
+        if hasattr(prompt_define_response, 'thoughts'):
+            logger.info(f"🔍 FINAL OUTPUT DEBUG: Parsed thoughts: {prompt_define_response.thoughts}")
         metadata = {
             "model_output": model_output.to_dict(),
             "ai_response_text": ai_response_text,

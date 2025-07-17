@@ -1,6 +1,6 @@
 import { Popover, Tag, TagProps, Tooltip } from 'antd';
 import classNames from 'classnames';
-import Image from 'next/image';
+import SafeImage from './SafeImage';
 import { HtmlHTMLAttributes, PropsWithChildren, ReactNode, memo, useMemo } from 'react';
 
 interface Props {
@@ -46,7 +46,7 @@ function GPTCard({
 
     if (typeof icon === 'string') {
       return (
-        <Image
+        <SafeImage
           className={classNames('w-11 h-11 rounded-full mr-4 object-contain bg-white', {
             'border border-gray-200': iconBorder,
           })}

@@ -176,16 +176,27 @@ async def get_chat_instance(
         dialogue (OpenAPIChatCompletionRequest): The chat request.
         system_app (SystemApp): system app.
     """
-    logger.info(f"get_chat_instance:{dialogue}")
+    logger.error(f"🚨 CHAT INSTANCE DEBUG: Initial request: {dialogue}")
+    logger.error(f"🚨 CHAT INSTANCE DEBUG: Chat mode before processing: {dialogue.chat_mode}")
+    
     if not dialogue.chat_mode:
         dialogue.chat_mode = ChatScene.ChatNormal.value()
+        logger.error(f"🚨 CHAT INSTANCE DEBUG: No chat mode specified, defaulting to: {dialogue.chat_mode}")
+    
     if not dialogue.conv_uid:
         conv_vo = __new_conversation(
             dialogue.chat_mode, dialogue.user_name, dialogue.sys_code
         )
         dialogue.conv_uid = conv_vo.conv_uid
+        logger.error(f"🚨 CHAT INSTANCE DEBUG: Created new conversation: {dialogue.conv_uid}")
+    
     if dialogue.chat_mode == "chat_data":
         dialogue.chat_mode = ChatScene.ChatWithDbExecute.value()
+        logger.error(f"🚨 CHAT INSTANCE DEBUG: Mapped 'chat_data' to ChatWithDbExecute: {dialogue.chat_mode}")
+    
+    logger.error(f"🚨 CHAT INSTANCE DEBUG: Final chat mode: {dialogue.chat_mode}")
+    logger.error(f"🚨 CHAT INSTANCE DEBUG: Is chat_with_db_execute? {dialogue.chat_mode == ChatScene.ChatWithDbExecute.value()}")
+    
     if not ChatScene.is_valid_mode(dialogue.chat_mode):
         raise StopAsyncIteration(f"Unsupported Chat Mode,{dialogue.chat_mode}!")
 
@@ -200,6 +211,15 @@ async def get_chat_instance(
         max_new_tokens=dialogue.max_new_tokens,
         chat_mode=ChatScene.of_mode(dialogue.chat_mode),
     )
+    
+    logger.error(f"🚨 CHAT INSTANCE DEBUG: ChatParam created:")
+    logger.error(f"🚨 CHAT INSTANCE DEBUG: - Model: {chat_param.model_name}")
+    logger.error(f"🚨 CHAT INSTANCE DEBUG: - Temperature: {chat_param.temperature}")
+    logger.error(f"🚨 CHAT INSTANCE DEBUG: - Max tokens: {chat_param.max_new_tokens}")
+    logger.error(f"🚨 CHAT INSTANCE DEBUG: - Chat mode: {chat_param.chat_mode}")
+    logger.error(f"🚨 CHAT INSTANCE DEBUG: - Select param (DB): {chat_param.select_param}")
+    logger.error(f"🚨 CHAT INSTANCE DEBUG: - User input: {chat_param.current_user_input}")
+    
     chat: BaseChat = await blocking_func_to_async(
         get_executor(),
         CHAT_FACTORY.get_implementation,
@@ -207,6 +227,10 @@ async def get_chat_instance(
         system_app,
         **{"chat_param": chat_param},
     )
+    
+    logger.error(f"🚨 CHAT INSTANCE DEBUG: Chat instance created: {type(chat).__name__}")
+    logger.error(f"🚨 CHAT INSTANCE DEBUG: Chat instance scene: {chat.chat_scene}")
+    
     return chat
 
 

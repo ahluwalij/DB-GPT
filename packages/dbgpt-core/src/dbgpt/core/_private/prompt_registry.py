@@ -102,6 +102,27 @@ class PromptTemplateRegistry:
         prompt_template = registry.get(language)
         if not prompt_template:
             prompt_template = registry.get(_DEFUALT_LANGUAGE_KEY)
+        
+        # CRITICAL DEBUG: Log what template is actually being returned
+        if scene_name == "chat_with_db_execute":
+            logger.error(f"🚨 REGISTRY DEBUG: Retrieved template for chat_with_db_execute")
+            logger.error(f"🚨 REGISTRY DEBUG: Template type: {type(prompt_template)}")
+            if hasattr(prompt_template, 'prompt') and hasattr(prompt_template.prompt, 'messages'):
+                for i, msg in enumerate(prompt_template.prompt.messages):
+                    if hasattr(msg, 'prompt') and hasattr(msg.prompt, 'template'):
+                        template_content = msg.prompt.template
+                        logger.error(f"🚨 REGISTRY DEBUG: Message {i} template length: {len(template_content)}")
+                        logger.error(f"🚨 REGISTRY DEBUG: Message {i} template excerpt: {template_content[:500]}...")
+                        # Check for case-insensitive instructions
+                        if 'lower(' in template_content.lower():
+                            logger.error(f"🚨 REGISTRY DEBUG: Template CONTAINS LOWER() instruction!")
+                        else:
+                            logger.error(f"🚨 REGISTRY DEBUG: Template MISSING LOWER() instruction!")
+                        if 'case-insensitive' in template_content.lower():
+                            logger.error(f"🚨 REGISTRY DEBUG: Template CONTAINS case-insensitive instruction!")
+                        else:
+                            logger.error(f"🚨 REGISTRY DEBUG: Template MISSING case-insensitive instruction!")
+            
         return prompt_template
 
 

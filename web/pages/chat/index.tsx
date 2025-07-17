@@ -105,7 +105,7 @@ const Chat: React.FC = () => {
   const [agent, setAgent] = useState<string>('');
   const [appInfo, setAppInfo] = useState<IApp>({} as IApp);
   // Hidden technical parameters - business users don't need to see these
-  const temperatureValue = 0.6;
+  const temperatureValue = 0;
   const maxNewTokensValue = 4000;
   const [resourceValue, setResourceValue] = useState<any>();
   const [modelValue, setModelValue] = useState<string>('');

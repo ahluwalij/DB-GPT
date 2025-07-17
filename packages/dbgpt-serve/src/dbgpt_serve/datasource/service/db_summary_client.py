@@ -47,11 +47,9 @@ class DBSummaryClient:
 
     def db_summary_embedding(self, dbname, db_type):
         """Put db profile and table profile summary into vector store."""
-        db_summary_client = None
         try:
             db_summary_client = self.create_summary_client(dbname, db_type)
-            
-            # Keep explicit reference to prevent premature garbage collection
+
             self.init_db_profile(db_summary_client, dbname)
 
             logger.info("db summary embedding success")
@@ -61,14 +59,6 @@ class DBSummaryClient:
                 f"{dbname}, {db_type} summary error!{str(e)}, detail: {message}"
             )
             raise
-        finally:
-            # Explicit cleanup after operations complete
-            if db_summary_client and hasattr(db_summary_client, 'db') and hasattr(db_summary_client.db, 'close'):
-                try:
-                    logger.debug(f"Explicitly closing db connection for {dbname}")
-                    db_summary_client.db.close()
-                except Exception as e:
-                    logger.warning(f"Error during explicit connection cleanup for {dbname}: {e}")
 
     def get_db_summary(self, dbname, query, topk):
         """Get user query related tables info."""
@@ -125,25 +115,16 @@ class DBSummaryClient:
                     separator="--table-field-separator--",
                 )
             )
-            
-            # Keep reference to prevent garbage collection during assembly
-            try:
-                db_assembler = DBSchemaAssembler.load_from_connection(
-                    connector=db_summary_client.db,
-                    table_vector_store_connector=table_vector_connector,
-                    field_vector_store_connector=field_vector_connector,
-                    chunk_parameters=chunk_parameters,
-                    max_seq_length=self.app_config.service.web.embedding_model_max_seq_len,
-                )
+            db_assembler = DBSchemaAssembler.load_from_connection(
+                connector=db_summary_client.db,
+                table_vector_store_connector=table_vector_connector,
+                field_vector_store_connector=field_vector_connector,
+                chunk_parameters=chunk_parameters,
+                max_seq_length=self.app_config.service.web.embedding_model_max_seq_len,
+            )
 
-                if len(db_assembler.get_chunks()) > 0:
-                    db_assembler.persist()
-                    
-                # Ensure db_summary_client stays in scope until operations complete
-                logger.debug(f"DB summary operations completed for {dbname} with client {id(db_summary_client)}")
-            except Exception as e:
-                logger.error(f"Error during db profile initialization for {dbname}: {e}")
-                raise
+            if len(db_assembler.get_chunks()) > 0:
+                db_assembler.persist()
         else:
             logger.info(f"Vector store name {vector_store_name} exist")
         logger.info("initialize db summary profile success...")
