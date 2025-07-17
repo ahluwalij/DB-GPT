@@ -48,9 +48,9 @@ The `start-dbgpt.sh` script automatically:
   - **Development**: http://localhost:3000 (with hot reload)
 
 ### OpenAI API Key
-The API key is hardcoded in `docker-compose.yml`:
+The API key is configured via environment variables in `.env` file and passed to `docker-compose.yml`:
 ```yaml
-OPENAI_API_KEY=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
+OPENAI_API_KEY=${OPENAI_API_KEY}
 ```
 
 ## 🛠️ Troubleshooting
