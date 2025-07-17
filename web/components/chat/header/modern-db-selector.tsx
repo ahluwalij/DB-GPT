@@ -274,7 +274,7 @@ function ModernDBSelector() {
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="w-44 justify-between bg-white hover:bg-gray-50 border-gray-200"
+            className="w-44 justify-between bg-white hover:bg-gray-50 border-gray-200 font-medium transition-all duration-200"
             onClick={() => {
               if (!popoverOpen) {
                 loadAllDatabases();
@@ -293,107 +293,120 @@ function ModernDBSelector() {
         <PopoverContent 
           className="w-80 p-0 bg-white border border-gray-200 shadow-lg rounded-lg"
           align="start"
-          style={{ backgroundColor: 'white !important' }}
         >
-          <div className="bg-white rounded-lg" style={{ backgroundColor: 'white !important' }}>
+          <div className="bg-white rounded-lg">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
               <h3 className="font-medium text-gray-800">Database Connections</h3>
               <Button
                 size="sm"
                 onClick={handleAddDatabase}
-                className="h-8 bg-blue-600 hover:bg-blue-700 text-white"
+                className="h-8 bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 rounded-lg"
               >
                 <Plus className="h-4 w-4 mr-1" />
                 Add
               </Button>
             </div>
 
-            {/* Current Selection */}
-            <div className="p-3 border-b border-gray-100 bg-gray-50">
-              <p className="text-xs text-gray-500 mb-2">Current Selection</p>
-              {dbOpts.map(item => (
-                <div 
-                  key={item.name}
-                  className={`flex items-center gap-2 p-2 rounded-md cursor-pointer transition-colors ${
-                    dbParam === item.name ? 'bg-blue-50 border border-blue-200' : 'hover:bg-gray-100'
-                  }`}
+            {/* Unselect Option */}
+            {dbParam && (
+              <div className="p-3 border-b border-gray-100">
+                <div
+                  className="flex items-center gap-3 p-2 rounded-lg cursor-pointer text-gray-700 hover:bg-gray-100 hover:text-gray-900 font-medium transition-all duration-200"
                   onClick={() => {
-                    setDbParam(item.name);
+                    setDbParam('');
                     setPopoverOpen(false);
                   }}
                 >
-                  <DBIcon
-                    width={20}
-                    height={20}
-                    src={item.icon}
-                    label={item.label}
-                    className="flex-shrink-0"
-                  />
-                  <span className={`text-sm truncate ${dbParam === item.name ? 'text-blue-700 font-medium' : 'text-gray-700'}`}>
-                    {item.name}
-                  </span>
+                  <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
+                    <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
+                  </div>
+                  <span className="text-sm">No Database Selected</span>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
 
-            {/* All Databases */}
+            {/* Database List */}
             <div className="max-h-64 overflow-y-auto">
               {loading ? (
                 <div className="flex items-center justify-center p-8">
                   <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                 </div>
               ) : allDatabases.length > 0 ? (
-                <div className="p-2">
-                  <p className="text-xs text-gray-500 px-2 py-1 mb-2">All Connections</p>
-                  {allDatabases.map((db) => (
-                    <div key={db.id} className="group flex items-center justify-between p-2 hover:bg-gray-50 rounded-md">
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <DBIcon
-                          width={20}
-                          height={20}
-                          src={dbMapper[db.type]?.icon}
-                          label={dbMapper[db.type]?.label}
-                          className="flex-shrink-0"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm text-gray-700 truncate">
-                            {db.params?.database || db.params?.path || 'Unknown'}
-                          </p>
-                          {db.description && (
-                            <p className="text-xs text-gray-500 truncate">{db.description}</p>
-                          )}
+                <div className="p-3">
+                  {allDatabases.map((db) => {
+                    const dbName = db.params?.database || db.params?.path || 'Unknown';
+                    const isSelected = dbParam === dbName;
+                    return (
+                      <div 
+                        key={db.id} 
+                        className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
+                          isSelected 
+                            ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm' 
+                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                        }`}
+                        onClick={(e) => {
+                          // Only select if not clicking on action buttons
+                          if (!e.target.closest('button')) {
+                            setDbParam(isSelected ? '' : dbName);
+                            setPopoverOpen(false);
+                          }
+                        }}
+                      >
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <DBIcon
+                            width={20}
+                            height={20}
+                            src={dbMapper[db.type]?.icon}
+                            label={dbMapper[db.type]?.label}
+                            className="flex-shrink-0"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm truncate">{dbName}</p>
+                            {db.description && (
+                              <p className="text-xs text-gray-500 truncate mt-0.5">{db.description}</p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 w-7 p-0 rounded-md hover:bg-gray-200 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRefreshDatabase(db);
+                            }}
+                            disabled={refreshingDb === db.id}
+                          >
+                            <RefreshCw className={`h-3 w-3 text-gray-600 ${refreshingDb === db.id ? 'animate-spin' : ''}`} />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 w-7 p-0 rounded-md hover:bg-blue-100 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditDatabase(db);
+                            }}
+                          >
+                            <Edit3 className="h-3 w-3 text-blue-600" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 w-7 p-0 rounded-md hover:bg-red-100 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteDatabase(db);
+                            }}
+                          >
+                            <Trash2 className="h-3 w-3 text-red-600" />
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 w-7 p-0"
-                          onClick={() => handleRefreshDatabase(db)}
-                          disabled={refreshingDb === db.id}
-                        >
-                          <RefreshCw className={`h-3 w-3 text-gray-600 ${refreshingDb === db.id ? 'animate-spin' : ''}`} />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 w-7 p-0"
-                          onClick={() => handleEditDatabase(db)}
-                        >
-                          <Edit3 className="h-3 w-3 text-blue-600" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 w-7 p-0"
-                          onClick={() => handleDeleteDatabase(db)}
-                        >
-                          <Trash2 className="h-3 w-3 text-red-600" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="p-8 text-center">
@@ -409,9 +422,9 @@ function ModernDBSelector() {
 
       {/* Database Form Modal */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="bg-white border border-gray-200 max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="bg-white border border-gray-200 max-w-2xl max-h-[80vh] overflow-y-auto rounded-lg shadow-lg">
           <DialogHeader>
-            <DialogTitle className="text-gray-800">
+            <DialogTitle className="text-gray-800 font-medium">
               {editingDb ? 'Edit Database Connection' : 'Add Database Connection'}
             </DialogTitle>
             <DialogDescription className="text-gray-600">
@@ -471,14 +484,14 @@ function ModernDBSelector() {
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
+              <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-all duration-200 rounded-lg">
                 Cancel
               </Button>
             </DialogClose>
             <Button 
               onClick={handleSubmitForm}
               disabled={formSubmitting || !selectedType}
-              className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+              className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 font-medium transition-all duration-200 rounded-lg"
             >
               {formSubmitting ? (
                 <>

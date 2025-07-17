@@ -76,7 +76,7 @@ export function AppSidebar() {
               >
                 <div className="flex items-center justify-center w-full">
                   <img 
-                    src="/uagi-icon.svg" 
+                    src="/uagi-logo.svg" 
                     alt="UAGI" 
                     className="h-8 w-auto"
                   />

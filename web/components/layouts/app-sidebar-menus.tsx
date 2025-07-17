@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { usePathname } from "next/navigation";
-import { MessageSquarePlus, Settings } from "lucide-react";
+import { MessageSquarePlus } from "lucide-react";
 
 export function AppSidebarMenus() {
   const router = useRouter();
@@ -21,7 +21,9 @@ export function AppSidebarMenus() {
       key: 'chat',
       name: 'New Chat',
       icon: (
-        <MessageSquarePlus 
+        <img 
+          src="/uagi-icon.svg" 
+          alt="UAGI" 
           className={`h-5 w-5 ${
             pathname.startsWith('/chat') || pathname === '/' 
               ? 'text-blue-700' 
@@ -31,21 +33,6 @@ export function AppSidebarMenus() {
       ),
       path: '/chat',
       isActive: pathname.startsWith('/chat') || pathname === '/',
-    },
-    {
-      key: 'construct',
-      name: 'Settings',
-      isActive: pathname.startsWith('/construct'),
-      icon: (
-        <Settings 
-          className={`h-5 w-5 ${
-            pathname.startsWith('/construct') 
-              ? 'text-blue-700' 
-              : 'text-gray-600'
-          }`}
-        />
-      ),
-      path: '/construct/database',
     },
   ];
 

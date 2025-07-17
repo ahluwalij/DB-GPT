@@ -52,6 +52,9 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [managementLoading, setManagementLoading] = useState(false);
   const [refreshingDb, setRefreshingDb] = useState<string | null>(null);
+  
+  // Local selection state for the popover
+  const [selectedValue, setSelectedValue] = useState<string>('');
 
   // Modal states
   const [modalOpen, setModalOpen] = useState(false);
@@ -76,6 +79,27 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
     } finally {
       setManagementLoading(false);
     }
+  };
+
+  // Initialize selectedValue when popover opens
+  const handlePopoverOpen = (open: boolean) => {
+    if (open) {
+      setSelectedValue(value || '');
+      loadAllDatabases();
+    }
+    setPopoverOpen(open);
+  };
+
+  // Handle saving the selection
+  const handleSave = () => {
+    onChange?.(selectedValue);
+    setPopoverOpen(false);
+  };
+
+  // Handle canceling the selection
+  const handleCancel = () => {
+    setSelectedValue(value || '');
+    setPopoverOpen(false);
   };
 
   // Get supported database types (only PostgreSQL as per original code)
@@ -239,21 +263,16 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
   const selectedDbType = dbTypeList.find(type => type.value === selectedType);
 
   // Find currently selected database label
-  const selectedDbLabel = databaseOptions.find(opt => opt.value === value)?.value || value || "Select Database";
+  const selectedDbLabel = value ? (databaseOptions.find(opt => opt.value === value)?.value || value) : "None";
 
   return (
     <>
-      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+      <Popover open={popoverOpen} onOpenChange={handlePopoverOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="w-44 justify-between bg-white hover:bg-gray-50 border-gray-200"
+            className="w-44 justify-between bg-white hover:bg-gray-50 border-gray-200 font-medium transition-all duration-200"
             disabled={disabled}
-            onClick={() => {
-              if (!popoverOpen) {
-                loadAllDatabases();
-              }
-            }}
           >
             <div className="flex items-center gap-2 min-w-0">
               {value && databaseOptions.length > 0 ? (
@@ -266,7 +285,9 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
                 )
               ) : (
                 <>
-                  <Database className="h-4 w-4 text-gray-600 flex-shrink-0" />
+                  <div className="h-4 w-4 flex items-center justify-center flex-shrink-0">
+                    <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
+                  </div>
                   <span className="truncate text-sm text-gray-700">{selectedDbLabel}</span>
                 </>
               )}
@@ -297,111 +318,156 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
               </Button>
             </div>
 
-            {/* Active Databases - only show if there are available databases for this scene */}
-            {databaseOptions.length > 0 && (
-              <div className="p-3 border-b border-gray-100 bg-gray-50">
-                <p className="text-xs text-gray-500 mb-2">Active</p>
-                {databaseOptions.map(option => (
-                  <div 
-                    key={option.value}
-                    className={`flex items-center gap-2 p-2 rounded-md cursor-pointer transition-colors ${
-                      value === option.value ? 'bg-blue-50 border border-blue-200' : 'hover:bg-gray-100'
-                    }`}
-                    onClick={() => {
-                      onChange?.(option.value);
-                      setPopoverOpen(false);
-                    }}
-                  >
-                    {option.label}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* All Databases - only show databases that are not already connected to this scene */}
+            {/* Selection Section */}
             <div className="max-h-64 overflow-y-auto">
               {managementLoading ? (
                 <div className="flex items-center justify-center p-8">
                   <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                 </div>
-              ) : (() => {
-                // Filter out databases that are already in databaseOptions
-                const connectedDbNames = databaseOptions.map(opt => opt.value);
-                const unconnectedDatabases = allDatabases.filter(db => 
-                  !connectedDbNames.includes((db.params as any)?.database || (db.params as any)?.path || 'Unknown')
-                );
-                
-                return unconnectedDatabases.length > 0 ? (
-                  <div className="p-2">
-                    <p className="text-xs text-gray-500 px-2 py-1 mb-2">All Connections</p>
-                    {unconnectedDatabases.map((db) => (
-                    <div key={db.id} className="group flex items-center justify-between p-2 hover:bg-gray-50 rounded-md">
-                      <div 
-                        className="flex items-center gap-2 min-w-0 flex-1 cursor-pointer"
-                        onClick={() => {
-                          const dbValue = (db.params as any)?.database || (db.params as any)?.path || 'Unknown';
-                          onChange?.(dbValue);
-                          setPopoverOpen(false);
-                        }}
-                      >
-                        <DBIcon
-                          width={20}
-                          height={20}
-                          src={dbMapper[db.type]?.icon}
-                          label={dbMapper[db.type]?.label}
-                          className="flex-shrink-0"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm text-gray-700 truncate">
-                            {(db.params as any)?.database || (db.params as any)?.path || 'Unknown'}
-                          </p>
-                          {db.description && (
-                            <p className="text-xs text-gray-500 truncate">{db.description}</p>
-                          )}
-                        </div>
+              ) : (
+                <div className="p-3">
+                  {/* None option */}
+                  <div 
+                    className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
+                      selectedValue === '' 
+                        ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm' 
+                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                    }`}
+                    onClick={() => setSelectedValue('')}
+                  >
+                    <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
+                      {selectedValue === '' && <div className="h-2 w-2 bg-blue-600 rounded-full"></div>}
+                    </div>
+                    <span className="text-sm">None</span>
+                  </div>
+
+                  {/* Available databases from current scene */}
+                  {databaseOptions.map(option => (
+                    <div 
+                      key={option.value}
+                      className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
+                        selectedValue === option.value 
+                          ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm' 
+                          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                      }`}
+                      onClick={() => setSelectedValue(option.value)}
+                    >
+                      <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
+                        {selectedValue === option.value && <div className="h-2 w-2 bg-blue-600 rounded-full"></div>}
                       </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 w-7 p-0"
-                          onClick={() => handleRefreshDatabase(db)}
-                          disabled={refreshingDb === db.id}
-                        >
-                          <RefreshCw className={`h-3 w-3 text-gray-600 ${refreshingDb === db.id ? 'animate-spin' : ''}`} />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 w-7 p-0"
-                          onClick={() => handleEditDatabase(db)}
-                        >
-                          <Edit3 className="h-3 w-3 text-blue-600" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 w-7 p-0"
-                          onClick={() => handleDeleteDatabase(db)}
-                        >
-                          <Trash2 className="h-3 w-3 text-red-600" />
-                        </Button>
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        {option.label}
                       </div>
                     </div>
-                    ))}
-                  </div>
-                ) : databaseOptions.length === 0 ? (
-                  <div className="p-8 text-center">
-                    <Database className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-sm text-gray-500">No databases configured</p>
-                    <p className="text-xs text-gray-400 mt-1">Click "Add" to create your first connection</p>
-                  </div>
-                ) : (
-                  <div className="p-4 text-center">
-                    <p className="text-sm text-gray-500">All databases are already connected to this chat</p>
-                  </div>
-                );
-              })()}
+                  ))}
+                  
+                  {/* Show other configured databases */}
+                  {(() => {
+                    const connectedDbNames = databaseOptions.map(opt => opt.value);
+                    const unconnectedDatabases = allDatabases.filter(db => 
+                      !connectedDbNames.includes((db.params as any)?.database || (db.params as any)?.path || 'Unknown')
+                    );
+                    
+                    return unconnectedDatabases.map((db) => {
+                      const dbName = (db.params as any)?.database || (db.params as any)?.path || 'Unknown';
+                      return (
+                        <div key={db.id} className="group flex items-center justify-between p-2 rounded-lg font-medium transition-all duration-200">
+                          <div 
+                            className={`flex items-center gap-3 min-w-0 flex-1 cursor-pointer ${
+                              selectedValue === dbName 
+                                ? 'text-blue-700' 
+                                : 'text-gray-700 hover:text-gray-900'
+                            }`}
+                            onClick={() => setSelectedValue(dbName)}
+                          >
+                            <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
+                              {selectedValue === dbName && <div className="h-2 w-2 bg-blue-600 rounded-full"></div>}
+                            </div>
+                            <DBIcon
+                              width={20}
+                              height={20}
+                              src={dbMapper[db.type]?.icon}
+                              label={dbMapper[db.type]?.label}
+                              className="flex-shrink-0"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm truncate">{dbName}</p>
+                              {db.description && (
+                                <p className="text-xs text-gray-500 truncate mt-0.5">{db.description}</p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 w-7 p-0 rounded-md hover:bg-gray-200 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRefreshDatabase(db);
+                              }}
+                              disabled={refreshingDb === db.id}
+                            >
+                              <RefreshCw className={`h-3 w-3 text-gray-600 ${refreshingDb === db.id ? 'animate-spin' : ''}`} />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 w-7 p-0 rounded-md hover:bg-blue-100 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditDatabase(db);
+                              }}
+                            >
+                              <Edit3 className="h-3 w-3 text-blue-600" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 w-7 p-0 rounded-md hover:bg-red-100 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteDatabase(db);
+                              }}
+                            >
+                              <Trash2 className="h-3 w-3 text-red-600" />
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
+
+                  {/* Show empty state if no databases available */}
+                  {databaseOptions.length === 0 && allDatabases.length === 0 && (
+                    <div className="p-8 text-center">
+                      <Database className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-sm text-gray-500">No databases configured</p>
+                      <p className="text-xs text-gray-400 mt-1">Click "Add" to create your first connection</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Save/Cancel Buttons */}
+            <div className="flex items-center justify-end gap-2 p-3 border-t border-gray-100 bg-gray-50">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCancel}
+                className="border-gray-300 text-gray-700 hover:bg-gray-100 font-medium transition-all duration-200"
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSave}
+                disabled={selectedValue === value}
+                className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 font-medium transition-all duration-200"
+              >
+                Save
+              </Button>
             </div>
           </div>
         </PopoverContent>

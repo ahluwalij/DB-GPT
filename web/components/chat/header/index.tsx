@@ -4,7 +4,7 @@ import ModeTab from '@/components/chat/mode-tab';
 import { useContext } from 'react';
 import AgentSelector from './agent-selector';
 import ChatExcel from './chat-excel';
-import DBSelector from './db-selector';
+import ModernDBSelector from './modern-db-selector';
 
 /**
  * chat header
@@ -22,7 +22,7 @@ function Header({ refreshHistory, modelChange }: Props) {
       {/* Models Selector */}
       <ModelSelector onChange={modelChange} />
       {/* DB Selector */}
-      <DBSelector />
+      <ModernDBSelector />
       {/* Excel Upload */}
       {/* Commented out to hide chat excel functionality
       {scene === 'chat_excel' && (

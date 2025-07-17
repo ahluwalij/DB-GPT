@@ -9,7 +9,7 @@ import type { UploadFile } from 'antd';
 import { Select, Tooltip, Upload } from 'antd';
 import classNames from 'classnames';
 import { useSearchParams } from 'next/navigation';
-import React, { memo, useCallback, useContext, useMemo, useState, useEffect } from 'react';
+import React, { memo, useCallback, useContext, useMemo, useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const Resource: React.FC<{
@@ -31,6 +31,9 @@ const Resource: React.FC<{
   // dataBase
   const [dbs, setDbs] = useState<IDB[]>([]);
   const [dbsLoading, setDbsLoading] = useState(false);
+  
+  // Track if we've initialized to prevent auto-selection after manual deselection
+  const hasInitialized = useRef(false);
 
   // 左边工具栏动态可用key
   const paramKey: string[] = useMemo(() => {
@@ -94,10 +97,11 @@ const Resource: React.FC<{
     [dbs],
   );
 
-  // Set default resource value when dbOpts are available
+  // Set default resource value when dbOpts are available (only on initial load)
   useEffect(() => {
-    if (!resourceValue && dbOpts?.length > 0) {
+    if (!resourceValue && dbOpts?.length > 0 && !hasInitialized.current) {
       setResourceValue(dbOpts[0].value);
+      hasInitialized.current = true;
     }
   }, [resourceValue, dbOpts, setResourceValue]);
 
