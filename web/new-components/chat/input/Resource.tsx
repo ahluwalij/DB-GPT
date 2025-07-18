@@ -6,7 +6,8 @@ import { IDB } from '@/types/chat';
 import { dbMapper } from '@/utils';
 import { ExperimentOutlined, FolderAddOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd';
-import { Select, Tooltip, Upload } from 'antd';
+import { Select, Tooltip, Upload, Popover, Button } from 'antd';
+import { ChevronDown, Loader2, BookOpen, Database } from 'lucide-react';
 import classNames from 'classnames';
 import { useSearchParams } from 'next/navigation';
 import React, { memo, useCallback, useContext, useMemo, useState, useEffect, useRef } from 'react';
@@ -201,16 +202,42 @@ const Resource: React.FC<{
       );
     case 'knowledge':
     case 'plugin':
-    case 'awel_flow':
+    case 'awel_flow': {
+      // Extract the label text from the React element if needed
+      const selectedOption = dbOpts.find(opt => opt.value === resourceValue);
+      let selectedLabel = "None";
+      
+      if (selectedOption) {
+        // If label is a React element, try to extract text
+        if (React.isValidElement(selectedOption.label)) {
+          // For knowledge spaces, the label is usually just text
+          selectedLabel = resourceValue || "None";
+        } else {
+          selectedLabel = selectedOption.label || resourceValue || "None";
+        }
+      } else if (resourceValue) {
+        selectedLabel = resourceValue;
+      }
+      
       return (
-        <ModernDBResource
+        <Select
           value={resourceValue}
-          onChange={setResourceValue}
-          databaseOptions={dbOpts}
+          className='w-44'
+          onChange={val => {
+            setResourceValue(val);
+          }}
           disabled={!!resource?.bind_value}
           loading={dbsLoading}
+          options={dbOpts}
+          dropdownMatchSelectWidth={false}
+          suffixIcon={dbsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronDown className="h-4 w-4" />}
+          style={{
+            borderRadius: '24px',
+          }}
+          popupClassName="rounded-lg"
         />
       );
+    }
   }
 };
 

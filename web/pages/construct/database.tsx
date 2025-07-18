@@ -205,8 +205,8 @@ function Database() {
 
           <div className='flex items-center gap-4'>
             <Button
-              className='border-none text-white bg-button-gradient'
-              icon={<PlusOutlined />}
+              className='flex items-center justify-center px-6 py-2 rounded-xl text-sm font-medium text-gray-800 bg-gray-200 border-0 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105'
+              icon={<PlusOutlined className='text-base' />}
               onClick={() => {
                 console.log(dbList);
                 console.log(dbTypeList);

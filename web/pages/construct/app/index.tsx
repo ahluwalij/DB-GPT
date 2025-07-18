@@ -310,7 +310,7 @@ export default function AppContent() {
             </div>
 
             <Button
-              className='border-none text-white bg-button-gradient flex items-center'
+              className='flex items-center justify-center px-6 py-2 rounded-xl text-sm font-medium text-white bg-button-gradient border-0 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105'
               icon={<PlusOutlined className='text-base' />}
               onClick={handleCreate}
             >
