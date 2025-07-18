@@ -46,7 +46,10 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
     param.type === 'resource' && param.value === 'database'
   );
   
-  const isDatasourceConnected = resourceValue && resourceValue !== '' && resourceValue !== 'null' && resourceValue !== 'undefined';
+  const isDatasourceConnected = resourceValue && 
+    (Array.isArray(resourceValue) 
+      ? resourceValue.length > 0 
+      : resourceValue !== '' && resourceValue !== 'null' && resourceValue !== 'undefined');
 
   const onSubmit = async () => {
     submitCountRef.current++;
@@ -79,12 +82,8 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
       app_code: appInfo.app_code || '',
       ...(paramKey.includes('temperature') && { temperature: temperatureValue }),
       ...(paramKey.includes('max_new_tokens') && { max_new_tokens: maxNewTokensValue }),
-      select_param,
       ...(paramKey.includes('resource') && {
-        select_param:
-          typeof resourceValue === 'string'
-            ? resourceValue
-            : JSON.stringify(resourceValue) || currentDialogue.select_param,
+        select_param: resourceValue || currentDialogue.select_param,
       }),
     };
 

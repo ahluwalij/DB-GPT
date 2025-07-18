@@ -26,7 +26,7 @@ const Resource: React.FC<{
   fileName: string;
   showAllResources?: boolean; // Optional prop to force showing all resources
 }> = ({ fileList, setFileList, setLoading, fileName, showAllResources = false }) => {
-  const { setResourceValue, setResourceType, appInfo, refreshHistory, refreshDialogList, modelValue, resourceValue, history } =
+  const { setResourceValue, setResourceType, appInfo, refreshHistory, refreshDialogList, modelValue, resourceValue, resourceType, history } =
     useContext(ChatContentContext);
 
   const { temperatureValue, maxNewTokensValue } = useContext(ChatContentContext);
@@ -37,19 +37,61 @@ const Resource: React.FC<{
   const { t } = useTranslation();
   const router = useRouter();
 
-  // Handle resource switching
-  const handleResourceSwitch = useCallback((newValue: string, newType: 'database' | 'knowledge' | null) => {
-    setResourceValue(newValue);
-    setResourceType(newType);
-    
-    // Update the URL to reflect the new resource type when switching between database and knowledge
-    if (chatId && newType !== null) {
-      const newScene = newType === 'database' ? 'chat_with_db_execute' : 'chat_knowledge';
-      // Update URL without page reload
-      const newUrl = `/chat?scene=${newScene}&id=${chatId}${modelValue ? `&model=${modelValue}` : ''}`;
-      router.push(newUrl, undefined, { shallow: true });
+  // State for multi-selection
+  const [selectedResources, setSelectedResources] = useState<Array<{name: string, type: 'database' | 'knowledge'}>>([]);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
+  // Handle resource selection/deselection
+  const handleResourceToggle = useCallback((resourceName: string, resourceType: 'database' | 'knowledge') => {
+    setSelectedResources(prev => {
+      const exists = prev.some(r => r.name === resourceName && r.type === resourceType);
+      if (exists) {
+        // Remove the resource
+        return prev.filter(r => !(r.name === resourceName && r.type === resourceType));
+      } else {
+        // Add the resource
+        return [...prev, {name: resourceName, type: resourceType}];
+      }
+    });
+  }, []);
+
+  // Handle saving the selection
+  const handleSaveSelection = useCallback(() => {
+    if (selectedResources.length === 0) {
+      setResourceValue(null);
+      setResourceType(null);
+    } else {
+      // Send array of selected resources to backend
+      setResourceValue(selectedResources);
+      // Set primary resource type based on selection
+      const hasDatabase = selectedResources.some(r => r.type === 'database');
+      const hasKnowledge = selectedResources.some(r => r.type === 'knowledge');
+      setResourceType(hasDatabase && hasKnowledge ? 'database' : hasDatabase ? 'database' : 'knowledge');
     }
-  }, [setResourceValue, setResourceType, chatId, modelValue, router]);
+    
+    // Update URL based on primary resource type
+    if (chatId && selectedResources.length > 0) {
+      const hasDatabase = selectedResources.some(r => r.type === 'database');
+      const hasKnowledge = selectedResources.some(r => r.type === 'knowledge');
+      let newScene = scene;
+      
+      if (hasDatabase && hasKnowledge) {
+        // Use database scene as primary when both are selected
+        newScene = 'chat_with_db_execute';
+      } else if (hasDatabase) {
+        newScene = 'chat_with_db_execute';
+      } else if (hasKnowledge) {
+        newScene = 'chat_knowledge';
+      }
+      
+      if (newScene !== scene) {
+        const newUrl = `/chat?scene=${newScene}&id=${chatId}${modelValue ? `&model=${modelValue}` : ''}`;
+        router.push(newUrl, undefined, { shallow: true });
+      }
+    }
+    
+    setPopoverOpen(false);
+  }, [selectedResources, setResourceValue, setResourceType, chatId, modelValue, router, scene]);
 
   // dataBase
   const [dbs, setDbs] = useState<IDB[]>([]);
@@ -80,6 +122,26 @@ const Resource: React.FC<{
   }, [appInfo.param_need, paramKey]);
 
   const resource = useMemo(() => appInfo.param_need?.find(i => i.type === 'resource'), [appInfo.param_need]);
+
+  // Initialize selected resources from current resourceValue
+  useEffect(() => {
+    if (resourceValue) {
+      try {
+        // Check if resourceValue is already an array
+        if (Array.isArray(resourceValue)) {
+          setSelectedResources(resourceValue);
+        } else if (typeof resourceValue === 'string' && resourceValue) {
+          // Legacy single resource - determine type based on current resource type
+          const type = resourceType || (isDataBase ? 'database' : isKnowledge ? 'knowledge' : 'database');
+          setSelectedResources([{name: resourceValue, type}]);
+        }
+      } catch (e) {
+        console.error('Failed to parse resourceValue:', e);
+      }
+    } else {
+      setSelectedResources([]);
+    }
+  }, [resourceValue, resourceType, isDataBase, isKnowledge]);
 
   // Fetch database options
   const fetchDbs = useCallback(async () => {
@@ -260,21 +322,26 @@ const Resource: React.FC<{
     case 'knowledge':
     case 'plugin':
     case 'awel_flow': {
-      // Extract the label text from the React element if needed
-      const selectedOption = dbOpts.find(opt => opt.value === resourceValue);
-      let selectedLabel = "None";
-      
-      if (selectedOption) {
-        // If label is a React element, try to extract text
-        if (React.isValidElement(selectedOption.label)) {
-          // For knowledge spaces, the label is usually just text
-          selectedLabel = resourceValue || "None";
-        } else {
-          selectedLabel = selectedOption.label || resourceValue || "None";
+      // Get label for selected resources
+      const getSelectedLabel = () => {
+        if (selectedResources.length === 0) {
+          return "None";
         }
-      } else if (resourceValue) {
-        selectedLabel = resourceValue;
-      }
+        
+        if (selectedResources.length === 1) {
+          return selectedResources[0].name;
+        } else {
+          // Show count of selected resources
+          const dbCount = selectedResources.filter(r => r.type === 'database').length;
+          const knowledgeCount = selectedResources.filter(r => r.type === 'knowledge').length;
+          const parts = [];
+          if (dbCount > 0) parts.push(`${dbCount} DB${dbCount > 1 ? 's' : ''}`);
+          if (knowledgeCount > 0) parts.push(`${knowledgeCount} Knowledge`);
+          return parts.join(', ');
+        }
+      };
+      
+      const selectedLabel = getSelectedLabel();
       
       // Get the appropriate icon based on resource type
       const getResourceIcon = () => {
@@ -285,7 +352,7 @@ const Resource: React.FC<{
       };
       
       return (
-        <Popover>
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="ghost"
@@ -293,7 +360,7 @@ const Resource: React.FC<{
               disabled={!!resource?.bind_value}
             >
               <div className="flex items-center gap-2 min-w-0">
-                {resourceValue ? (
+                {selectedResources.length > 0 ? (
                   <>
                     {getResourceIcon()}
                     <span className="truncate text-sm text-gray-700">{selectedLabel}</span>
@@ -323,8 +390,11 @@ const Resource: React.FC<{
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-gray-100">
                 <h3 className="font-medium text-gray-800">
-                  {showUnifiedView ? 'All Resources' : resource?.value === 'knowledge' ? 'Knowledge Spaces' : 'Select Resource'}
+                  {showUnifiedView ? 'Select Resources' : resource?.value === 'knowledge' ? 'Knowledge Spaces' : 'Select Resource'}
                 </h3>
+                {showUnifiedView && (
+                  <span className="text-xs text-gray-500">You can select multiple resources</span>
+                )}
               </div>
 
               {/* Selection Section */}
@@ -335,19 +405,19 @@ const Resource: React.FC<{
                   </div>
                 ) : (
                   <div className="p-3 space-y-2">
-                    {/* None option */}
+                    {/* Clear all option */}
                     <div 
                       className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
-                        !resourceValue 
+                        selectedResources.length === 0 
                           ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
                           : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                       }`}
                       onClick={() => {
-                        handleResourceSwitch('', null);
+                        setSelectedResources([]);
                       }}
                     >
-                      <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
-                        {!resourceValue && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
+                      <div className="h-5 w-5 border-2 border-gray-300 rounded-full flex items-center justify-center">
+                        {selectedResources.length === 0 && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
                       </div>
                       <span className="text-sm">None</span>
                     </div>
@@ -362,21 +432,27 @@ const Resource: React.FC<{
                               Databases
                             </div>
                             {allResources.databases.map(db => {
-                              const isSelected = resourceValue === db.param;
+                              const isSelected = selectedResources.some(r => r.name === db.param && r.type === 'database');
                               return (
                                 <div 
                                   key={db.param}
                                   className={`flex items-center gap-3 p-2 mx-3 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
                                     isSelected 
-                                      ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
+                                      ? 'bg-blue-50 text-blue-900 border border-blue-200 shadow-sm' 
                                       : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                                   }`}
                                   onClick={() => {
-                                    handleResourceSwitch(db.param, 'database');
+                                    handleResourceToggle(db.param, 'database');
                                   }}
                                 >
-                                  <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
-                                    {isSelected && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
+                                  <div className={`h-5 w-5 border-2 rounded flex items-center justify-center ${
+                                    isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
+                                  }`}>
+                                    {isSelected && (
+                                      <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                    )}
                                   </div>
                                   <div className="flex items-center gap-2 min-w-0 flex-1">
                                     <Database className="h-4 w-4 text-gray-600 flex-shrink-0" />
@@ -395,21 +471,27 @@ const Resource: React.FC<{
                               Knowledge Spaces
                             </div>
                             {allResources.knowledge_spaces.map(space => {
-                              const isSelected = resourceValue === space.param;
+                              const isSelected = selectedResources.some(r => r.name === space.param && r.type === 'knowledge');
                               return (
                                 <div 
                                   key={space.param}
                                   className={`flex items-center gap-3 p-2 mx-3 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
                                     isSelected 
-                                      ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
+                                      ? 'bg-green-50 text-green-900 border border-green-200 shadow-sm' 
                                       : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                                   }`}
                                   onClick={() => {
-                                    handleResourceSwitch(space.param, 'knowledge');
+                                    handleResourceToggle(space.param, 'knowledge');
                                   }}
                                 >
-                                  <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
-                                    {isSelected && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
+                                  <div className={`h-5 w-5 border-2 rounded flex items-center justify-center ${
+                                    isSelected ? 'border-green-500 bg-green-500' : 'border-gray-300'
+                                  }`}>
+                                    {isSelected && (
+                                      <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                    )}
                                   </div>
                                   <div className="flex items-center gap-2 min-w-0 flex-1">
                                     <BookOpen className="h-4 w-4 text-gray-600 flex-shrink-0" />
@@ -427,23 +509,27 @@ const Resource: React.FC<{
                         <div 
                           key={option.value}
                           className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
-                            resourceValue === option.value 
-                              ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
+                            selectedResources.some(r => r.name === option.value) 
+                              ? 'bg-blue-50 text-blue-900 border border-blue-200 shadow-sm' 
                               : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                           }`}
                           onClick={() => {
                             // Determine type based on appInfo
-                            let type: 'database' | 'knowledge' | null = null;
-                            if (resource?.value === 'database') {
-                              type = 'database';
-                            } else if (resource?.value === 'knowledge') {
+                            let type: 'database' | 'knowledge' = 'database';
+                            if (resource?.value === 'knowledge') {
                               type = 'knowledge';
                             }
-                            handleResourceSwitch(option.value, type);
+                            handleResourceToggle(option.value, type);
                           }}
                         >
-                          <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
-                            {resourceValue === option.value && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
+                          <div className={`h-5 w-5 border-2 rounded flex items-center justify-center ${
+                            selectedResources.some(r => r.name === option.value) ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
+                          }`}>
+                            {selectedResources.some(r => r.name === option.value) && (
+                              <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            )}
                           </div>
                           <div className="flex items-center gap-2 min-w-0 flex-1">
                             {React.isValidElement(option.label) ? (
@@ -477,6 +563,42 @@ const Resource: React.FC<{
                     )}
                   </div>
                 )}
+              </div>
+              
+              {/* Save/Cancel Buttons */}
+              <div className="flex items-center justify-end gap-2 p-3 border-t border-gray-100 bg-gray-50">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    // Reset to current resourceValue
+                    if (resourceValue) {
+                      try {
+                        if (Array.isArray(resourceValue)) {
+                          setSelectedResources(resourceValue);
+                        } else if (typeof resourceValue === 'string' && resourceValue) {
+                          const type = resourceType || (isDataBase ? 'database' : isKnowledge ? 'knowledge' : 'database');
+                          setSelectedResources([{name: resourceValue, type}]);
+                        }
+                      } catch (e) {
+                        setSelectedResources([]);
+                      }
+                    } else {
+                      setSelectedResources([]);
+                    }
+                    setPopoverOpen(false);
+                  }}
+                  className="border-gray-300 text-gray-700 hover:bg-gray-100 font-medium transition-all duration-200"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleSaveSelection}
+                  className="bg-gray-600 hover:bg-gray-700 text-white font-medium transition-all duration-200"
+                >
+                  Save
+                </Button>
               </div>
             </div>
           </PopoverContent>

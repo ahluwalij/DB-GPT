@@ -419,6 +419,20 @@ class MultiAgents(BaseComponent, ABC):
         **ext_info,
     ):
         # logger.info(f"app_agent_chat:{gpts_name},{user_query},{conv_uid}")
+        
+        # Check if this is a multi-resource request
+        select_param = ext_info.get('select_param')
+        if gpts_name.startswith('multi_resource_') and isinstance(select_param, list):
+            # Handle dynamic multi-resource app creation
+            from .multi_resource_handler import get_multi_resource_handler
+            handler = get_multi_resource_handler(self.system_app)
+            
+            # Create or get the multi-resource app
+            gpts_app = handler.get_or_create_multi_resource_app(
+                resources=select_param,
+                user_code=user_code
+            )
+            gpts_name = gpts_app.app_code
 
         # Temporary compatible scenario messages
         conv_serve = ConversationServe.get_instance(CFG.SYSTEM_APP)

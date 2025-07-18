@@ -355,9 +355,16 @@ const Chat: React.FC = () => {
 
         // Determine the appropriate chat mode based on resource type
         let chatMode = scene;
+        let appCode = data?.app_code;
         
-        // If we have a resource value, we need to determine if it's a database or knowledge space
-        if (resourceValue && resourceType) {
+        // Handle multi-resource scenarios
+        if (resourceValue && Array.isArray(resourceValue) && resourceValue.length > 1) {
+          // Multiple resources - use agent chat mode with dynamic multi-agent app
+          chatMode = 'chat_agent';
+          // Create a temporary app code for this multi-resource combination
+          appCode = `multi_resource_${resourceValue.map(r => r.name).join('_')}`;
+        } else if (resourceValue && resourceType) {
+          // Single resource - use appropriate chat mode
           if (resourceType === 'database') {
             chatMode = 'chat_with_db_execute';
           } else if (resourceType === 'knowledge') {
@@ -372,6 +379,11 @@ const Chat: React.FC = () => {
           user_input: content,
           select_param: data?.select_param || resourceValue,
         };
+        
+        // Add app_code for multi-agent scenarios
+        if (appCode) {
+          apiData.app_code = appCode;
+        }
 
         // Add other data fields
         if (data) {

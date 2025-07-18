@@ -542,6 +542,9 @@ async def chat_completions(
             dialogue.ext_info.update({"model_name": dialogue.model_name})
             dialogue.ext_info.update({"incremental": dialogue.incremental})
             dialogue.ext_info.update({"temperature": dialogue.temperature})
+            # Pass select_param for multi-resource scenarios
+            if dialogue.select_param:
+                dialogue.ext_info.update({"select_param": dialogue.select_param})
             return StreamingResponse(
                 multi_agents.app_agent_chat(
                     conv_uid=dialogue.conv_uid,
