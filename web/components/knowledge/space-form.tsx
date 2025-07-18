@@ -26,18 +26,23 @@ export default function SpaceForm(props: IProps) {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    form.setFieldValue('storage', spaceConfig?.[0].name);
-    setStorage(spaceConfig?.[0].name);
+    // Filter out KnowledgeGraph and get the first available storage
+    const availableStorages = spaceConfig?.filter((item: any) => item.name !== 'KnowledgeGraph');
+    const firstStorage = availableStorages?.[0];
     
-    // Set default domain type to 'Normal' if available
-    const defaultStorage = spaceConfig?.[0];
-    if (defaultStorage?.domain_types?.length > 0) {
-      const normalDomain = defaultStorage.domain_types.find((domain: any) => domain.name === 'Normal');
-      if (normalDomain) {
-        form.setFieldValue('field', 'Normal');
-      } else {
-        // If 'Normal' is not found, set the first available domain type
-        form.setFieldValue('field', defaultStorage.domain_types[0].name);
+    if (firstStorage) {
+      form.setFieldValue('storage', firstStorage.name);
+      setStorage(firstStorage.name);
+      
+      // Set default domain type to 'Normal' if available
+      if (firstStorage?.domain_types?.length > 0) {
+        const normalDomain = firstStorage.domain_types.find((domain: any) => domain.name === 'Normal');
+        if (normalDomain) {
+          form.setFieldValue('field', 'Normal');
+        } else {
+          // If 'Normal' is not found, set the first available domain type
+          form.setFieldValue('field', firstStorage.domain_types[0].name);
+        }
       }
     }
   }, [spaceConfig]);
@@ -119,13 +124,15 @@ export default function SpaceForm(props: IProps) {
           rules={[{ required: true, message: t('Please_select_the_storage') }]}
         >
           <Select className='mb-5 h-12' placeholder={t('Please_select_the_storage')} onChange={handleStorageChange}>
-            {spaceConfig?.map((item: any) => {
-              return (
-                <Select.Option key={item.name} value={item.name}>
-                  {item.desc}
-                </Select.Option>
-              );
-            })}
+            {spaceConfig
+              ?.filter((item: any) => item.name !== 'KnowledgeGraph')
+              ?.map((item: any) => {
+                return (
+                  <Select.Option key={item.name} value={item.name}>
+                    {item.desc}
+                  </Select.Option>
+                );
+              })}
           </Select>
         </Form.Item>
         <Form.Item<FieldType>
@@ -135,8 +142,9 @@ export default function SpaceForm(props: IProps) {
         >
           <Select className='mb-5 h-12' placeholder={t('Domain')}>
             {spaceConfig
+              ?.filter((item: any) => item.name !== 'KnowledgeGraph')
               ?.find((item: any) => item.name === storage)
-              ?.domain_types.map((item: any) => {
+              ?.domain_types?.map((item: any) => {
                 return (
                   <Select.Option key={item.name} value={item.name}>
                     {item.desc}

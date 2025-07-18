@@ -6,8 +6,14 @@ import { IDB } from '@/types/chat';
 import { dbMapper } from '@/utils';
 import { ExperimentOutlined, FolderAddOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd';
-import { Select, Tooltip, Upload, Popover, Button } from 'antd';
+import { Select, Tooltip, Upload } from 'antd';
 import { ChevronDown, Loader2, BookOpen, Database } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import classNames from 'classnames';
 import { useSearchParams } from 'next/navigation';
 import React, { memo, useCallback, useContext, useMemo, useState, useEffect, useRef } from 'react';
@@ -35,6 +41,8 @@ const Resource: React.FC<{
   
   // Track if we've initialized to prevent auto-selection after manual deselection
   const hasInitialized = useRef(false);
+  // Track the previous resource type to detect changes
+  const prevResourceType = useRef<string | undefined>();
 
   // 左边工具栏动态可用key
   const paramKey: string[] = useMemo(() => {
@@ -75,6 +83,18 @@ const Resource: React.FC<{
   useEffect(() => {
     fetchDbs();
   }, [fetchDbs]);
+
+  // Reset initialization when resource type changes
+  useEffect(() => {
+    const currentResourceType = resource?.value;
+    if (prevResourceType.current && prevResourceType.current !== currentResourceType) {
+      // Resource type has changed, reset initialization
+      hasInitialized.current = false;
+      // Clear existing databases to force reload
+      setDbs([]);
+    }
+    prevResourceType.current = currentResourceType;
+  }, [resource?.value]);
 
   const dbOpts = useMemo(
     () =>
@@ -219,23 +239,122 @@ const Resource: React.FC<{
         selectedLabel = resourceValue;
       }
       
+      // Get the appropriate icon based on resource type
+      const getResourceIcon = () => {
+        if (resource?.value === 'knowledge') {
+          return <BookOpen className="h-4 w-4 text-gray-600 flex-shrink-0" />;
+        }
+        return <Database className="h-4 w-4 text-gray-600 flex-shrink-0" />;
+      };
+      
       return (
-        <Select
-          value={resourceValue}
-          className='w-44'
-          onChange={val => {
-            setResourceValue(val);
-          }}
-          disabled={!!resource?.bind_value}
-          loading={dbsLoading}
-          options={dbOpts}
-          dropdownMatchSelectWidth={false}
-          suffixIcon={dbsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronDown className="h-4 w-4" />}
-          style={{
-            borderRadius: '24px',
-          }}
-          popupClassName="rounded-lg"
-        />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost"
+              className="w-44 justify-between bg-gray-100 hover:bg-gray-200 font-medium transition-all duration-200 rounded-full px-3 py-1 text-sm"
+              disabled={!!resource?.bind_value}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                {resourceValue ? (
+                  <>
+                    {getResourceIcon()}
+                    <span className="truncate text-sm text-gray-700">{selectedLabel}</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="h-4 w-4 flex items-center justify-center flex-shrink-0">
+                      <div className="h-2 w-2 rounded-full bg-gray-400"></div>
+                    </div>
+                    <span className="truncate text-sm text-gray-700">None</span>
+                  </>
+                )}
+              </div>
+              {dbsLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin text-gray-400 flex-shrink-0" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" />
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent 
+            className="w-80 p-0 bg-white border border-gray-200 shadow-lg rounded-lg"
+            align="start"
+            style={{ backgroundColor: 'white !important' }}
+          >
+            <div className="bg-white rounded-lg" style={{ backgroundColor: 'white !important' }}>
+              {/* Header */}
+              <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                <h3 className="font-medium text-gray-800">
+                  {resource?.value === 'knowledge' ? 'Knowledge Spaces' : 'Select Resource'}
+                </h3>
+              </div>
+
+              {/* Selection Section */}
+              <div className="max-h-64 overflow-y-auto">
+                {dbsLoading ? (
+                  <div className="flex items-center justify-center p-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                  </div>
+                ) : (
+                  <div className="p-3 space-y-2">
+                    {/* None option */}
+                    <div 
+                      className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
+                        !resourceValue 
+                          ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
+                          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                      }`}
+                      onClick={() => setResourceValue('')}
+                    >
+                      <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
+                        {!resourceValue && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
+                      </div>
+                      <span className="text-sm">None</span>
+                    </div>
+
+                    {/* Available options */}
+                    {dbOpts.map(option => (
+                      <div 
+                        key={option.value}
+                        className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
+                          resourceValue === option.value 
+                            ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
+                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                        }`}
+                        onClick={() => setResourceValue(option.value)}
+                      >
+                        <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
+                          {resourceValue === option.value && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
+                        </div>
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          {React.isValidElement(option.label) ? (
+                            <>
+                              {getResourceIcon()}
+                              <span className="text-sm truncate">{option.value}</span>
+                            </>
+                          ) : (
+                            <span className="text-sm truncate">{option.label}</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Show empty state if no options available */}
+                    {dbOpts.length === 0 && (
+                      <div className="p-8 text-center">
+                        {getResourceIcon()}
+                        <p className="text-sm text-gray-500 mt-3">
+                          {resource?.value === 'knowledge' ? 'No knowledge spaces available' : 'No resources available'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       );
     }
   }

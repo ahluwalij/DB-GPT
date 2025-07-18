@@ -124,6 +124,28 @@ const Chat: React.FC = () => {
     );
   }, [appInfo, dbName, knowledgeId, model]);
 
+  // Clear resource value when switching between incompatible chat modes
+  useEffect(() => {
+    const databaseScenes = ['chat_with_db_qa', 'chat_with_db_execute', 'chat_dashboard'];
+    const knowledgeScenes = ['chat_knowledge'];
+    
+    const resourceType = appInfo?.param_need?.find(item => item.type === 'resource')?.value;
+    
+    // If we have a resource value but the resource type has changed
+    if (resourceValue && resourceType) {
+      // Check if we're switching from database to knowledge or vice versa
+      const wasDatabase = databaseScenes.includes(currentDialogInfo.chat_scene || '');
+      const isDatabase = resourceType === 'database';
+      const wasKnowledge = knowledgeScenes.includes(currentDialogInfo.chat_scene || '');
+      const isKnowledge = resourceType === 'knowledge';
+      
+      if ((wasDatabase && isKnowledge) || (wasKnowledge && isDatabase)) {
+        // Clear resource value when switching between incompatible types
+        setResourceValue(undefined);
+      }
+    }
+  }, [scene, appInfo, currentDialogInfo.chat_scene]);
+
   useEffect(() => {
     // 仅初始化执行，防止dashboard页面无法切换状态
     setIsMenuExpand(scene !== 'chat_dashboard');

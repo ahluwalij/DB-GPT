@@ -1437,17 +1437,23 @@ def adapt_native_app_model(dialogue: ConversationVo):
                         app_info.app_code == ChatScene.ChatKnowledge.value()
                         and not dialogue.select_param.isdigit()
                     ):
-                        from dbgpt_app.knowledge.service import (
-                            KnowledgeService,
-                            KnowledgeSpaceRequest,
-                        )
+                        # Check if the resource type is actually knowledge before attempting lookup
+                        if resource_param.get("value") == "knowledge":
+                            from dbgpt_app.knowledge.service import (
+                                KnowledgeService,
+                                KnowledgeSpaceRequest,
+                            )
 
-                        ks_service = KnowledgeService()
-                        knowledge_spaces = ks_service.get_knowledge_space(
-                            KnowledgeSpaceRequest(name=dialogue.select_param)
-                        )
-                        if len(knowledge_spaces) == 1:
-                            dialogue.select_param = knowledge_spaces[0].name
+                            ks_service = KnowledgeService()
+                            knowledge_spaces = ks_service.get_knowledge_space(
+                                KnowledgeSpaceRequest(name=dialogue.select_param)
+                            )
+                            if len(knowledge_spaces) == 1:
+                                dialogue.select_param = knowledge_spaces[0].name
+                        else:
+                            # If resource type is not knowledge (e.g., database), 
+                            # don't try to look it up as a knowledge space
+                            logger.info(f"Resource type is {resource_param.get('value')}, not attempting knowledge space lookup")
         return dialogue
     except Exception as e:
         logger.info(f"adapt_native_app_model error: {e}")

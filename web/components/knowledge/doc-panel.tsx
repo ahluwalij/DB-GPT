@@ -282,7 +282,7 @@ export default function DocPanel(props: IProps) {
               }}
               loading={isLoading}
             >
-              {t('Refresh_status')}
+              {t('Refresh')}
             </Button>
           </div>
         </div>
@@ -446,9 +446,9 @@ export default function DocPanel(props: IProps) {
         >
           {t('Add_Datasource')}
         </Button>
-        <Button size='middle' className='flex items-center mx-2' icon={<ToolFilled />} onClick={handleArguments}>
+        {/* <Button size='middle' className='flex items-center mx-2' icon={<ToolFilled />} onClick={handleArguments}>
           Arguments
-        </Button>
+        </Button> */}
         {space.vector_type === 'KnowledgeGraph' && (
           <Button
             size='middle'
@@ -459,9 +459,9 @@ export default function DocPanel(props: IProps) {
             {t('View_Graph')}
           </Button>
         )}
-        <Button icon={<ExperimentOutlined />} onClick={() => setRecallTestOpen(true)}>
+        {/* <Button icon={<ExperimentOutlined />} onClick={() => setRecallTestOpen(true)}>
           {t('Recall_test')}
-        </Button>
+        </Button> */}
       </Space>
       <Divider />
       <Spin spinning={isLoading}>{renderDocumentCard()}</Spin>
