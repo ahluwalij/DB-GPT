@@ -38,10 +38,10 @@ const getChartSpec = (data: GetChartConfigProps['data'], dataProps: GetChartConf
 
 const ckb: ChartKnowledge = {
   id: 'multi_measure_column_chart',
-  name: 'multi_measure_column_chart',
-  alias: ['multi_measure_column_chart'],
+  name: 'Bar Chart',
+  alias: ['Bar Chart'],
   family: ['ColumnCharts'],
-  def: 'multi_measure_column_chart uses lines with segments to show changes in data in a ordinal dimension',
+  def: 'Bar Chart uses lines with segments to show changes in data in a ordinal dimension',
   purpose: ['Comparison', 'Distribution'],
   coord: ['Cartesian2D'],
   category: ['Statistic'],
@@ -58,7 +58,7 @@ const ckb: ChartKnowledge = {
 /* 订制一个图表需要的所有参数 */
 export const multi_measure_column_chart: CustomChart = {
   /* 图表唯一 Id */
-  chartType: 'multi_measure_column_chart',
+  chartType: 'Bar Chart',
   /* 图表知识 */
   chartKnowledge: ckb as ChartKnowledge,
   /** 图表中文名 */

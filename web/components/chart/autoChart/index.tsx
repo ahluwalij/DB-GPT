@@ -131,7 +131,7 @@ export const AutoChart = (props: AutoChartProps) => {
   // Helper function to get chart type name
   const getChartTypeName = (type: string) => {
     const chartNames: Record<string, string> = {
-      bar_chart: 'Bar Chart',
+      bar_chart: 'Horizontal Bar Chart',
       line_chart: 'Line Chart', 
       pie_chart: 'Pie Chart',
       area_chart: 'Area Chart',

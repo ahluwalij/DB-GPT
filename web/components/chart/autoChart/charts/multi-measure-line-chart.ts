@@ -65,7 +65,7 @@ const ckb: ChartKnowledge = {
 /* 订制一个图表需要的所有参数 */
 export const multi_measure_line_chart: CustomChart = {
   /* 图表唯一 Id */
-  chartType: 'multi_measure_line_chart',
+  chartType: 'Line Chart',
   /* 图表知识 */
   chartKnowledge: ckb as ChartKnowledge,
   /** 图表中文名 */

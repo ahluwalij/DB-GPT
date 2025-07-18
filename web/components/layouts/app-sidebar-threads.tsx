@@ -44,8 +44,6 @@ export function AppSidebarThreads() {
   const { setRefreshSidebar } = useSidebarRefresh();
   
   const [generatingTitleThreadIds, setGeneratingTitleThreadIds] = useState<string[]>([]);
-  const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
-  const [editingTitle, setEditingTitle] = useState<string>("");
   
   // State to track if expanded view is active
   const [isExpanded, setIsExpanded] = useState(false);
@@ -81,29 +79,7 @@ export function AppSidebarThreads() {
   // Current thread ID for highlighting active thread
   const currentThreadId = chatId;
 
-  const handleStartRename = (threadId: string, currentTitle: string) => {
-    setEditingThreadId(threadId);
-    setEditingTitle(currentTitle);
-  };
 
-  const handleSaveRename = async (threadId: string) => {
-    try {
-      // TODO: Implement actual update API call
-      console.log("Update thread:", threadId, "with title:", editingTitle);
-      toast.success("Thread updated successfully");
-      setEditingThreadId(null);
-      setEditingTitle("");
-      // Refresh the thread list to show updated title
-      refreshDialogList();
-    } catch (error) {
-      toast.error("Failed to update thread");
-    }
-  };
-
-  const handleCancelRename = () => {
-    setEditingThreadId(null);
-    setEditingTitle("");
-  };
 
   // Check if we have 40 or more threads to display "View All" button
   const hasExcessThreads = threadList && threadList.length >= MAX_THREADS_COUNT;
@@ -227,7 +203,7 @@ export function AppSidebarThreads() {
 
   return (
     <>
-      {threadGroupByDate.map((group, index) => {
+      {threadGroupByDate.filter(group => group.threads.length > 0).map((group, index) => {
         const isFirst = index === 0;
         return (
           <SidebarGroup key={group.label}>
@@ -283,7 +259,6 @@ export function AppSidebarThreads() {
                           beforeTitle={thread.user_input || thread.select_param || "New Chat"}
                           side="right"
                           onDeleted={refreshDialogList}
-                          onRenamed={(title) => handleStartRename(thread.conv_uid, title)}
                         >
                           <div className={`flex items-center rounded-lg transition-all duration-200 ${
                             currentThreadId === thread.conv_uid 
@@ -295,50 +270,30 @@ export function AppSidebarThreads() {
                               className="group-hover/thread:bg-transparent pl-2 pr-6 py-2 flex-1 min-w-0"
                               isActive={currentThreadId === thread.conv_uid}
                             >
-                              {editingThreadId === thread.conv_uid ? (
-                                <div className="flex items-center min-w-0 flex-1">
-                                  <input
-                                    type="text"
-                                    value={editingTitle}
-                                    onChange={(e) => setEditingTitle(e.target.value)}
-                                    onBlur={() => handleCancelRename()}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
-                                        handleSaveRename(thread.conv_uid);
-                                      } else if (e.key === 'Escape') {
-                                        handleCancelRename();
-                                      }
-                                    }}
-                                    className="flex-1 px-2 py-1 text-sm bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                                    autoFocus
-                                  />
-                                </div>
-                              ) : (
-                                <Link
-                                  href={`/chat?scene=${thread.chat_mode}&id=${thread.conv_uid}`}
-                                  className="flex items-center min-w-0 flex-1"
-                                >
-                                  {generatingTitleThreadIds.includes(
-                                    thread.conv_uid,
-                                  ) ? (
-                                    <div className={`truncate animate-pulse thread-title text-sm ${
-                                      currentThreadId === thread.conv_uid 
-                                        ? 'text-black-700 font-medium' 
-                                        : 'text-gray-600'
-                                    }`}>
-                                      {thread.user_input || thread.select_param || "New Chat"}
-                                    </div>
-                                  ) : (
-                                    <p className={`truncate thread-title text-sm ${
-                                      currentThreadId === thread.conv_uid 
-                                        ? 'text-black-700 font-medium' 
-                                        : 'text-gray-600 group-hover/thread:text-gray-800'
-                                    }`}>
-                                      {thread.user_input || thread.select_param || "New Chat"}
-                                    </p>
-                                  )}
-                                </Link>
-                              )}
+                              <Link
+                                href={`/chat?scene=${thread.chat_mode}&id=${thread.conv_uid}`}
+                                className="flex items-center min-w-0 flex-1"
+                              >
+                                {generatingTitleThreadIds.includes(
+                                  thread.conv_uid,
+                                ) ? (
+                                  <div className={`truncate animate-pulse thread-title text-sm ${
+                                    currentThreadId === thread.conv_uid 
+                                      ? 'text-black-700 font-medium' 
+                                      : 'text-gray-600'
+                                  }`}>
+                                    {thread.user_input || thread.select_param || "New Chat"}
+                                  </div>
+                                ) : (
+                                  <p className={`truncate thread-title text-sm ${
+                                    currentThreadId === thread.conv_uid 
+                                      ? 'text-black-700 font-medium' 
+                                      : 'text-gray-600 group-hover/thread:text-gray-800'
+                                  }`}>
+                                    {thread.user_input || thread.select_param || "New Chat"}
+                                  </p>
+                                )}
+                              </Link>
                             </SidebarMenuButton>
 
                             <div className="flex-shrink-0 px-1">

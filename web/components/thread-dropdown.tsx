@@ -6,8 +6,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { apiInterceptors, delDialogue } from "@/client/api";
-import { Input } from "@/components/ui/input";
-import { Loader, PencilLine, Trash } from "lucide-react";
+import { Loader, Trash } from "lucide-react";
 import { 
   Dialog,
   DialogClose,
@@ -23,19 +22,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Command,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "@/components/ui/command";
 
 type Props = {
   threadId: string;
   beforeTitle?: string;
   onDeleted?: () => void;
-  onRenamed?: (newTitle: string) => void;
   side?: "top" | "bottom" | "left" | "right";
   align?: "start" | "end" | "center";
   children: React.ReactNode;
@@ -46,7 +37,6 @@ export function ThreadDropdown({
   children,
   beforeTitle,
   onDeleted,
-  onRenamed,
   side = "right",
   align = "start",
 }: Props) {
@@ -102,18 +92,6 @@ export function ThreadDropdown({
           }}
         >
           <div className="bg-white rounded-lg p-1" style={{ backgroundColor: 'white !important' }}>
-            <div 
-              className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer transition-colors"
-              onClick={() => {
-                onRenamed?.(beforeTitle || "");
-                setOpen(false);
-              }}
-              style={{ color: '#374151 !important' }}
-            >
-              <PencilLine className="h-4 w-4 text-gray-600" style={{ color: '#4b5563 !important' }} />
-              <span className="text-sm font-medium" style={{ color: '#374151 !important' }}>Rename</span>
-            </div>
-            <div className="h-px bg-gray-200 my-1" style={{ backgroundColor: '#e5e7eb !important' }} />
             <div 
               className="flex items-center gap-3 px-3 py-2 text-red-600 hover:bg-red-50 rounded-md cursor-pointer transition-colors"
               onClick={() => {

@@ -18,9 +18,9 @@ export function CodePreview({ code, light, dark, language, customStyle }: Props)
   const { mode } = useContext(ChatContext);
 
   return (
-    <div className='relative'>
+    <div className='relative overflow-x-auto rounded-lg max-w-full'>
       <Button
-        className='absolute right-3 top-2 text-gray-300 hover:!text-gray-200 bg-gray-700'
+        className='absolute right-3 top-2 text-gray-300 hover:!text-gray-200 bg-gray-700 z-10'
         type='text'
         icon={<CopyOutlined />}
         onClick={() => {
@@ -29,9 +29,16 @@ export function CodePreview({ code, light, dark, language, customStyle }: Props)
         }}
       />
       <SyntaxHighlighter
-        customStyle={customStyle}
+        customStyle={{
+          margin: 0,
+          borderRadius: '0.5rem',
+          maxWidth: '100%',
+          ...customStyle,
+        }}
         language={language}
         style={mode === 'dark' ? (dark ?? coldarkDark) : (light ?? oneDark)}
+        wrapLines={false}
+        wrapLongLines={false}
       >
         {code}
       </SyntaxHighlighter>

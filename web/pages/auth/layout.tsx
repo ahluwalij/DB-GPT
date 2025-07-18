@@ -19,7 +19,7 @@ export default function AuthLayout({
             </h1>
             <div className="flex-1" />
             <FlipWords
-              words={["Your AI Database Assistant"]}
+              words={[""]}
               className=" mb-4 text-muted-foreground"
             />
           </div>

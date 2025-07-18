@@ -151,9 +151,9 @@ const ChatContent: React.FC<{
   );
 
   return (
-    <div className={`flex gap-3 mt-6 ${isRobot ? 'max-w-2xl' : 'max-w-2xl ml-auto'}`}>
+    <div className={`flex gap-3 mt-6 ${isRobot ? `max-w-2xl ${thinking && !context ? 'w-auto' : 'w-full'}` : 'max-w-2xl ml-auto w-full'}`}>
       {/* Remove icons - no icon div needed */}
-      <div className={`flex ${scene === 'chat_agent' && !thinking ? 'flex-1' : ''} overflow-hidden`}>
+      <div className={`flex ${scene === 'chat_agent' && !thinking ? 'flex-1' : ''} ${thinking && !context ? 'w-auto' : 'w-full'} max-w-full`}>
         {/* 用户提问 */}
         {!isRobot && (
           <div className='flex flex-1 flex-col group/message'>
@@ -212,8 +212,8 @@ const ChatContent: React.FC<{
         )}
         {/* ai回答 */}
         {isRobot && (
-          <div className='flex flex-1 flex-col group/message'>
-            <div className='bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl rounded-tl-none mb-2'>
+          <div className={`flex flex-1 flex-col group/message min-w-0 max-w-full ${thinking && !context ? 'w-auto' : 'w-full'}`}>
+            <div className={`bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl rounded-tl-none mb-2 min-w-0 max-w-full overflow-hidden ${thinking && !context ? 'w-auto' : 'w-full'}`}>
               {typeof context === 'object' && (
                 <div>
                   {`[${context.template_name}]: `}
@@ -224,12 +224,14 @@ const ChatContent: React.FC<{
                 </div>
               )}
               {typeof context === 'string' && scene === 'chat_agent' && (
-                <GPTVis components={markdownComponents} {...markdownPlugins}>
-                  {preprocessLaTeX(formatMarkdownValForAgent(value))}
-                </GPTVis>
+                <div className='w-full max-w-full overflow-hidden'>
+                  <GPTVis components={markdownComponents} {...markdownPlugins}>
+                    {preprocessLaTeX(formatMarkdownValForAgent(value))}
+                  </GPTVis>
+                </div>
               )}
               {typeof context === 'string' && scene !== 'chat_agent' && (
-                <div>
+                <div className='w-full max-w-full overflow-hidden'>
                   <GPTVis
                     components={{
                       ...markdownComponents,
@@ -243,11 +245,11 @@ const ChatContent: React.FC<{
               )}
               {/* 正在思考 */}
               {thinking && !context && (
-                <div className='flex items-center gap-2'>
-                  <div className='flex'>
-                    <div className='w-1 h-1 rounded-full mx-1 animate-pulse1'></div>
-                    <div className='w-1 h-1 rounded-full mx-1 animate-pulse2'></div>
-                    <div className='w-1 h-1 rounded-full mx-1 animate-pulse3'></div>
+                <div className='flex items-center justify-start'>
+                  <div className='flex items-center gap-1'>
+                    <div className='w-1 h-1 rounded-full bg-gray-400 animate-pulse1'></div>
+                    <div className='w-1 h-1 rounded-full bg-gray-400 animate-pulse2'></div>
+                    <div className='w-1 h-1 rounded-full bg-gray-400 animate-pulse3'></div>
                   </div>
                 </div>
               )}
