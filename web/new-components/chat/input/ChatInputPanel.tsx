@@ -90,12 +90,9 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
 
     await handleChat(newUserInput, params);
 
-    // 如果应用进来第一次对话，刷新对话列表
-    if (submitCountRef.current === 1) {
-      await refreshDialogList();
-      // Also refresh the sidebar to show the new conversation
-      refreshSidebar();
-    }
+    // Refresh dialog list and sidebar after each message to ensure conversation appears immediately
+    await refreshDialogList();
+    refreshSidebar();
   };
 
   // expose setUserInput to parent via ref

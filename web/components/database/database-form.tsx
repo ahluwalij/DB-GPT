@@ -41,7 +41,7 @@ function DatabaseForm({
     host: 'aws-0-us-east-2.pooler.supabase.com',
     port: 5432,
     user: 'postgres.eyernxegjjcfrwrupbtg',
-    password: 'QyZ3NfJdrTJs2T9V',
+    password: 'gYuhsMArUJZfw5ZH',
     database: 'postgres'
   };
   

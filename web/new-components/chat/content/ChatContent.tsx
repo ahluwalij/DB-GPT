@@ -213,7 +213,7 @@ const ChatContent: React.FC<{
         {/* ai回答 */}
         {isRobot && (
           <div className={`flex flex-1 flex-col group/message min-w-0 max-w-full ${thinking && !context ? 'w-auto' : 'w-full'}`}>
-            <div className={`bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl rounded-tl-none mb-2 min-w-0 max-w-full overflow-hidden ${thinking && !context ? 'w-auto' : 'w-full'}`}>
+            <div className={`bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl mb-2 min-w-0 max-w-full overflow-hidden ${thinking && !context ? 'w-auto' : 'w-full'}`}>
               {typeof context === 'object' && (
                 <div>
                   {`[${context.template_name}]: `}

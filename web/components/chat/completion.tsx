@@ -91,6 +91,9 @@ const Completion = ({ messages, onSubmit, onFormatContent }: Props) => {
       }
 
       await onSubmit(content, submitData);
+      
+      // Refresh sidebar after sending message to ensure conversation appears immediately
+      refreshSidebar();
     } finally {
       setIsLoading(false);
     }
