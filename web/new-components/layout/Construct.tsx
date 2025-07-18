@@ -23,12 +23,6 @@ function ConstructLayout({ children }: { children: React.ReactNode }) {
       path: '/database',
     },
     {
-      key: 'prompt',
-      name: 'Context',
-      icon: <MessageOutlined />,
-      path: '/prompt',
-    },
-    {
       key: 'knowledge',
       name: 'Knowledge',
       icon: <BookOutlined />,

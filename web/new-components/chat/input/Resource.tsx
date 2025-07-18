@@ -203,15 +203,12 @@ const Resource: React.FC<{
     case 'plugin':
     case 'awel_flow':
       return (
-        <Select
+        <ModernDBResource
           value={resourceValue}
-          className='w-52 h-8 rounded-3xl'
-          onChange={val => {
-            setResourceValue(val);
-          }}
+          onChange={setResourceValue}
+          databaseOptions={dbOpts}
           disabled={!!resource?.bind_value}
           loading={dbsLoading}
-          options={dbOpts}
         />
       );
   }

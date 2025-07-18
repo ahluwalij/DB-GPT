@@ -164,13 +164,13 @@ class DbChatOutputParser(BaseOutputParser):
         err_msg = None
         success = False
         try:
-            if (
-                not prompt_response.direct_response
-                or len(prompt_response.direct_response) <= 0
-            ) and (not prompt_response.sql or len(prompt_response.sql) <= 0):
-                raise AppActionException("Can not find sql in response", speak)
-
-            if prompt_response.sql:
+            # Handle direct response (no SQL needed - just conversational)
+            if prompt_response.direct_response and (not prompt_response.sql or len(prompt_response.sql) <= 0):
+                speak = prompt_response.direct_response
+                view_json_str = ""
+                success = True
+            # Handle SQL response
+            elif prompt_response.sql:
                 df = data(prompt_response.sql)
                 param["type"] = prompt_response.display
 
@@ -186,10 +186,9 @@ class DbChatOutputParser(BaseOutputParser):
                 )
                 view_json_str = json.dumps(param, default=serialize, ensure_ascii=False)
                 success = True
-            elif prompt_response.direct_response:
-                speak = prompt_response.direct_response
-                view_json_str = ""
-                success = True
+            # No response at all - this is the error case
+            else:
+                raise AppActionException("No SQL or direct response found", speak)
         except Exception as e:
             logger.error("parse_view_response error!" + str(e))
             err_param = {

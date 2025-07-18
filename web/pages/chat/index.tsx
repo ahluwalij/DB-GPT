@@ -22,7 +22,6 @@ const DbEditor = dynamic(() => import('@/components/chat/db-editor'), {
 });
 const ChatContainer = dynamic(() => import('@/components/chat/chat-container'), { ssr: false });
 
-const { Content } = Layout;
 
 interface ChatContentProps {
   history: ChatHistoryResponse; // 会话记录列表
@@ -410,29 +409,48 @@ const Chat: React.FC = () => {
       return isContract ? <DbEditor /> : <ChatContainer />;
     } else {
       return (
-        <Spin spinning={historyLoading} className='w-full h-full m-auto'>
-          <Content className={`flex flex-col h-screen bg-white ${!hasMessages ? 'justify-center items-center' : ''}`}>
-            {hasMessages && <ChatContentContainer ref={scrollRef} className='flex-1' />}
-            {/* Greeting and input container with animation */}
-            <motion.div
-              className={hasMessages ? 'w-full' : 'w-full max-w-4xl'}
-              initial={false}
-              animate={{
-                y: hasMessages ? 0 : 0,
-                scale: hasMessages ? 1 : 1,
-              }}
-              transition={{
-                duration: 0.6,
-                ease: [0.25, 0.1, 0.25, 1],
-              }}
-            >
-              {/* Greeting component above the chat input - only show when no messages */}
-              {!hasMessages && <ChatGreeting />}
-              {/* Pass ref to ChatInputPanel for external control */}
-              <ChatInputPanel ref={chatInputRef} ctrl={ctrl} />
-            </motion.div>
-          </Content>
-        </Spin>
+        <div className='flex flex-col h-full bg-white relative'>
+          <Spin spinning={historyLoading} className='absolute inset-0' />
+          {hasMessages ? (
+            <>
+              <ChatContentContainer ref={scrollRef} className='flex-1 overflow-y-auto' />
+              <motion.div
+                className='w-full'
+                initial={false}
+                animate={{
+                  y: 0,
+                  scale: 1,
+                }}
+                transition={{
+                  duration: 0.6,
+                  ease: [0.25, 0.1, 0.25, 1],
+                }}
+              >
+                <ChatInputPanel ref={chatInputRef} ctrl={ctrl} />
+              </motion.div>
+            </>
+          ) : (
+            <div className='flex-1 flex items-center justify-center'>
+              <div className='w-full max-w-4xl'>
+                <ChatGreeting />
+                <motion.div
+                  className='w-full mt-4'
+                  initial={false}
+                  animate={{
+                    y: 0,
+                    scale: 1,
+                  }}
+                  transition={{
+                    duration: 0.6,
+                    ease: [0.25, 0.1, 0.25, 1],
+                  }}
+                >
+                  <ChatInputPanel ref={chatInputRef} ctrl={ctrl} />
+                </motion.div>
+              </div>
+            </div>
+          )}
+        </div>
       );
     }
   };
@@ -466,13 +484,13 @@ const Chat: React.FC = () => {
         setHistory,
       }}
     >
-      <Flex flex={1}>
-        <Layout className='bg-gradient-light bg-cover bg-center dark:bg-gradient-dark'>
-          <Layout className='bg-transparent'>
+      <div className='flex flex-col h-full'>
+        <Layout className='flex-1 bg-gradient-light bg-cover bg-center dark:bg-gradient-dark' style={{ display: 'flex', flexDirection: 'column' }}>
+          <Layout className='h-full bg-transparent' style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             {contentRender()}
           </Layout>
         </Layout>
-      </Flex>
+      </div>
     </ChatContentContext.Provider>
   );
 };

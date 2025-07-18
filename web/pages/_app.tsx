@@ -1,5 +1,7 @@
 import { ChatContext, ChatContextProvider } from '@/app/chat-context';
-import SideBar from '@/components/layout/side-bar';
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/layouts/app-sidebar";
+import { SidebarRefreshProvider } from "@/components/layouts/sidebar-refresh-context";
 import { NotificationProvider } from '@/components/providers/NotificationProvider';
 import { STORAGE_USERINFO_KEY, STORAGE_USERINFO_VALID_TIME_KEY } from '@/utils/constants/index';
 import { App, ConfigProvider, MappingAlgorithm, theme } from 'antd';
@@ -118,17 +120,19 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
     }
     
     return (
-      <div className='flex w-screen h-screen overflow-hidden'>
-        <Head>
-          <meta name='viewport' content='initial-scale=1.0, width=device-width, maximum-scale=1' />
-        </Head>
-        {router.pathname !== '/construct/app/extra' && (
-          <div className={classNames('transition-[width]', isMenuExpand ? 'w-60' : 'w-20', 'hidden', 'md:block')}>
-            <SideBar />
-          </div>
-        )}
-        <div className='flex flex-col flex-1 relative overflow-hidden'>{children}</div>
-      </div>
+      <SidebarRefreshProvider>
+        <SidebarProvider defaultOpen={isMenuExpand}>
+          <Head>
+            <meta name='viewport' content='initial-scale=1.0, width=device-width, maximum-scale=1' />
+          </Head>
+          {router.pathname !== '/construct/app/extra' && <AppSidebar />}
+          <SidebarInset className="flex flex-col h-screen">
+            <div className="flex-1 flex flex-col min-h-0">
+              {children}
+            </div>
+          </SidebarInset>
+        </SidebarProvider>
+      </SidebarRefreshProvider>
     );
   };
 
