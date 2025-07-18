@@ -227,7 +227,7 @@ const Knowledge = () => {
                 }
                 RightBottom={
                   <ChatButton
-                    text={t('start_chat')}
+                    text={t('Start Chat')}
                     onClick={() => {
                       handleChat(space);
                     }}

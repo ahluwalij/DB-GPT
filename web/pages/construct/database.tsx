@@ -152,49 +152,6 @@ function Database() {
     return parts[parts.length - 1];
   };
 
-  // Show business context guidance after PostgreSQL connection
-  const showBusinessContextGuidance = () => {
-    const isNewConnection = !modal.info; // Check if it's a new connection (not edit)
-    
-    if (isNewConnection) {
-      Modal.confirm({
-        title: '🎯 Enhance Your Data Analysis with Business Context',
-        width: 600,
-        content: (
-          <div className="py-4">
-            <p className="mb-4">
-              <strong>Great! Your PostgreSQL database is now connected.</strong>
-            </p>
-            <p className="mb-4">
-              To get the most out of your data analysis, we recommend creating a <strong>Business Context</strong> that includes:
-            </p>
-            <ul className="list-disc pl-6 mb-4 space-y-2">
-              <li><strong>Key Performance Indicators (KPIs)</strong> - Define your important business metrics</li>
-              <li><strong>Internal Business Terms</strong> - Explain company-specific terminology</li>
-              <li><strong>Example Business Questions</strong> - Common analysis patterns your team uses</li>
-              <li><strong>Data Visualization Preferences</strong> - How you like to see your data displayed</li>
-            </ul>
-            <p className="mb-2">
-              This helps the AI provide more relevant and business-focused insights from your data.
-            </p>
-          </div>
-        ),
-        okText: '📝 Create Business Context',
-        cancelText: '✅ Continue Without Context',
-        onOk() {
-          // Navigate to context creation page
-          router.push('/construct/prompt/add');
-        },
-        onCancel() {
-          // User chooses to continue without context
-          message.success('✅ Database connected successfully! You can add business context later from the Context tab.');
-        }
-      });
-    } else {
-      // For edit operations, just show success message
-      message.success('Database connection updated successfully!');
-    }
-  };
 
   return (
     <ConstructLayout>
@@ -250,8 +207,7 @@ function Database() {
           onSuccess={() => {
             setModal({ open: false });
             refreshDbList();
-            // Show business context guidance for PostgreSQL connections
-            showBusinessContextGuidance();
+            // Business context guidance removed
           }}
           onClose={() => {
             setModal({ open: false });

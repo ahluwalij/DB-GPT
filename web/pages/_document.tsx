@@ -37,7 +37,6 @@ class MyDocument extends Document {
     return (
       <Html lang='en'>
         <Head>
-          <link rel='icon' href='/favicon.svg' type='image/svg+xml' />
           <link rel='icon' href='/favicon.ico' />
           <meta name='description' content='Revolutionizing Database Interactions with Private LLM Technology' />
           <meta property='og:description' content='UAGI - Advanced AI Technology' />

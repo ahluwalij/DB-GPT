@@ -120,7 +120,7 @@ const ChatButton: React.FC<{
   onClick?: () => void;
   Icon?: React.ReactNode | string;
   text?: string;
-}> = ({ onClick, Icon, text = t('start_chat') }) => {
+}> = ({ onClick, Icon, text = t('Start Chat') }) => {
   return (
     <button
       className='flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium transition-all duration-200 hover:shadow-sm'

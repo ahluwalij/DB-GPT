@@ -35,10 +35,12 @@ interface ChatContentProps {
   temperatureValue: any;
   maxNewTokensValue: any;
   resourceValue: any;
+  resourceType: 'database' | 'knowledge' | null;
   modelValue: string;
   setModelValue: React.Dispatch<React.SetStateAction<string>>;
 
   setResourceValue: React.Dispatch<React.SetStateAction<any>>;
+  setResourceType: React.Dispatch<React.SetStateAction<'database' | 'knowledge' | null>>;
   setAppInfo: React.Dispatch<React.SetStateAction<IApp>>;
   setAgent: React.Dispatch<React.SetStateAction<string>>;
   setCanAbort: React.Dispatch<React.SetStateAction<boolean>>;
@@ -61,9 +63,11 @@ export const ChatContentContext = createContext<ChatContentProps>({
   temperatureValue: 0.5,
   maxNewTokensValue: 1024,
   resourceValue: {},
+  resourceType: null,
   modelValue: '',
   setModelValue: () => {},
   setResourceValue: () => {},
+  setResourceType: () => {},
 
   setAppInfo: () => {},
   setAgent: () => {},
@@ -109,6 +113,7 @@ const Chat: React.FC = () => {
   const temperatureValue = 0;
   const maxNewTokensValue = 4000;
   const [resourceValue, setResourceValue] = useState<any>();
+  const [resourceType, setResourceType] = useState<'database' | 'knowledge' | null>(null);
   const [modelValue, setModelValue] = useState<string>('');
   const [hasMessages, setHasMessages] = useState<boolean>(false);
 
@@ -119,9 +124,18 @@ const Chat: React.FC = () => {
                           (model && model.toLowerCase().includes('o3')) ? model :
                           appModel || model;
     setModelValue(preferredModel);
-    setResourceValue(
-      knowledgeId || dbName || appInfo?.param_need?.filter(item => item.type === 'resource')[0]?.bind_value,
-    );
+    const initialResource = knowledgeId || dbName || appInfo?.param_need?.filter(item => item.type === 'resource')[0]?.bind_value;
+    setResourceValue(initialResource);
+    
+    // Set resource type based on appInfo when initializing
+    if (initialResource) {
+      const resourceParam = appInfo?.param_need?.find(item => item.type === 'resource');
+      if (resourceParam?.value === 'database') {
+        setResourceType('database');
+      } else if (resourceParam?.value === 'knowledge') {
+        setResourceType('knowledge');
+      }
+    }
   }, [appInfo, dbName, knowledgeId, model]);
 
   // Clear resource value when switching between incompatible chat modes
@@ -145,6 +159,15 @@ const Chat: React.FC = () => {
       }
     }
   }, [scene, appInfo, currentDialogInfo.chat_scene]);
+
+  // Set resource type based on scene for existing conversations
+  useEffect(() => {
+    if (scene === 'chat_with_db_execute' || scene === 'chat_with_db_qa' || scene === 'chat_dashboard') {
+      setResourceType('database');
+    } else if (scene === 'chat_knowledge') {
+      setResourceType('knowledge');
+    }
+  }, [scene]);
 
   useEffect(() => {
     // 仅初始化执行，防止dashboard页面无法切换状态
@@ -330,11 +353,24 @@ const Chat: React.FC = () => {
           return [...baseHistory, ...newMessages];
         });
 
+        // Determine the appropriate chat mode based on resource type
+        let chatMode = scene;
+        
+        // If we have a resource value, we need to determine if it's a database or knowledge space
+        if (resourceValue && resourceType) {
+          if (resourceType === 'database') {
+            chatMode = 'chat_with_db_execute';
+          } else if (resourceType === 'knowledge') {
+            chatMode = 'chat_knowledge';
+          }
+        }
+        
         // Create data object with all fields
         const apiData: Record<string, any> = {
-          chat_mode: scene,
+          chat_mode: chatMode,
           model_name: modelValue,
           user_input: content,
+          select_param: data?.select_param || resourceValue,
         };
 
         // Add other data fields
@@ -404,7 +440,7 @@ const Chat: React.FC = () => {
         });
       });
     },
-    [chatId, modelValue, chat, scene], // Removed 'history' from dependencies
+    [chatId, modelValue, chat, scene, resourceType], // Removed 'history' from dependencies
   );
 
   useAsyncEffect(async () => {
@@ -491,9 +527,11 @@ const Chat: React.FC = () => {
         temperatureValue,
         maxNewTokensValue,
         resourceValue,
+        resourceType,
         modelValue,
         setModelValue,
         setResourceValue,
+        setResourceType,
 
         setAppInfo,
         setAgent,

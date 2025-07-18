@@ -419,3 +419,7 @@ export const delApp = (data: Record<string, string>) => {
 export const getSpaceConfig = () => {
   return GET<string, SpaceConfig>(`/knowledge/space/config`);
 };
+
+export const getAllResources = () => {
+  return POST<null, { databases: any[]; knowledge_spaces: any[] }>('/api/v1/chat/resources/all');
+};

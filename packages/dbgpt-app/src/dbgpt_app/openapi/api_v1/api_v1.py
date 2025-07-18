@@ -328,6 +328,21 @@ async def params_list(
     return Result.succ(result)
 
 
+@router.post("/v1/chat/resources/all", response_model=Result[dict])
+async def get_all_resources(
+    user_token: UserRequest = Depends(get_user_from_headers),
+):
+    """Get all available resources (databases and knowledge spaces)"""
+    databases = get_db_list(user_token.user_id if user_token else None)
+    knowledge_spaces = knowledge_list(user_token.user_id if user_token else None)
+    
+    result = {
+        "databases": databases,
+        "knowledge_spaces": knowledge_spaces
+    }
+    return Result.succ(result)
+
+
 @router.post("/v1/resource/file/upload")
 async def file_upload(
     chat_mode: str,

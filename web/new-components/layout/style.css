@@ -1,7 +1,7 @@
 /* 在全局 CSS 文件中 */
 /* 选择 Ant Design Tabs 组件的 tab 栏 */
 .ant-tabs-nav {
-  @apply bg-[#edf8fb] backdrop-filter backdrop-blur-lg dark:border-[#6f7f95] dark:bg-[#6f7f95] dark:bg-opacity-60 h-14 px-6;
+  @apply bg-gray-100 backdrop-filter backdrop-blur-lg dark:border-[#6f7f95] dark:bg-[#6f7f95] dark:bg-opacity-60 h-14 px-6;
 }
 .ant-tabs-nav::before {
   @apply dark:border-[#6f7f95];

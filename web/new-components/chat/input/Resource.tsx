@@ -1,6 +1,5 @@
-import { apiInterceptors, postChatModeParamsFileLoad, postChatModeParamsList } from '@/client/api';
+import { apiInterceptors, postChatModeParamsFileLoad, postChatModeParamsList, getAllResources } from '@/client/api';
 import DBIcon from '@/components/common/db-icon';
-import ModernDBResource from '@/components/chat/input/modern-db-resource';
 import { ChatContentContext } from '@/pages/chat';
 import { IDB } from '@/types/chat';
 import { dbMapper } from '@/utils';
@@ -16,6 +15,7 @@ import {
 } from '@/components/ui/popover';
 import classNames from 'classnames';
 import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import React, { memo, useCallback, useContext, useMemo, useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -24,8 +24,9 @@ const Resource: React.FC<{
   setFileList: React.Dispatch<React.SetStateAction<UploadFile<any>[]>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   fileName: string;
-}> = ({ fileList, setFileList, setLoading, fileName }) => {
-  const { setResourceValue, appInfo, refreshHistory, refreshDialogList, modelValue, resourceValue } =
+  showAllResources?: boolean; // Optional prop to force showing all resources
+}> = ({ fileList, setFileList, setLoading, fileName, showAllResources = false }) => {
+  const { setResourceValue, setResourceType, appInfo, refreshHistory, refreshDialogList, modelValue, resourceValue, history } =
     useContext(ChatContentContext);
 
   const { temperatureValue, maxNewTokensValue } = useContext(ChatContentContext);
@@ -34,10 +35,27 @@ const Resource: React.FC<{
   const chatId = searchParams?.get('id') ?? '';
 
   const { t } = useTranslation();
+  const router = useRouter();
+
+  // Handle resource switching
+  const handleResourceSwitch = useCallback((newValue: string, newType: 'database' | 'knowledge' | null) => {
+    setResourceValue(newValue);
+    setResourceType(newType);
+    
+    // Update the URL to reflect the new resource type when switching between database and knowledge
+    if (chatId && newType !== null) {
+      const newScene = newType === 'database' ? 'chat_with_db_execute' : 'chat_knowledge';
+      // Update URL without page reload
+      const newUrl = `/chat?scene=${newScene}&id=${chatId}${modelValue ? `&model=${modelValue}` : ''}`;
+      router.push(newUrl, undefined, { shallow: true });
+    }
+  }, [setResourceValue, setResourceType, chatId, modelValue, router]);
 
   // dataBase
   const [dbs, setDbs] = useState<IDB[]>([]);
   const [dbsLoading, setDbsLoading] = useState(false);
+  const [allResources, setAllResources] = useState<{ databases: IDB[]; knowledge_spaces: IDB[] } | null>(null);
+  const [showUnifiedView, setShowUnifiedView] = useState(false);
   
   // Track if we've initialized to prevent auto-selection after manual deselection
   const hasInitialized = useRef(false);
@@ -68,8 +86,22 @@ const Resource: React.FC<{
     if ((isDataBase || isKnowledge) && !resource?.bind_value) {
       setDbsLoading(true);
       try {
-        const [, res] = await apiInterceptors(postChatModeParamsList(scene as string));
-        setDbs(res ?? []);
+        // Check if we should show unified view (both databases and knowledge spaces)
+        if (showUnifiedView) {
+          const [, res] = await apiInterceptors(getAllResources());
+          if (res) {
+            setAllResources(res);
+            // Combine both resources into a single list
+            const combined = [
+              ...(res.databases || []),
+              ...(res.knowledge_spaces || [])
+            ];
+            setDbs(combined);
+          }
+        } else {
+          const [, res] = await apiInterceptors(postChatModeParamsList(scene as string));
+          setDbs(res ?? []);
+        }
       } catch (error) {
         console.error('Failed to fetch database list:', error);
         setDbs([]);
@@ -77,12 +109,19 @@ const Resource: React.FC<{
         setDbsLoading(false);
       }
     }
-  }, [isDataBase, isKnowledge, resource?.bind_value, scene]);
+  }, [isDataBase, isKnowledge, resource?.bind_value, scene, showUnifiedView]);
 
   // Effect to fetch databases when needed
   useEffect(() => {
     fetchDbs();
   }, [fetchDbs]);
+
+  // Always show unified view for database and knowledge resources
+  useEffect(() => {
+    // Enable unified view when we have database or knowledge resources
+    const shouldShowUnified = isDataBase || isKnowledge;
+    setShowUnifiedView(shouldShowUnified);
+  }, [isDataBase, isKnowledge]);
 
   // Reset initialization when resource type changes
   useEffect(() => {
@@ -120,11 +159,18 @@ const Resource: React.FC<{
 
   // Set default resource value when dbOpts are available (only on initial load)
   useEffect(() => {
-    if (!resourceValue && dbOpts?.length > 0 && !hasInitialized.current) {
+    if (!resourceValue && dbOpts?.length > 0 && !hasInitialized.current && allResources) {
       setResourceValue(dbOpts[0].value);
+      // Determine if the first option is a database or knowledge space
+      const firstDb = allResources.databases.find(db => db.param === dbOpts[0].value);
+      if (firstDb) {
+        setResourceType('database');
+      } else {
+        setResourceType('knowledge');
+      }
       hasInitialized.current = true;
     }
-  }, [resourceValue, dbOpts, setResourceValue]);
+  }, [resourceValue, dbOpts, setResourceValue, setResourceType, allResources]);
 
   // 上传
   const onUpload = useCallback(async () => {
@@ -211,15 +257,6 @@ const Resource: React.FC<{
       );
     }
     case 'database':
-      return (
-        <ModernDBResource
-          value={resourceValue}
-          onChange={setResourceValue}
-          databaseOptions={dbOpts}
-          disabled={!!resource?.bind_value}
-          loading={dbsLoading}
-        />
-      );
     case 'knowledge':
     case 'plugin':
     case 'awel_flow': {
@@ -286,7 +323,7 @@ const Resource: React.FC<{
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-gray-100">
                 <h3 className="font-medium text-gray-800">
-                  {resource?.value === 'knowledge' ? 'Knowledge Spaces' : 'Select Resource'}
+                  {showUnifiedView ? 'All Resources' : resource?.value === 'knowledge' ? 'Knowledge Spaces' : 'Select Resource'}
                 </h3>
               </div>
 
@@ -305,7 +342,9 @@ const Resource: React.FC<{
                           ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
                           : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                       }`}
-                      onClick={() => setResourceValue('')}
+                      onClick={() => {
+                        handleResourceSwitch('', null);
+                      }}
                     >
                       <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
                         {!resourceValue && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
@@ -313,39 +352,126 @@ const Resource: React.FC<{
                       <span className="text-sm">None</span>
                     </div>
 
-                    {/* Available options */}
-                    {dbOpts.map(option => (
-                      <div 
-                        key={option.value}
-                        className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
-                          resourceValue === option.value 
-                            ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
-                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                        }`}
-                        onClick={() => setResourceValue(option.value)}
-                      >
-                        <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
-                          {resourceValue === option.value && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
+                    {/* Show categorized resources if in unified view */}
+                    {showUnifiedView && allResources ? (
+                      <>
+                        {/* Databases Section */}
+                        {allResources.databases.length > 0 && (
+                          <>
+                            <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                              Databases
+                            </div>
+                            {allResources.databases.map(db => {
+                              const isSelected = resourceValue === db.param;
+                              return (
+                                <div 
+                                  key={db.param}
+                                  className={`flex items-center gap-3 p-2 mx-3 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
+                                    isSelected 
+                                      ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
+                                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                                  }`}
+                                  onClick={() => {
+                                    handleResourceSwitch(db.param, 'database');
+                                  }}
+                                >
+                                  <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
+                                    {isSelected && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
+                                  </div>
+                                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                                    <Database className="h-4 w-4 text-gray-600 flex-shrink-0" />
+                                    <span className="text-sm truncate">{db.param}</span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </>
+                        )}
+
+                        {/* Knowledge Spaces Section */}
+                        {allResources.knowledge_spaces.length > 0 && (
+                          <>
+                            <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-2">
+                              Knowledge Spaces
+                            </div>
+                            {allResources.knowledge_spaces.map(space => {
+                              const isSelected = resourceValue === space.param;
+                              return (
+                                <div 
+                                  key={space.param}
+                                  className={`flex items-center gap-3 p-2 mx-3 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
+                                    isSelected 
+                                      ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
+                                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                                  }`}
+                                  onClick={() => {
+                                    handleResourceSwitch(space.param, 'knowledge');
+                                  }}
+                                >
+                                  <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
+                                    {isSelected && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
+                                  </div>
+                                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                                    <BookOpen className="h-4 w-4 text-gray-600 flex-shrink-0" />
+                                    <span className="text-sm truncate">{space.param}</span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      /* Original single list display */
+                      dbOpts.map(option => (
+                        <div 
+                          key={option.value}
+                          className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
+                            resourceValue === option.value 
+                              ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
+                              : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                          }`}
+                          onClick={() => {
+                            // Determine type based on appInfo
+                            let type: 'database' | 'knowledge' | null = null;
+                            if (resource?.value === 'database') {
+                              type = 'database';
+                            } else if (resource?.value === 'knowledge') {
+                              type = 'knowledge';
+                            }
+                            handleResourceSwitch(option.value, type);
+                          }}
+                        >
+                          <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
+                            {resourceValue === option.value && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
+                          </div>
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                            {React.isValidElement(option.label) ? (
+                              <>
+                                {getResourceIcon()}
+                                <span className="text-sm truncate">{option.value}</span>
+                              </>
+                            ) : (
+                              <span className="text-sm truncate">{option.label}</span>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                          {React.isValidElement(option.label) ? (
-                            <>
-                              {getResourceIcon()}
-                              <span className="text-sm truncate">{option.value}</span>
-                            </>
-                          ) : (
-                            <span className="text-sm truncate">{option.label}</span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
 
                     {/* Show empty state if no options available */}
-                    {dbOpts.length === 0 && (
+                    {((showUnifiedView && allResources && allResources.databases.length === 0 && allResources.knowledge_spaces.length === 0) || 
+                      (!showUnifiedView && dbOpts.length === 0)) && (
                       <div className="p-8 text-center">
-                        {getResourceIcon()}
-                        <p className="text-sm text-gray-500 mt-3">
-                          {resource?.value === 'knowledge' ? 'No knowledge spaces available' : 'No resources available'}
+                        <div className="mx-auto mb-3 w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <p className="text-sm text-gray-500">
+                          {showUnifiedView ? 'No resources available' : 
+                           resource?.value === 'knowledge' ? 'No knowledge spaces available' : 
+                           'No databases available'}
                         </p>
                       </div>
                     )}
