@@ -52,7 +52,7 @@ export default function StrategyForm({ strategies, docType, fileName, field }: I
             key={`param_${param.param_name}`}
             label={param.param_name}
             name={[field!.name, 'chunk_parameters', param.param_name]}
-            rules={[{ required: true, message: t('Please_input_the_name') }]}
+            rules={[{ required: true, message: t('Space Descriptor') }]}
             initialValue={param.default_value}
             valuePropName={param.param_type === 'boolean' ? 'checked' : 'value'}
             tooltip={param.description}

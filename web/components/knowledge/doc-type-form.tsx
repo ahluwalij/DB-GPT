@@ -18,22 +18,10 @@ export default function DocTypeForm(props: IProps) {
       iconType: 'TEXT',
     },
     {
-      type: 'URL',
-      title: t('URL'),
-      subTitle: t('Fetch_the_content_of_a_URL'),
-      iconType: 'WEBPAGE',
-    },
-    {
       type: 'DOCUMENT',
       title: t('Document'),
-      subTitle: t('Upload_a_document'),
+      subTitle: t('Upload a document'),
       iconType: 'DOCUMENT',
-    },
-    {
-      type: 'YUQUEURL',
-      title: t('yuque'),
-      subTitle: t('Get_yuque_document'),
-      iconType: 'YUQUEURL',
     },
   ];
 

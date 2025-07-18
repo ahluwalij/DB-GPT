@@ -117,9 +117,9 @@ export default function DocUploadForm(props: IProps) {
         <Form.Item<FieldType>
           label={`${t('Name')}:`}
           name='docName'
-          rules={[{ required: true, message: t('Please_input_the_name') }]}
+          rules={[{ required: true, message: t('Space Descriptor') }]}
         >
-          <Input className='mb-5 h-12' placeholder={t('Please_input_the_name')} />
+          <Input className='mb-5 h-12' placeholder={t('Space Descriptor')} />
         </Form.Item>
         <Form.Item<FieldType>
           label={`${t('Text_Source')}:`}
@@ -179,9 +179,9 @@ export default function DocUploadForm(props: IProps) {
         <Form.Item<FieldType>
           label={`${t('Name')}:`}
           name='docName'
-          rules={[{ required: true, message: t('Please_input_the_name') }]}
+          rules={[{ required: true, message: t('Space Descriptor') }]}
         >
-          <Input className='mb-5 h-12' placeholder={t('Please_input_the_name')} />
+          <Input className='mb-5 h-12' placeholder={t('Space Descriptor')} />
         </Form.Item>
         <Form.Item<FieldType>
           label={`${t('Web_Page_URL')}:`}
@@ -234,9 +234,9 @@ export default function DocUploadForm(props: IProps) {
         <Form.Item<FieldType>
           label={`${t('Name')}:`}
           name='docName'
-          rules={[{ required: true, message: t('Please_input_the_name') }]}
+          rules={[{ required: true, message: t('Space Descriptor') }]}
         >
-          <Input className='mb-5 h-12' placeholder={t('Please_input_the_name')} />
+          <Input className='mb-5 h-12' placeholder={t('Space Descriptor')} />
         </Form.Item>
         <Form.Item<FieldType>
           label={t('document_url')}
@@ -331,22 +331,22 @@ export default function DocUploadForm(props: IProps) {
             customRequest={uploadFile}
           >
             <p className='ant-upload-drag-icon'>
-              <InboxOutlined />
+              <InboxOutlined className='text-gray-400' />
             </p>
-            <p style={{ color: 'rgb(22, 108, 255)', fontSize: '20px' }}>{t('Select_or_Drop_file')}</p>
-            <p className='ant-upload-hint' style={{ color: 'rgb(22, 108, 255)' }}>
+            <p className='text-gray-600' style={{ fontSize: '20px' }}>{t('Select Or Drop Files')}</p>
+            <p className='ant-upload-hint text-gray-500'>
               PDF, PowerPoint, Excel, Word, Text, Markdown, Zip1, Csv
             </p>
           </Dragger>
         </Form.Item>
-        <Form.Item<FieldType> label='关联问题:'>
+        <Form.Item<FieldType> label='Related Questions:'>
           <Form.List name='questions'>
             {(fields, { add, remove }) => (
               <>
                 {fields.map(({ key, name }) => (
                   <div key={key} className={cls('flex flex-1 items-center gap-8 mb-6')}>
                     <Form.Item label='' name={[name, 'question']} className='grow'>
-                      <Input placeholder='请输入问题' />
+                      <Input placeholder='Input Question' />
                     </Form.Item>
                     <Form.Item>
                       <MinusCircleOutlined

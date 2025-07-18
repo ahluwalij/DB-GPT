@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { usePathname } from "next/navigation";
-import { MessageSquarePlus, Edit3 } from "lucide-react";
+import { MessageSquarePlus, Edit3, Settings } from "lucide-react";
 
 export function AppSidebarMenus() {
   const router = useRouter();
@@ -31,6 +31,21 @@ export function AppSidebarMenus() {
       ),
       path: '/chat',
       isActive: pathname.startsWith('/chat') || pathname === '/',
+    },
+    {
+      key: 'settings',
+      name: 'Settings',
+      icon: (
+        <Settings 
+          className={`h-5 w-5 ${
+            pathname.startsWith('/construct') 
+              ? 'text-black-700' 
+              : 'text-gray-600'
+          }`}
+        />
+      ),
+      path: '/construct/database',
+      isActive: pathname.startsWith('/construct'),
     },
   ];
 

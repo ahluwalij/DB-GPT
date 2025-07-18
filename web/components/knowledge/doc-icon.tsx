@@ -1,13 +1,13 @@
-import { FileTextFilled, FileWordTwoTone, IeCircleFilled, YuqueFilled } from '@ant-design/icons';
+import { FileTextFilled, FileWordFilled, IeCircleFilled, YuqueFilled } from '@ant-design/icons';
 
 export default function DocIcon({ type }: { type: string }) {
   if (type === 'TEXT') {
-    return <FileTextFilled className='text-[#2AA3FF] mr-2 !text-lg' />;
+    return <FileTextFilled className='text-gray-200 mr-2 !text-lg' />;
   } else if (type === 'DOCUMENT') {
-    return <FileWordTwoTone className='text-[#2AA3FF] mr-2 !text-lg' />;
+    return <FileWordFilled className='text-gray-200 mr-2 !text-lg' />;
   } else if (type === 'YUQUEURL') {
-    return <YuqueFilled className='text-[#2AA3FF] mr-2 !text-lg' />;
+    return <YuqueFilled className='text-gray-200 mr-2 !text-lg' />;
   } else {
-    return <IeCircleFilled className='text-[#2AA3FF] mr-2 !text-lg' />;
+    return <IeCircleFilled className='text-gray-200 mr-2 !text-lg' />;
   }
 }

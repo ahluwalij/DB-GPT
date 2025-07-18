@@ -28,10 +28,34 @@ export default function SpaceForm(props: IProps) {
   useEffect(() => {
     form.setFieldValue('storage', spaceConfig?.[0].name);
     setStorage(spaceConfig?.[0].name);
+    
+    // Set default domain type to 'Normal' if available
+    const defaultStorage = spaceConfig?.[0];
+    if (defaultStorage?.domain_types?.length > 0) {
+      const normalDomain = defaultStorage.domain_types.find((domain: any) => domain.name === 'Normal');
+      if (normalDomain) {
+        form.setFieldValue('field', 'Normal');
+      } else {
+        // If 'Normal' is not found, set the first available domain type
+        form.setFieldValue('field', defaultStorage.domain_types[0].name);
+      }
+    }
   }, [spaceConfig]);
 
   const handleStorageChange = (data: string) => {
     setStorage(data);
+    
+    // Update domain type when storage changes
+    const selectedStorage = spaceConfig?.find((item: any) => item.name === data);
+    if (selectedStorage?.domain_types?.length > 0) {
+      const normalDomain = selectedStorage.domain_types.find((domain: any) => domain.name === 'Normal');
+      if (normalDomain) {
+        form.setFieldValue('field', 'Normal');
+      } else {
+        // If 'Normal' is not found, set the first available domain type
+        form.setFieldValue('field', selectedStorage.domain_types[0].name);
+      }
+    }
   };
 
   const handleFinish = async (fieldsValue: FieldType) => {
@@ -76,7 +100,7 @@ export default function SpaceForm(props: IProps) {
           label={t('Knowledge_Space_Name')}
           name='spaceName'
           rules={[
-            { required: true, message: t('Please_input_the_name') },
+            { required: true, message: t('Space Descriptor') },
             () => ({
               validator(_, value) {
                 if (/[^\u4e00-\u9fa50-9a-zA-Z_-]/.test(value)) {
@@ -87,7 +111,7 @@ export default function SpaceForm(props: IProps) {
             }),
           ]}
         >
-          <Input className='h-12' placeholder={t('Please_input_the_name')} />
+          <Input className='h-12' placeholder={t('Space Descriptor')} />
         </Form.Item>
         <Form.Item<FieldType>
           label={t('Storage')}
@@ -107,9 +131,9 @@ export default function SpaceForm(props: IProps) {
         <Form.Item<FieldType>
           label={t('Domain')}
           name='field'
-          rules={[{ required: true, message: t('Please_select_the_domain_type') }]}
+          rules={[{ required: true, message: t('Domain') }]}
         >
-          <Select className='mb-5 h-12' placeholder={t('Please_select_the_domain_type')}>
+          <Select className='mb-5 h-12' placeholder={t('Domain')}>
             {spaceConfig
               ?.find((item: any) => item.name === storage)
               ?.domain_types.map((item: any) => {

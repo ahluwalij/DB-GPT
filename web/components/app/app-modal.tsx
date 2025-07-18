@@ -336,9 +336,9 @@ export default function AppModal(props: IProps) {
             <Form.Item<FieldType>
               label={'App Name'}
               name='app_name'
-              rules={[{ required: true, message: t('Please_input_the_name') }]}
+              rules={[{ required: true, message: t('Space Descriptor') }]}
             >
-              <Input placeholder={t('Please_input_the_name')} />
+              <Input placeholder={t('Space Descriptor')} />
             </Form.Item>
             <Form.Item<FieldType>
               label={t('Description')}

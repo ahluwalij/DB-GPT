@@ -6,6 +6,7 @@ import Icon, {
   ForkOutlined,
   MessageOutlined,
   PartitionOutlined,
+  BookOutlined,
 } from '@ant-design/icons';
 import { ConfigProvider, Tabs } from 'antd';
 import { t } from 'i18next';
@@ -26,6 +27,18 @@ function ConstructLayout({ children }: { children: React.ReactNode }) {
       name: 'Context',
       icon: <MessageOutlined />,
       path: '/prompt',
+    },
+    {
+      key: 'knowledge',
+      name: 'Knowledge',
+      icon: <BookOutlined />,
+      path: '/knowledge',
+    },
+    {
+      key: 'app',
+      name: 'App',
+      icon: <AppstoreOutlined />,
+      path: '/app',
     },
   ];
   const router = useRouter();

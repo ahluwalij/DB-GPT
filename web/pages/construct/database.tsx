@@ -55,18 +55,17 @@ function Database() {
 
   const dbTypeList = useMemo(() => {
     const supportDbList = dbSupportList
-      .filter(item => item?.name === 'postgresql') // Only show PostgreSQL
       .map(item => {
         const db_type = item?.name;
         return { ...dbMapper[db_type], value: db_type, isFileDb: true, parameters: item.parameters };
       }) as DBOption[];
     
-    // Only show PostgreSQL even if unsupported
+    // Show all unsupported databases from dbMapper
     const unSupportDbList = Object.keys(dbMapper)
-      .filter(item => item === 'postgresql' && !supportDbList.some(db => db.value === item))
+      .filter(item => !supportDbList.some(db => db.value === item))
       .map(item => ({
         ...dbMapper[item],
-        value: dbMapper[item].label,
+        value: item,
         disabled: true,
       })) as DBOption[];
     

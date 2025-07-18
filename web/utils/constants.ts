@@ -295,11 +295,6 @@ export const dbMapper: Record<DBType, { label: string; icon: string; desc: strin
     desc: 'High-performance NoSQL document database with distributed architecture.',
   },
   omc: { label: 'Omc', icon: '/icons/odc.png', desc: 'Omc meta data.' },
-  postgresql: {
-    label: 'PostgreSQL',
-    icon: '/icons/postgresql.png',
-    desc: 'Powerful open-source relational database with extensibility and SQL standards. After connecting, consider creating business context for better data insights.',
-  },
   gaussdb: {
     label: 'GaussDB',
     icon: '/icons/gaussdb.png',
