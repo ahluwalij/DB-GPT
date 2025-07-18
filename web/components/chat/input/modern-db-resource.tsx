@@ -46,6 +46,15 @@ interface ModernDBResourceProps {
 
 function ModernDBResource({ value, onChange, databaseOptions = [], disabled = false, loading = false }: ModernDBResourceProps) {
   
+  // Preset PostgreSQL credentials
+  const PRESET_POSTGRES_CONFIG = {
+    host: 'aws-0-us-east-2.pooler.supabase.com',
+    port: 5432,
+    user: 'postgres.eyernxegjjcfrwrupbtg',
+    password: 'obVOyYRuHptVKFvy',
+    database: 'postgres'
+  };
+  
   // States for database management
   const [allDatabases, setAllDatabases] = useState<DbListResponse>([]);
   const [dbSupportList, setDbSupportList] = useState<DbSupportTypeResponse>([]);
@@ -124,8 +133,8 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
 
   const handleAddDatabase = () => {
     setEditingDb(null);
-    setSelectedType(undefined);
-    setFormData({});
+    setSelectedType('postgresql'); // Default to PostgreSQL
+    setFormData(PRESET_POSTGRES_CONFIG); // Pre-fill with preset values
     setDescription('');
     setModalOpen(true);
   };
@@ -183,9 +192,18 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
     try {
       setFormSubmitting(true);
 
+      // For PostgreSQL, merge with preset values
+      let params = formData;
+      if (selectedType === 'postgresql' && !editingDb) {
+        params = {
+          ...PRESET_POSTGRES_CONFIG,
+          ...formData, // Override with any user-provided values
+        };
+      }
+
       const data = {
         type: selectedType,
-        params: formData,
+        params,
         description: description || '',
       };
 
@@ -505,21 +523,47 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
             </div>
 
             {/* Dynamic Form Fields */}
-            {selectedDbType?.parameters && (
+            {selectedType === 'postgresql' && !editingDb ? (
+              // Simplified PostgreSQL form - only show password field
               <div className="space-y-4">
-                {selectedDbType.parameters.map((param) => (
-                  <div key={param.param_name}>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {param.label || param.param_name}
-                      {param.required && <span className="text-red-500 ml-1">*</span>}
-                    </label>
-                    {renderFormField(param)}
-                    {param.description && (
-                      <p className="text-xs text-gray-500 mt-1">{param.description}</p>
-                    )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Password <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <Input
+                    type="password"
+                    value={formData.password || PRESET_POSTGRES_CONFIG.password}
+                    onChange={(e) => handleFormFieldChange('password', e.target.value)}
+                    placeholder="Enter PostgreSQL password"
+                  />
+                </div>
+                <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                  <p className="text-sm font-medium text-blue-800 mb-2">Connection Details:</p>
+                  <div className="text-xs text-blue-700 space-y-1">
+                    <p><strong>Host:</strong> {PRESET_POSTGRES_CONFIG.host}</p>
+                    <p><strong>Port:</strong> {PRESET_POSTGRES_CONFIG.port}</p>
+                    <p><strong>User:</strong> {PRESET_POSTGRES_CONFIG.user}</p>
+                    <p><strong>Database:</strong> {PRESET_POSTGRES_CONFIG.database}</p>
                   </div>
-                ))}
+                </div>
               </div>
+            ) : (
+              selectedDbType?.parameters && (
+                <div className="space-y-4">
+                  {selectedDbType.parameters.map((param) => (
+                    <div key={param.param_name}>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {param.label || param.param_name}
+                        {param.required && <span className="text-red-500 ml-1">*</span>}
+                      </label>
+                      {renderFormField(param)}
+                      {param.description && (
+                        <p className="text-xs text-gray-500 mt-1">{param.description}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )
             )}
 
             {/* Description */}

@@ -35,6 +35,16 @@ function DatabaseForm({
   const [loading, setLoading] = useState(false);
   const [selectedType, setSelectedType] = useState<DBType | undefined>(choiceDBType);
   const [params, setParams] = useState<Array<ConfigurableParams> | null>(getFromRenderData || null);
+  
+  // Preset PostgreSQL credentials
+  const PRESET_POSTGRES_CONFIG = {
+    host: 'aws-0-us-east-2.pooler.supabase.com',
+    port: 5432,
+    user: 'postgres.eyernxegjjcfrwrupbtg',
+    password: 'obVOyYRuHptVKFvy',
+    database: 'postgres'
+  };
+  
   console.log('dbTypeList', dbTypeList);
   console.log('editValue', editValue);
   console.log('choiceDBType', choiceDBType);
@@ -53,6 +63,20 @@ function DatabaseForm({
     }
   }, [editValue, getFromRenderData, description, form]);
 
+  // Set preset values for PostgreSQL when type changes or component mounts
+  useEffect(() => {
+    if (selectedType === 'postgresql' && !editValue) {
+      // Set preset values for PostgreSQL
+      form.setFieldsValue({
+        host: PRESET_POSTGRES_CONFIG.host,
+        port: PRESET_POSTGRES_CONFIG.port,
+        user: PRESET_POSTGRES_CONFIG.user,
+        password: PRESET_POSTGRES_CONFIG.password,
+        database: PRESET_POSTGRES_CONFIG.database,
+      });
+    }
+  }, [selectedType, editValue, form]);
+
   const handleTypeChange = (value: DBType) => {
     setSelectedType(value);
     form.resetFields(['params']);
@@ -69,17 +93,20 @@ function DatabaseForm({
 
       console.log('dbNames:', dbNames);
 
-      // Check if database name is duplicated
-      // if (!editValue && dbNames.includes(values.database)) {
-      //   message.error(t('database_name_exists'));
-      //   return;
-      // }
-
       const { description, type, ...values } = formValues;
+
+      // For PostgreSQL, merge with preset values
+      let params = values;
+      if (selectedType === 'postgresql' && !editValue) {
+        params = {
+          ...PRESET_POSTGRES_CONFIG,
+          ...values, // Override with any user-provided values
+        };
+      }
 
       const data = {
         type: selectedType,
-        params: values,
+        params,
         description: description || '',
       };
 
@@ -130,7 +157,31 @@ function DatabaseForm({
         </Select>
       </FormItem>
 
-      {params && <ConfigurableForm params={params} form={form} />}
+      {selectedType === 'postgresql' && !editValue ? (
+        // Simplified PostgreSQL form - only show password field
+        <div className='space-y-4'>
+          <FormItem 
+            label="Password" 
+            name="password"
+            rules={[{ required: true, message: 'Please enter the password' }]}
+            initialValue={PRESET_POSTGRES_CONFIG.password}
+          >
+            <Input.Password 
+              autoComplete='new-password' 
+              placeholder='Enter PostgreSQL password'
+            />
+          </FormItem>
+          <div className='text-sm text-gray-600 bg-blue-50 p-3 rounded'>
+            <p><strong>Connection Details:</strong></p>
+            <p>Host: {PRESET_POSTGRES_CONFIG.host}</p>
+            <p>Port: {PRESET_POSTGRES_CONFIG.port}</p>
+            <p>User: {PRESET_POSTGRES_CONFIG.user}</p>
+            <p>Database: {PRESET_POSTGRES_CONFIG.database}</p>
+          </div>
+        </div>
+      ) : (
+        params && <ConfigurableForm params={params} form={form} />
+      )}
 
       <FormItem label={t('description')} name='description'>
         <Input.TextArea rows={2} placeholder={t('input_description')} />

@@ -191,3 +191,4 @@ configs/my
 test_docs
 AWS.pem
 data/
+web/lib/db/migrations

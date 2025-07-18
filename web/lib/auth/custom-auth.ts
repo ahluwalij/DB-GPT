@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
-import { UserSchema, SessionSchema } from "../db/pg/schema.pg";
+import { UserSchema, SessionSchema } from "../db/mysql/schema.mysql";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
