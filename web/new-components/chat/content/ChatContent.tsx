@@ -250,7 +250,6 @@ const ChatContent: React.FC<{
               {/* 正在思考 */}
               {thinking && !context && (
                 <div className='flex items-center gap-2'>
-                  <span className='flex text-sm text-[#1c2533] dark:text-white'>{t('thinking')}</span>
                   <div className='flex'>
                     <div className='w-1 h-1 rounded-full mx-1 animate-pulse1'></div>
                     <div className='w-1 h-1 rounded-full mx-1 animate-pulse2'></div>

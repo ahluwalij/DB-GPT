@@ -13,8 +13,58 @@ const db = drizzle(client, {
   mode: "default" 
 });
 
+// Track if tables have been initialized
+let tablesInitialized = false;
+
+// Ensure required tables exist
+async function ensureTablesExist() {
+  if (tablesInitialized) return;
+  
+  try {
+    const connection = await client.getConnection();
+    
+    // Create user table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS \`user\` (
+        \`id\` varchar(36) NOT NULL PRIMARY KEY,
+        \`name\` varchar(255) NOT NULL,
+        \`email\` varchar(255) NOT NULL UNIQUE,
+        \`email_verified\` boolean NOT NULL DEFAULT false,
+        \`password\` varchar(255),
+        \`image\` varchar(500),
+        \`preferences\` json,
+        \`created_at\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        \`updated_at\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create session table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS \`session\` (
+        \`id\` varchar(36) NOT NULL PRIMARY KEY,
+        \`expires_at\` timestamp NOT NULL,
+        \`token\` varchar(255) NOT NULL UNIQUE,
+        \`created_at\` timestamp NOT NULL,
+        \`updated_at\` timestamp NOT NULL,
+        \`ip_address\` varchar(45),
+        \`user_agent\` varchar(500),
+        \`user_id\` varchar(36) NOT NULL,
+        FOREIGN KEY (\`user_id\`) REFERENCES \`user\`(\`id\`) ON DELETE CASCADE
+      )
+    `);
+
+    connection.release();
+    tablesInitialized = true;
+  } catch (error) {
+    console.error("Error ensuring tables exist:", error);
+  }
+}
+
 export async function signUpUser(email: string, password: string, name: string) {
   try {
+    // Ensure tables exist before operation
+    await ensureTablesExist();
+    
     // Check if user already exists
     const existingUser = await db.select().from(UserSchema).where(eq(UserSchema.email, email)).limit(1);
     if (existingUser.length > 0) {
@@ -46,6 +96,9 @@ export async function signUpUser(email: string, password: string, name: string) 
 
 export async function signInUser(email: string, password: string) {
   try {
+    // Ensure tables exist before operation
+    await ensureTablesExist();
+    
     // Find user by email
     const users = await db.select().from(UserSchema).where(eq(UserSchema.email, email)).limit(1);
     if (users.length === 0) {
@@ -91,6 +144,9 @@ export async function signInUser(email: string, password: string) {
 
 export async function getSession(token: string) {
   try {
+    // Ensure tables exist before operation
+    await ensureTablesExist();
+    
     const sessions = await db.select({
       session: SessionSchema,
       user: UserSchema,

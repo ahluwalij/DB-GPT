@@ -93,26 +93,6 @@ const ToolsBar: React.FC<{
           }, 0);
         },
       },
-      {
-        tip: t('erase_memory'),
-        icon: clsLoading ? (
-          <Spin spinning={clsLoading} indicator={<LoadingOutlined style={{ fontSize: 20 }} />} />
-        ) : (
-          <ClearOutlined />
-        ),
-        can_use: history.length > 0,
-        key: 'clear',
-        onClick: async () => {
-          if (clsLoading) {
-            return;
-          }
-          setClsLoading(true);
-          await apiInterceptors(clearChatHistory(currentDialogue.conv_uid)).finally(async () => {
-            await refreshHistory();
-            setClsLoading(false);
-          });
-        },
-      },
     ];
   }, [
     t,

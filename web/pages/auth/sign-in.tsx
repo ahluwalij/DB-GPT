@@ -14,7 +14,6 @@ import {
 } from "../../components/ui/card";
 import { useObjectState } from "../../hooks/use-object-state";
 import { Loader } from "lucide-react";
-import { safe } from "../../lib/ts-safe";
 import { customAuthClient } from "../../lib/auth/client-custom";
 import { toast } from "sonner";
 import { GithubIcon } from "../../components/ui/github-icon";
@@ -29,9 +28,9 @@ export default function SignInPage() {
     password: "",
   });
 
-  const emailAndPasswordSignIn = () => {
+  const emailAndPasswordSignIn = async () => {
     setLoading(true);
-    safe(async () => {
+    try {
       const result = await customAuthClient.signIn({
         email: formData.email,
         password: formData.password,
@@ -40,9 +39,12 @@ export default function SignInPage() {
       
       // Force a full page reload to ensure auth state is updated
       window.location.href = "/chat";
-    })
-      .watch(() => setLoading(false))
-      .unwrap();
+    } catch (error) {
+      console.error("Sign-in error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to sign in");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const googleSignIn = () => {
@@ -109,27 +111,6 @@ export default function SignInPage() {
                 ) : (
                   "Sign In"
                 )}
-              </Button>
-            </div>
-            <div className="flex items-center my-4">
-              <div className="flex-1 h-px bg-accent"></div>
-              <span className="px-4 text-sm text-muted-foreground">
-                or continue with
-              </span>
-              <div className="flex-1 h-px bg-accent"></div>
-            </div>
-            <div className="flex gap-2 w-full">
-              <Button
-                variant="outline"
-                onClick={googleSignIn}
-                className="flex-1 "
-              >
-                <GoogleIcon className="size-4 fill-foreground" />
-                Google
-              </Button>
-              <Button variant="outline" onClick={githubSignIn} className="flex-1">
-                <GithubIcon className="size-4 fill-foreground" />
-                GitHub
               </Button>
             </div>
 

@@ -15,7 +15,7 @@ export default function AuthLayout({
             </div>
             <h1 className="text-xl font-semibold flex items-center gap-3 animate-in fade-in duration-1000">
               <Think />
-              <span>DB-GPT</span>
+              <span>UniversalAGI</span>
             </h1>
             <div className="flex-1" />
             <FlipWords

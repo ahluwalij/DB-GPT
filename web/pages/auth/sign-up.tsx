@@ -108,22 +108,23 @@ export default function SignUpPage() {
     
     console.log("successPasswordStep: Password validation passed");
     
+    setIsLoading(true);
     try {
-      await safeProcessWithLoading(async () => {
-        console.log("Attempting signup with:", { email: formData.email, name: formData.name });
-        const result = await customAuthClient.signUp({
-          email: formData.email,
-          password: formData.password,
-          name: formData.name,
-        });
-        console.log("Signup successful:", result);
-        toast.success("Account created successfully!");
-        console.log("About to redirect to /chat");
-        router.push("/chat");
-      }).unwrap();
+      console.log("Attempting signup with:", { email: formData.email, name: formData.name });
+      const result = await customAuthClient.signUp({
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+      });
+      console.log("Signup successful:", result);
+      toast.success("Account created successfully!");
+      console.log("About to redirect to /chat");
+      router.push("/chat");
     } catch (error) {
       console.error("successPasswordStep: Error during signup:", error);
       toast.error(error instanceof Error ? error.message : "Signup failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
