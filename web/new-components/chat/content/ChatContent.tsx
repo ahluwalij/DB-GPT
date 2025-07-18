@@ -245,7 +245,7 @@ const ChatContent: React.FC<{
               )}
               {/* 正在思考 */}
               {thinking && !context && (
-                <div className='flex items-center justify-start'>
+                <div className='flex items-center justify-center'>
                   <div className='flex items-center gap-1'>
                     <div className='w-1 h-1 rounded-full bg-gray-400 animate-pulse1'></div>
                     <div className='w-1 h-1 rounded-full bg-gray-400 animate-pulse2'></div>
