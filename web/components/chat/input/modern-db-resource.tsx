@@ -304,7 +304,7 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
               ) : (
                 <>
                   <div className="h-4 w-4 flex items-center justify-center flex-shrink-0">
-                    <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
+                    <div className={`h-2 w-2 rounded-full ${value ? 'bg-green-500' : 'bg-gray-400'}`}></div>
                   </div>
                   <span className="truncate text-sm text-gray-700">{selectedDbLabel}</span>
                 </>
