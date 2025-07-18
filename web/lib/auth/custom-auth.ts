@@ -87,7 +87,25 @@ export async function signUpUser(email: string, password: string, name: string) 
       updatedAt: new Date(),
     });
 
-    return { success: true, user: { id: userId, name, email } };
+    // Create session for the new user (auto sign-in after signup)
+    const sessionId = uuidv4();
+    const sessionToken = uuidv4();
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    await db.insert(SessionSchema).values({
+      id: sessionId,
+      userId,
+      token: sessionToken,
+      expiresAt,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    return { 
+      success: true, 
+      user: { id: userId, name, email },
+      session: { token: sessionToken, expiresAt }
+    };
   } catch (error) {
     console.error("Signup error:", error);
     throw error;

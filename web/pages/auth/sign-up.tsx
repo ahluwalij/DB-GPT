@@ -117,9 +117,12 @@ export default function SignUpPage() {
         name: formData.name,
       });
       console.log("Signup successful:", result);
-      toast.success("Account created successfully!");
+      toast.success("Account created successfully! Welcome!");
       console.log("About to redirect to /chat");
-      router.push("/chat");
+      // Small delay to ensure session is properly set before redirect
+      setTimeout(() => {
+        router.push("/chat");
+      }, 100);
     } catch (error) {
       console.error("successPasswordStep: Error during signup:", error);
       toast.error(error instanceof Error ? error.message : "Signup failed");

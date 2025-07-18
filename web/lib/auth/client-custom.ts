@@ -32,6 +32,7 @@ class CustomAuthClient {
         throw new Error(result.error || 'Sign up failed');
       }
 
+      // Session cookie is automatically set by the API response
       return result;
     } catch (error) {
       console.error('CustomAuthClient: Sign up error:', error);

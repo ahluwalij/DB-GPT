@@ -62,9 +62,7 @@ class RDBMSDatasourceParameters(BaseDatasourceParameters):
         default="${env:DBGPT_DB_PASSWORD}",
         metadata={
             "help": _(
-                "Database password, you can write your password directly, of course, "
-                "you can also use environment variables, such as "
-                "${env:DBGPT_DB_PASSWORD}"
+                "Database password"
             ),
             "tags": "privacy",
         },
