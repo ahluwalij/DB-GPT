@@ -120,7 +120,7 @@ function GPTCard({
             {operations.map((item, index) => (
               <Tooltip key={`operation-${index}`} title={item.label}>
                 <div
-                  className='relative flex flex-1 items-center justify-center h-11 text-gray-400 hover:text-blue-500 transition-colors duration-300 cursor-pointer'
+                  className='relative flex flex-1 items-center justify-center h-11 text-gray-400 hover:text-black-500 transition-colors duration-300 cursor-pointer'
                   onClick={e => {
                     e.stopPropagation();
                     item.onClick?.();

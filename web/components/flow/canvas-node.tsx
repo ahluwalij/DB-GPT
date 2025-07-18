@@ -168,7 +168,7 @@ const CanvasNode: React.FC<CanvasNodeProps> = ({ data }) => {
       trigger={['hover']}
       content={
         <>
-          <IconWrapper className='hover:text-blue-500'>
+          <IconWrapper className='hover:text-black-500'>
             <CopyOutlined className='h-full text-lg cursor-pointer' onClick={copyNode} />
           </IconWrapper>
 
@@ -199,7 +199,7 @@ const CanvasNode: React.FC<CanvasNodeProps> = ({ data }) => {
             'w-80': node?.tags?.ui_size === 'middle' || !node?.tags?.ui_size,
             'w-[256px]': node?.tags?.ui_size === 'small',
             'w-[530px]': node?.tags?.ui_size === 'large',
-            'border-blue-500': node.selected || isHovered,
+            'border-gray-500': node.selected || isHovered,
             'border-stone-400 dark:border-white': !node.selected && !isHovered,
             'border-dashed': flowType !== 'operator',
             'border-red-600': node.invalid,

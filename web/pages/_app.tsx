@@ -137,7 +137,7 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
       locale={enUS}
       theme={{
         token: {
-          colorPrimary: '#0C75FC',
+          colorPrimary: '#6B7280',
           borderRadius: 4,
         },
         algorithm: mode === 'dark' ? antdDarkTheme : undefined,

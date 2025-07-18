@@ -1,7 +1,8 @@
 import { apiInterceptors, cancelFeedback, feedbackAdd, getFeedbackReasons } from '@/client/api';
-import { CopyOutlined, DislikeOutlined, LikeOutlined } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
-import { Button, Divider, Input, Popover, Tag, message } from 'antd';
+import { Divider, Input, Popover, Tag, message } from 'antd';
+import { Button } from '@/components/ui/button';
+import { Copy, ThumbsDown, ThumbsUp } from 'lucide-react';
 import classNames from 'classnames';
 import copy from 'copy-to-clipboard';
 import { useSearchParams } from 'next/navigation';
@@ -35,7 +36,7 @@ const DislikeContent: React.FC<{
           return (
             <Tag
               key={item.reason_type}
-              className={`text-xs text-[#525964] mb-2 p-1 px-2 rounded-md cursor-pointer ${isSelect ? 'border-[#0c75fc] text-[#0c75fc]' : ''}`}
+              className={`text-xs text-[#525964] mb-2 p-1 px-2 rounded-md cursor-pointer ${isSelect ? 'border-[#6B7280] text-[#6B7280]' : ''}`}
               onClick={() => {
                 setSelectedTags((preArr: Tags[]) => {
                   const index = preArr.findIndex(tag => tag.reason_type === item.reason_type);
@@ -52,23 +53,23 @@ const DislikeContent: React.FC<{
         })}
       </div>
       <Input.TextArea
-        placeholder={t('feedback_tip')}
+        placeholder={t('Feedback')}
         className='w-64 h-20 resize-none mb-2'
         value={remark}
         onChange={e => setRemark(e.target.value.trim())}
       />
       <div className='flex gap-2 justify-end'>
         <Button
-          className='w-16 h-8'
+          variant="outline"
+          size="sm"
           onClick={() => {
             setFeedbackOpen(false);
           }}
         >
-          取消
+          Cancel
         </Button>
         <Button
-          type='primary'
-          className='min-w-16 h-8'
+          size="sm"
           onClick={async () => {
             const reason_types = selectedTags.map(item => item.reason_type);
             await feedback?.({
@@ -77,9 +78,9 @@ const DislikeContent: React.FC<{
               remark,
             });
           }}
-          loading={loading}
+          disabled={loading}
         >
-          确认
+          Confirm
         </Button>
       </div>
     </div>
@@ -129,7 +130,7 @@ const Feedback: React.FC<{ content: Record<string, any> }> = ({ content }) => {
       onSuccess: data => {
         const [, res] = data;
         setStatus(res?.feedback_type);
-        message.success('反馈成功');
+        message.success(t('Feedback Success'));
         setFeedbackOpen(false);
       },
     },
@@ -156,7 +157,7 @@ const Feedback: React.FC<{ content: Record<string, any> }> = ({ content }) => {
         const [, res] = data;
         if (res) {
           setStatus('none');
-          message.success('操作成功');
+          message.success(t('Success'));
         }
       },
     },
@@ -165,49 +166,61 @@ const Feedback: React.FC<{ content: Record<string, any> }> = ({ content }) => {
   return (
     <>
       {contextHolder}
-      <div className='flex flex-1 items-center text-sm px-4'>
-        <div className='flex gap-3'>
-          <LikeOutlined
-            className={classNames('cursor-pointer', { 'text-[#0C75FC]': status === 'like' })}
+      <div className='flex w-full opacity-0 group-hover/message:opacity-100 transition-opacity duration-300'>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={classNames('size-3! p-4! hover:bg-gray-100', { 'text-[#6B7280]': status === 'like' })}
+          onClick={async () => {
+            if (status === 'like') {
+              await cancel();
+              return;
+            }
+            await feedback({ feedback_type: 'like' });
+          }}
+        >
+          <ThumbsUp className="h-4 w-4" />
+        </Button>
+        <Popover
+          placement='bottom'
+          autoAdjustOverflow
+          destroyTooltipOnHide={true}
+          content={
+            <DislikeContent
+              setFeedbackOpen={setFeedbackOpen}
+              feedback={feedback}
+              list={list || []}
+              loading={loading}
+            />
+          }
+          trigger='click'
+          open={feedbackOpen}
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            className={classNames('size-3! p-4! hover:bg-gray-100', {
+              'text-[#6B7280]': status === 'unlike',
+            })}
             onClick={async () => {
-              if (status === 'like') {
+              if (status === 'unlike') {
                 await cancel();
                 return;
               }
-              await feedback({ feedback_type: 'like' });
+              await getReasonList();
             }}
-          />
-          <Popover
-            placement='bottom'
-            autoAdjustOverflow
-            destroyTooltipOnHide={true}
-            content={
-              <DislikeContent
-                setFeedbackOpen={setFeedbackOpen}
-                feedback={feedback}
-                list={list || []}
-                loading={loading}
-              />
-            }
-            trigger='click'
-            open={feedbackOpen}
           >
-            <DislikeOutlined
-              className={classNames('cursor-pointer', {
-                'text-[#0C75FC]': status === 'unlike',
-              })}
-              onClick={async () => {
-                if (status === 'unlike') {
-                  await cancel();
-                  return;
-                }
-                await getReasonList();
-              }}
-            />
-          </Popover>
-        </div>
-        <Divider type='vertical' />
-        <CopyOutlined className='cursor-pointer' onClick={() => onCopyContext(content.context)} />
+            <ThumbsDown className="h-4 w-4" />
+          </Button>
+        </Popover>
+        <Button
+          variant="ghost"
+          size="sm"
+          className='size-3! p-4! hover:bg-gray-100'
+          onClick={() => onCopyContext(content.context)}
+        >
+          <Copy className="h-4 w-4" />
+        </Button>
       </div>
     </>
   );

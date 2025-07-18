@@ -246,7 +246,7 @@ const InputContainer: React.FC = () => {
           <Popover content='暂停回复' trigger={['hover']}>
             <PauseCircleOutlined
               className={classnames('p-2 cursor-pointer', {
-                'text-[#0c75fc]': canAbort,
+                'text-[#6B7280]': canAbort,
                 'text-gray-400': !canAbort,
               })}
               onClick={abort}
@@ -279,7 +279,7 @@ const InputContainer: React.FC = () => {
         className={classnames(
           'flex py-2 px-3 items-center justify-between bg-white dark:bg-[#242733] dark:border-[#6f7f95] rounded-xl border',
           {
-            'border-[#0c75fc] dark:border-[rgba(12,117,252,0.8)]': isFocus,
+            'border-[#6B7280] dark:border-[rgba(107,114,128,0.8)]': isFocus,
           },
         )}
       >

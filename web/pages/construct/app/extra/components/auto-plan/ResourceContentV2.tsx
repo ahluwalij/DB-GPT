@@ -359,7 +359,7 @@ const ResourceContentV2: React.FC<ResourceContentV2Props> = ({
 
           {/* Data Dynamic Toggle */}
           <Form.Item label={t('resource_dynamic')} name='is_dynamic' valuePropName='checked'>
-            <Switch style={{ background: isDynamic ? '#1677ff' : '#ccc' }} />
+            <Switch style={{ background: isDynamic ? '#6B7280' : '#ccc' }} />
           </Form.Item>
 
           {/* Only show the configuration form if it's not dynamic and the parameters are loaded */}

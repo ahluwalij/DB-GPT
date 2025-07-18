@@ -37,7 +37,7 @@ const PromptSelect: React.FC<PromptSelectType> = ({ value, onChange, promptList 
         showSearch
       />
       {curPrompt && (
-        <span className='text-sm text-blue-500 cursor-pointer' onClick={() => setShowPrompt(true)}>
+        <span className='text-sm text-black-500 cursor-pointer' onClick={() => setShowPrompt(true)}>
           <ExclamationCircleOutlined className='mr-1' />
           查看详情
         </span>

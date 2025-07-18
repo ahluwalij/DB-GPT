@@ -294,19 +294,21 @@ const basicComponents: MarkdownComponent = {
   },
   table({ children }) {
     return (
-      <table className='my-2 rounded-tl-md rounded-tr-md  bg-white dark:bg-gray-800 text-sm rounded-lg overflow-hidden'>
-        {children}
-      </table>
+      <div className='my-4 rounded-lg overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700 inline-block'>
+        <table className='bg-white dark:bg-gray-800 text-sm'>
+          {children}
+        </table>
+      </div>
     );
   },
   thead({ children }) {
-    return <thead className='bg-[#fafafa] dark:bg-black font-semibold'>{children}</thead>;
+    return <thead className='bg-gray-50 dark:bg-gray-900 font-semibold'>{children}</thead>;
   },
   th({ children }) {
-    return <th className='!text-left p-4'>{children}</th>;
+    return <th className='!text-left px-4 py-3 text-gray-700 dark:text-gray-300 font-medium'>{children}</th>;
   },
   td({ children }) {
-    return <td className='p-4 border-t border-[#f0f0f0] dark:border-gray-700'>{children}</td>;
+    return <td className='px-4 py-3 border-t border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-200'>{children}</td>;
   },
   h1({ children }) {
     return <h3 className='text-2xl font-bold my-4 border-b border-slate-300 pb-4'>{children}</h3>;
@@ -322,7 +324,7 @@ const basicComponents: MarkdownComponent = {
   },
   a({ children, href }) {
     return (
-      <div className='inline-block text-blue-600 dark:text-blue-400'>
+      <div className='inline-block text-black-600 dark:text-black-400'>
         <LinkOutlined className='mr-1' />
         <a href={href} target='_blank' rel='noreferrer'>
           {children}

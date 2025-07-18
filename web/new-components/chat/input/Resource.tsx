@@ -82,11 +82,11 @@ const Resource: React.FC<{
           label: (
             <>
               <DBIcon
-                width={24}
-                height={24}
+                width={22}
+                height={22}
                 src={dbMapper[db.type].icon}
                 label={dbMapper[db.type].label}
-                className='w-[1.5em] h-[1.5em] mr-1 inline-block mt-[-4px]'
+                className='mr-1 w-[2rem] h-[2rem]'
               />
               {db.param}
             </>

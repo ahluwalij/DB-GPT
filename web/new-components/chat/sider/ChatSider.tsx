@@ -137,7 +137,7 @@ const MenuItem: React.FC<{
         </div>
       )}
       <div
-        className={` w-1 rounded-sm bg-[#0c75fc] absolute top-1/2 left-0 -translate-y-1/2 transition-all duration-500 ease-in-out ${
+        className={` w-1 rounded-sm bg-[#6B7280] absolute top-1/2 left-0 -translate-y-1/2 transition-all duration-500 ease-in-out ${
           active ? 'h-5' : 'w-0 h-0'
         }`}
       />

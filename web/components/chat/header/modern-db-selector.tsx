@@ -301,7 +301,7 @@ function ModernDBSelector() {
               <Button
                 size="sm"
                 onClick={handleAddDatabase}
-                className="h-8 bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 rounded-lg"
+                className="h-8 bg-gray-600 hover:bg-gray-700 text-white font-medium transition-all duration-200 rounded-lg"
               >
                 <Plus className="h-4 w-4 mr-1" />
                 Add
@@ -342,7 +342,7 @@ function ModernDBSelector() {
                         key={db.id} 
                         className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
                           isSelected 
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm' 
+                            ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
                             : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                         }`}
                         onClick={(e) => {
@@ -384,13 +384,13 @@ function ModernDBSelector() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="h-7 w-7 p-0 rounded-md hover:bg-blue-100 transition-colors"
+                            className="h-7 w-7 p-0 rounded-md hover:bg-gray-100 transition-colors"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleEditDatabase(db);
                             }}
                           >
-                            <Edit3 className="h-3 w-3 text-blue-600" />
+                            <Edit3 className="h-3 w-3 text-black-600" />
                           </Button>
                           <Button
                             size="sm"
@@ -440,7 +440,7 @@ function ModernDBSelector() {
                 value={selectedType || ''}
                 onChange={(e) => setSelectedType(e.target.value as DBType)}
                 disabled={!!editingDb}
-                className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               >
                 <option value="">Select database type</option>
                 {dbTypeList.map(type => (
@@ -476,7 +476,7 @@ function ModernDBSelector() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Optional description for this database connection"
-                className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                 rows={2}
               />
             </div>
@@ -491,7 +491,7 @@ function ModernDBSelector() {
             <Button 
               onClick={handleSubmitForm}
               disabled={formSubmitting || !selectedType}
-              className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 font-medium transition-all duration-200 rounded-lg"
+              className="bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-50 font-medium transition-all duration-200 rounded-lg"
             >
               {formSubmitting ? (
                 <>

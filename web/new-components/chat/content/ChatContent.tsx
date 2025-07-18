@@ -6,10 +6,11 @@ import {
   ClockCircleOutlined,
   CloseOutlined,
   CodeOutlined,
-  CopyOutlined,
   LoadingOutlined,
   UserOutlined,
 } from '@ant-design/icons';
+import { Button } from '@/components/ui/button';
+import { Copy } from 'lucide-react';
 import { GPTVis } from '@antv/gpt-vis';
 import { message } from 'antd';
 import classNames from 'classnames';
@@ -18,15 +19,7 @@ import { useSearchParams } from 'next/navigation';
 import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Feedback from './Feedback';
-import RobotIcon from './RobotIcon';
-
-const UserIcon: React.FC = () => {
-  return (
-    <div className='flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-tr from-[#31afff] to-[#1677ff] text-white'>
-      <UserOutlined className='text-sm' />
-    </div>
-  );
-};
+// Icons removed for cleaner chat bubble design
 
 type DBGPTView = {
   name: string;
@@ -158,15 +151,14 @@ const ChatContent: React.FC<{
   );
 
   return (
-    <div className={`flex gap-3 mt-6 ${isRobot ? 'max-w-4xl' : 'max-w-2xl ml-auto'}`}>
-      {/* icon */}
-      <div className='flex flex-shrink-0 items-start'>{isRobot ? <RobotIcon model={model_name} /> : <UserIcon />}</div>
+    <div className={`flex gap-3 mt-6 ${isRobot ? 'max-w-2xl' : 'max-w-2xl ml-auto'}`}>
+      {/* Remove icons - no icon div needed */}
       <div className={`flex ${scene === 'chat_agent' && !thinking ? 'flex-1' : ''} overflow-hidden`}>
         {/* 用户提问 */}
         {!isRobot && (
-          <div className='flex flex-1 relative group'>
+          <div className='flex flex-1 flex-col group/message'>
             <div
-              className='flex-1 text-sm text-[#1c2533] dark:text-white'
+              className='flex-1 text-sm text-[#1c2533] dark:text-white bg-gray-100 dark:bg-gray-700 rounded-3xl px-4 py-3 max-w-fit ml-auto'
               style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
             >
               {typeof context === 'string' && (
@@ -192,9 +184,11 @@ const ChatContent: React.FC<{
               )}
             </div>
             {typeof context === 'string' && context.trim() && (
-              <div className='absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200'>
-                <button
-                  className='flex items-center justify-center w-8 h-8 text-[#525964] dark:text-[rgba(255,255,255,0.6)] hover:text-[#1677ff] dark:hover:text-white transition-colors'
+              <div className='flex justify-end mt-1 opacity-0 group-hover/message:opacity-100 transition-opacity duration-300'>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className='size-3! p-4! hover:bg-gray-100'
                   onClick={() => {
                     if (typeof context === 'string') {
                       navigator.clipboard
@@ -210,16 +204,16 @@ const ChatContent: React.FC<{
                   }}
                   title={t('copy_to_clipboard')}
                 >
-                  <CopyOutlined />
-                </button>
+                  <Copy className="h-4 w-4" />
+                </Button>
               </div>
             )}
           </div>
         )}
         {/* ai回答 */}
         {isRobot && (
-          <div className='flex flex-1 flex-col'>
-            <div className='bg-white dark:bg-[rgba(255,255,255,0.16)] p-4 rounded-2xl rounded-tl-none mb-2'>
+          <div className='flex flex-1 flex-col group/message'>
+            <div className='bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl rounded-tl-none mb-2'>
               {typeof context === 'object' && (
                 <div>
                   {`[${context.template_name}]: `}

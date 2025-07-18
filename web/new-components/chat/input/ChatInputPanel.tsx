@@ -10,6 +10,7 @@ import { useSidebarRefresh } from '@/components/layouts/sidebar-refresh-context'
 import { UserChatContent } from '@/types/chat';
 import { parseResourceValue } from '@/utils';
 import ToolsBar from './ToolsBar';
+import ModelSwitcher from './ModelSwitcher';
 
 const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortController }> = ({ ctrl }, ref) => {
   const { t } = useTranslation();
@@ -39,6 +40,13 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
   const paramKey: string[] = useMemo(() => {
     return appInfo.param_need?.map(i => i.type) || [];
   }, [appInfo.param_need]);
+
+  // Check if datasource is required and connected
+  const isDatasourceRequired = paramKey.includes('resource') && appInfo.param_need?.some(param => 
+    param.type === 'resource' && param.value === 'database'
+  );
+  
+  const isDatasourceConnected = resourceValue && resourceValue !== '' && resourceValue !== 'null' && resourceValue !== 'undefined';
 
   const onSubmit = async () => {
     submitCountRef.current++;
@@ -96,17 +104,18 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
   }));
 
   return (
-    <div className='flex flex-col w-5/6 mx-auto pt-4 pb-6 bg-transparent'>
+    <div className='flex flex-col w-5/6 max-w-4xl mx-auto pt-4 pb-6 bg-transparent'>
       <div
-        className={`flex flex-1 flex-col bg-white dark:bg-[rgba(255,255,255,0.16)] px-5 py-4 pt-2 rounded-xl relative border-t border-b border-l border-r dark:border-[rgba(255,255,255,0.6)] ${
-          isFocus ? 'border-[#0c75fc]' : ''
+        className={`flex flex-1 flex-col bg-gray-100 dark:bg-gray-700 px-5 py-4 pt-2 rounded-xl relative border-t border-b border-l border-r dark:border-[rgba(255,255,255,0.6)] ${
+          isFocus ? 'border-[#6B7280]' : ''
         }`}
         id='input-panel'
       >
         <ToolsBar ctrl={ctrl} />
         <Input.TextArea
           placeholder="Ask a question or request data analysis..."
-          className='w-full h-20 resize-none border-0 p-0 focus:shadow-none dark:bg-transparent'
+          className='w-full h-20 resize-none border-0 p-0 focus:shadow-none bg-gray-100 dark:bg-gray-700'
+          style={{ backgroundColor: '#f3f4f6' }}
           value={userInput}
           onKeyDown={e => {
             if (e.key === 'Enter') {
@@ -117,7 +126,7 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
                 return;
               }
               e.preventDefault();
-              if (!userInput.trim() || replyLoading) {
+              if (!userInput.trim() || replyLoading || (isDatasourceRequired && !isDatasourceConnected)) {
                 return;
               }
               onSubmit();
@@ -133,27 +142,32 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
           onCompositionStart={() => setIsZhInput(true)}
           onCompositionEnd={() => setIsZhInput(false)}
         />
-        <Button
-          type='primary'
-          className={classNames(
-            'flex items-center justify-center w-14 h-8 rounded-lg text-sm absolute right-4 bottom-3 bg-button-gradient border-0',
-            {
-              'cursor-not-allowed': !userInput.trim(),
-            },
-          )}
-          onClick={() => {
-            if (replyLoading || !userInput.trim()) {
-              return;
-            }
-            onSubmit();
-          }}
-        >
-          {replyLoading ? (
-            <Spin spinning={replyLoading} indicator={<LoadingOutlined className='text-white' />} />
-          ) : (
-            'Send'
-          )}
-        </Button>
+        <div className='absolute right-4 bottom-3 flex items-center gap-2'>
+          <ModelSwitcher />
+          <Button
+            type='primary'
+            disabled={!userInput.trim() || (isDatasourceRequired && !isDatasourceConnected)}
+            className={classNames(
+              'flex items-center justify-center w-14 h-8 rounded-lg text-sm text-white border-0',
+              {
+                'bg-gray-700 hover:bg-gray-800': userInput.trim() && (!isDatasourceRequired || isDatasourceConnected),
+                'bg-gray-400 cursor-not-allowed': !userInput.trim() || (isDatasourceRequired && !isDatasourceConnected),
+              },
+            )}
+            onClick={() => {
+              if (replyLoading || !userInput.trim() || (isDatasourceRequired && !isDatasourceConnected)) {
+                return;
+              }
+              onSubmit();
+            }}
+          >
+            {replyLoading ? (
+              <Spin spinning={replyLoading} indicator={<LoadingOutlined className='text-white' />} />
+            ) : (
+              'Send'
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );

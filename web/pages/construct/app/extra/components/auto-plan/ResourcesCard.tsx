@@ -160,7 +160,7 @@ const ResourcesCard: React.FC<{
               {resourceTypeIcon[item.icon || '']}
               <Typography.Text
                 className={classNames('flex flex-1 items-center text-sm p-0 m-0 mx-2 line-clamp-1', {
-                  'text-[#0c75fc]': item.uid === activeKey,
+                  'text-[#6B7280]': item.uid === activeKey,
                 })}
                 editable={{
                   autoSize: {

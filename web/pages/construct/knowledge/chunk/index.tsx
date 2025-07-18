@@ -135,7 +135,7 @@ function ChunkList() {
                 key={chunk.id}
                 title={
                   <Space className='flex justify-between'>
-                    <Tag color='blue'># {index + (currentPage - 1) * DEDAULT_PAGE_SIZE}</Tag>
+                    <Tag color='gray'># {index + (currentPage - 1) * DEDAULT_PAGE_SIZE}</Tag>
                     {/* <DocIcon type={chunk.doc_type} /> */}
                     <span className='text-sm'>{chunk.doc_name}</span>
                   </Space>
@@ -154,7 +154,7 @@ function ChunkList() {
                 <p className='font-semibold'>{t('Meta_Data')}: </p>
                 <p>{chunk?.meta_info}</p>
                 {/* <Space
-                  className="absolute bottom-0 right-0 left-0 flex items-center justify-center cursor-pointer text-[#1890ff] bg-[rgba(255,255,255,0.8)] z-30"
+                  className="absolute bottom-0 right-0 left-0 flex items-center justify-center cursor-pointer text-[#6B7280] bg-[rgba(255,255,255,0.8)] z-30"
                   onClick={() => setIsExpand(!isExpand)}
                 >
                   <DoubleRightOutlined rotate={isExpand ? -90 : 90} /> {isExpand ? '收起' : '展开'}

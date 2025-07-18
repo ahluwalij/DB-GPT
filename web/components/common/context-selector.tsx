@@ -87,16 +87,16 @@ const ContextSelector: React.FC<ContextSelectorProps> = ({ onContextSelect, chat
   return (
     <div className="flex items-center gap-2">
       {selectedContext ? (
-        <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">
-          <CheckCircleOutlined className="text-blue-500" />
-          <span className="text-sm font-medium text-blue-800">
+        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+          <CheckCircleOutlined className="text-gray-500" />
+          <span className="text-sm font-medium text-gray-800">
             {selectedContext.prompt_name}
           </span>
           <Button
             size="small"
             type="text"
             onClick={handleClearContext}
-            className="text-blue-600 hover:text-blue-800"
+            className="text-gray-600 hover:text-gray-800"
           >
             ×
           </Button>
@@ -119,7 +119,7 @@ const ContextSelector: React.FC<ContextSelectorProps> = ({ onContextSelect, chat
           size="small"
           icon={<SettingOutlined />}
           loading={loading}
-          className="border-gray-300 hover:border-blue-400"
+          className="border-gray-300 hover:border-gray-400"
         >
           {selectedContext ? 'Change Context' : 'Select Context'}
         </Button>

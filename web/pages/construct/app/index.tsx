@@ -352,7 +352,7 @@ export default function AppContent() {
                         }
                       >
                         <DingdingOutlined
-                          className='cursor-pointer text-[#0069fe] hover:bg-white hover:dark:bg-black p-2 rounded-md'
+                          className='cursor-pointer text-[#4B5563] hover:bg-white hover:dark:bg-black p-2 rounded-md'
                           onClick={() => shareDingding(item)}
                           onDoubleClick={() => openDingding(item)}
                         />

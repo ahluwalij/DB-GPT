@@ -288,8 +288,8 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
       <Popover open={popoverOpen} onOpenChange={handlePopoverOpen}>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
-            className="w-44 justify-between bg-white hover:bg-gray-50 border-gray-200 font-medium transition-all duration-200"
+            variant="ghost"
+            className="w-44 justify-between bg-gray-100 hover:bg-gray-200 font-medium transition-all duration-200 rounded-full px-3 py-1 text-sm"
             disabled={disabled}
           >
             <div className="flex items-center gap-2 min-w-0">
@@ -329,7 +329,7 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
               <Button
                 size="sm"
                 onClick={handleAddDatabase}
-                className="h-8 bg-blue-600 hover:bg-blue-700 text-white"
+                className="h-8 bg-gray-600 hover:bg-gray-700 text-white"
               >
                 <Plus className="h-4 w-4 mr-1" />
                 Add
@@ -343,18 +343,18 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
                   <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                 </div>
               ) : (
-                <div className="p-3">
+                <div className="p-3 space-y-2">
                   {/* None option */}
                   <div 
                     className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
                       selectedValue === '' 
-                        ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm' 
+                        ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
                         : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                     }`}
                     onClick={() => setSelectedValue('')}
                   >
                     <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
-                      {selectedValue === '' && <div className="h-2 w-2 bg-blue-600 rounded-full"></div>}
+                      {selectedValue === '' && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
                     </div>
                     <span className="text-sm">None</span>
                   </div>
@@ -365,13 +365,13 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
                       key={option.value}
                       className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
                         selectedValue === option.value 
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm' 
+                          ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
                           : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                       }`}
                       onClick={() => setSelectedValue(option.value)}
                     >
                       <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
-                        {selectedValue === option.value && <div className="h-2 w-2 bg-blue-600 rounded-full"></div>}
+                        {selectedValue === option.value && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
                       </div>
                       <div className="flex items-center gap-2 min-w-0 flex-1">
                         {option.label}
@@ -393,17 +393,17 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
                           <div 
                             className={`flex items-center gap-3 min-w-0 flex-1 cursor-pointer ${
                               selectedValue === dbName 
-                                ? 'text-blue-700' 
+                                ? 'text-black-700' 
                                 : 'text-gray-700 hover:text-gray-900'
                             }`}
                             onClick={() => setSelectedValue(dbName)}
                           >
                             <div className="h-5 w-5 border-2 border-gray-300 rounded flex items-center justify-center">
-                              {selectedValue === dbName && <div className="h-2 w-2 bg-blue-600 rounded-full"></div>}
+                              {selectedValue === dbName && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
                             </div>
                             <DBIcon
-                              width={20}
-                              height={20}
+                              width={22}
+                              height={22}
                               src={dbMapper[db.type]?.icon}
                               label={dbMapper[db.type]?.label}
                               className="flex-shrink-0"
@@ -431,13 +431,13 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="h-7 w-7 p-0 rounded-md hover:bg-blue-100 transition-colors"
+                              className="h-7 w-7 p-0 rounded-md hover:bg-gray-100 transition-colors"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleEditDatabase(db);
                               }}
                             >
-                              <Edit3 className="h-3 w-3 text-blue-600" />
+                              <Edit3 className="h-3 w-3 text-black-600" />
                             </Button>
                             <Button
                               size="sm"
@@ -482,7 +482,7 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
                 size="sm"
                 onClick={handleSave}
                 disabled={selectedValue === value}
-                className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 font-medium transition-all duration-200"
+                className="bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-50 font-medium transition-all duration-200"
               >
                 Save
               </Button>
@@ -511,7 +511,7 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
                 value={selectedType || ''}
                 onChange={(e) => setSelectedType(e.target.value as DBType)}
                 disabled={!!editingDb}
-                className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               >
                 <option value="">Select database type</option>
                 {dbTypeList.map(type => (
@@ -537,9 +537,9 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
                     placeholder="Enter PostgreSQL password"
                   />
                 </div>
-                <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                  <p className="text-sm font-medium text-blue-800 mb-2">Connection Details:</p>
-                  <div className="text-xs text-blue-700 space-y-1">
+                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                  <p className="text-sm font-medium text-gray-800 mb-2">Connection Details:</p>
+                  <div className="text-xs text-gray-700 space-y-1">
                     <p><strong>Host:</strong> {PRESET_POSTGRES_CONFIG.host}</p>
                     <p><strong>Port:</strong> {PRESET_POSTGRES_CONFIG.port}</p>
                     <p><strong>User:</strong> {PRESET_POSTGRES_CONFIG.user}</p>
@@ -573,7 +573,7 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Optional description for this database connection"
-                className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                 rows={2}
               />
             </div>
@@ -588,7 +588,7 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
             <Button 
               onClick={handleSubmitForm}
               disabled={formSubmitting || !selectedType}
-              className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+              className="bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-50"
             >
               {formSubmitting ? (
                 <>

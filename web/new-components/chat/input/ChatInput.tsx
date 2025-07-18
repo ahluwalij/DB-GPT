@@ -39,7 +39,7 @@ function ChatInput() {
   return (
     <div
       className={`flex flex-1 h-12 p-2 pl-4 items-center justify-between bg-white dark:bg-[#242733] dark:border-[#6f7f95] rounded-xl  border-t border-b border-l border-r ${
-        isFocus ? 'border-[#0c75fc]' : ''
+        isFocus ? 'border-[#6B7280]' : ''
       }`}
     >
       <Input.TextArea

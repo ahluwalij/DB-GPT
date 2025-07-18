@@ -80,7 +80,7 @@ const ResourceContent: React.FC<{
       return null;
       // return (
       //   <Form.Item label={returnLabel('互联网', 'xxx')} name="value">
-      //     <Switch style={{ background: value ? '#1677ff' : '#ccc' }} />
+      //     <Switch style={{ background: value ? '#6B7280' : '#ccc' }} />
       //   </Form.Item>
       // );
     }
@@ -134,7 +134,7 @@ const ResourceContent: React.FC<{
           />
         </Form.Item>
         <Form.Item label={t('resource_dynamic')} name='is_dynamic'>
-          <Switch style={{ background: isDynamic ? '#1677ff' : '#ccc' }} />
+          <Switch style={{ background: isDynamic ? '#6B7280' : '#ccc' }} />
         </Form.Item>
         {/* 如果选择了动态参数这里就不需要参数了 */}
         {!isDynamic && <> {renderParameter()}</>}

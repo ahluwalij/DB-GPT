@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { usePathname } from "next/navigation";
-import { MessageSquarePlus } from "lucide-react";
+import { MessageSquarePlus, Edit3 } from "lucide-react";
 
 export function AppSidebarMenus() {
   const router = useRouter();
@@ -21,12 +21,10 @@ export function AppSidebarMenus() {
       key: 'chat',
       name: 'New Chat',
       icon: (
-        <img 
-          src="/uagi-icon.svg" 
-          alt="UAGI" 
+        <Edit3 
           className={`h-5 w-5 ${
             pathname.startsWith('/chat') || pathname === '/' 
-              ? 'text-blue-700' 
+              ? 'text-black-700' 
               : 'text-gray-600'
           }`}
         />
@@ -44,11 +42,7 @@ export function AppSidebarMenus() {
             <SidebarMenuItem key={item.key}>
               <Link href={item.path}>
                 <SidebarMenuButton 
-                  className={`font-medium transition-all duration-200 rounded-lg px-3 py-2.5 ${
-                    item.isActive 
-                      ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm' 
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                  }`}
+                  className="font-medium transition-all duration-200 rounded-lg px-3 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-gray-700 hover:border hover:border-gray-200 hover:shadow-sm"
                   isActive={item.isActive}
                 >
                   <div className="flex items-center gap-3">

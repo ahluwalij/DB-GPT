@@ -31,7 +31,7 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 220 14% 92%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
@@ -91,7 +91,7 @@ body {
   margin: 0;
   font-family: var(--joy-fontFamily-body, var(--joy-Josefin Sans, sans-serif));
   line-height: var(--joy-lineHeight-md, 1.5);
-  --antd-primary-color: #0069fe;
+  --antd-primary-color: #6B7280;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   -webkit-appearance: none;
 }
@@ -234,9 +234,11 @@ pre {
 }
 
 table {
-  display: block;
-  width: 100%;
-  table-layout: fixed;
+  display: table;
+  width: auto;
+  max-width: 100%;
+  table-layout: auto;
+  border-collapse: collapse;
 }
 
 .rc-md-editor {
@@ -312,7 +314,6 @@ table {
 
 /* Active thread highlighting */
 [data-active="true"] {
-  background-color: hsl(var(--sidebar-accent)) !important;
   color: hsl(var(--sidebar-accent-foreground)) !important;
 }
 

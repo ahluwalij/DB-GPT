@@ -171,7 +171,7 @@ function DatabaseForm({
               placeholder='Enter PostgreSQL password'
             />
           </FormItem>
-          <div className='text-sm text-gray-600 bg-blue-50 p-3 rounded'>
+          <div className='text-sm text-gray-600 bg-gray-50 p-3 rounded'>
             <p><strong>Connection Details:</strong></p>
             <p>Host: {PRESET_POSTGRES_CONFIG.host}</p>
             <p>Port: {PRESET_POSTGRES_CONFIG.port}</p>

@@ -366,7 +366,7 @@ function DbEditor() {
               <div className='flex items-center'>
                 {renderIcon(item.type)}&nbsp;&nbsp;&nbsp;
                 {beforeStr}
-                <span className='text-[#1677ff]'>{searchValue}</span>
+                <span className='text-[#6B7280]'>{searchValue}</span>
                 {afterStr}&nbsp;
                 {item?.type && <div className='text-gray-400'>{item?.type}</div>}
               </div>

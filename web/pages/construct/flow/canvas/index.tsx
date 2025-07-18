@@ -233,7 +233,7 @@ const Canvas: React.FC = () => {
               <Tooltip
                 key={title}
                 title={title}
-                className='w-8 h-8 rounded-md bg-stone-300 dark:bg-zinc-700 dark:text-zinc-200 hover:text-blue-500 dark:hover:text-zinc-100'
+                className='w-8 h-8 rounded-md bg-stone-300 dark:bg-zinc-700 dark:text-zinc-200 hover:text-black-500 dark:hover:text-zinc-100'
               >
                 {icon}
               </Tooltip>

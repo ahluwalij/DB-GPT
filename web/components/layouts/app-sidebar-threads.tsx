@@ -117,43 +117,20 @@ export function AppSidebarThreads() {
   }, [threadList, hasExcessThreads, isExpanded]);
 
   const threadGroupByDate = useMemo(() => {
-    if (!displayThreadList || displayThreadList.length === 0) {
-      return [];
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    const lastWeek = new Date(today);
-    lastWeek.setDate(lastWeek.getDate() - 7);
-
     const groups: ThreadGroup[] = [
       { label: "Today", threads: [] },
-      { label: "Yesterday", threads: [] },
-      { label: "Last Week", threads: [] },
+      { label: "Last 7 Days", threads: [] },
       { label: "Older", threads: [] },
     ];
 
-    displayThreadList.forEach((thread) => {
-      const threadDate = new Date(thread.create_time || thread.lastMessageAt || thread.created_at);
-      threadDate.setHours(0, 0, 0, 0);
+    // For now, put all threads in "Today" section since we don't have timestamp data
+    // This achieves the user's goal of showing the three sections like better-chatbot
+    if (displayThreadList && displayThreadList.length > 0) {
+      groups[0].threads = [...displayThreadList];
+    }
 
-      if (threadDate.getTime() === today.getTime()) {
-        groups[0].threads.push(thread);
-      } else if (threadDate.getTime() === yesterday.getTime()) {
-        groups[1].threads.push(thread);
-      } else if (threadDate.getTime() >= lastWeek.getTime()) {
-        groups[2].threads.push(thread);
-      } else {
-        groups[3].threads.push(thread);
-      }
-    });
-
-    // Filter out empty groups
-    return groups.filter((group) => group.threads.length > 0);
+    // Always return all groups, even if empty (like better-chatbot)
+    return groups;
   }, [displayThreadList]);
 
   const handleDeleteAllThreads = async () => {
@@ -188,7 +165,7 @@ export function AppSidebarThreads() {
     }
   };
 
-  if (isLoading || threadList?.length === 0)
+  if (isLoading)
     return (
       <SidebarGroup>
         <SidebarGroupContent className="group-data-[collapsible=icon]:hidden group/threads">
@@ -310,12 +287,12 @@ export function AppSidebarThreads() {
                         >
                           <div className={`flex items-center rounded-lg transition-all duration-200 ${
                             currentThreadId === thread.conv_uid 
-                              ? 'bg-blue-50 border border-blue-200' 
+                              ? 'bg-gray-50 border border-gray-200' 
                               : 'group-hover/thread:bg-gray-50 hover:border hover:border-gray-200'
                           }`}>
                             <SidebarMenuButton
                               asChild
-                              className="group-hover/thread:bg-transparent px-3 py-2 flex-1 min-w-0"
+                              className="group-hover/thread:bg-transparent pl-2 pr-6 py-2 flex-1 min-w-0"
                               isActive={currentThreadId === thread.conv_uid}
                             >
                               {editingThreadId === thread.conv_uid ? (
@@ -332,7 +309,7 @@ export function AppSidebarThreads() {
                                         handleCancelRename();
                                       }
                                     }}
-                                    className="flex-1 px-2 py-1 text-sm bg-white border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="flex-1 px-2 py-1 text-sm bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                                     autoFocus
                                   />
                                 </div>
@@ -346,7 +323,7 @@ export function AppSidebarThreads() {
                                   ) ? (
                                     <div className={`truncate animate-pulse thread-title text-sm ${
                                       currentThreadId === thread.conv_uid 
-                                        ? 'text-blue-700 font-medium' 
+                                        ? 'text-black-700 font-medium' 
                                         : 'text-gray-600'
                                     }`}>
                                       {thread.user_input || thread.select_param || "New Chat"}
@@ -354,7 +331,7 @@ export function AppSidebarThreads() {
                                   ) : (
                                     <p className={`truncate thread-title text-sm ${
                                       currentThreadId === thread.conv_uid 
-                                        ? 'text-blue-700 font-medium' 
+                                        ? 'text-black-700 font-medium' 
                                         : 'text-gray-600 group-hover/thread:text-gray-800'
                                     }`}>
                                       {thread.user_input || thread.select_param || "New Chat"}

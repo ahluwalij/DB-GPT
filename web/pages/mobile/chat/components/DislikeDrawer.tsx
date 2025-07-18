@@ -36,7 +36,7 @@ const DislikeDrawer: React.FC<{
             return (
               <Tag
                 key={item.reason_type}
-                className={`text-sm text-[#525964] p-1 px-2 rounded-md cursor-pointer ${isSelect ? 'border-[#0c75fc] text-[#0c75fc]' : ''}`}
+                className={`text-sm text-[#525964] p-1 px-2 rounded-md cursor-pointer ${isSelect ? 'border-[#6B7280] text-[#6B7280]' : ''}`}
                 onClick={() => {
                   setSelectedTags((preArr: Tags[]) => {
                     const index = preArr.findIndex(tag => tag.reason_type === item.reason_type);

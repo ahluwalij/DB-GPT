@@ -4,6 +4,7 @@ import { apiInterceptors, getAppInfo, getChatHistory, getDialogueList, newDialog
 import useChat from '@/hooks/use-chat';
 import ChatContentContainer from '@/new-components/chat/ChatContentContainer';
 import ChatInputPanel from '@/new-components/chat/input/ChatInputPanel';
+import { ChatGreeting } from '@/components/chat/chat-greeting';
 // import ChatSider from '@/new-components/chat/sider/ChatSider';
 import { IApp } from '@/types/app';
 import { ChartData, ChatHistoryResponse, IChatDialogueSchema, UserChatContent } from '@/types/chat';
@@ -14,6 +15,7 @@ import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/router';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 
 const DbEditor = dynamic(() => import('@/components/chat/db-editor'), {
   ssr: false,
@@ -109,6 +111,7 @@ const Chat: React.FC = () => {
   const maxNewTokensValue = 4000;
   const [resourceValue, setResourceValue] = useState<any>();
   const [modelValue, setModelValue] = useState<string>('');
+  const [hasMessages, setHasMessages] = useState<boolean>(false);
 
   useEffect(() => {
     // Prefer o3 model, fall back to appInfo model or context model
@@ -218,6 +221,8 @@ const Chat: React.FC = () => {
         order.current = viewList[viewList.length - 1].order + 1;
       }
       setHistory(res || []);
+      // Set hasMessages based on existing history
+      setHasMessages((res || []).length > 0);
     },
   });
 
@@ -228,6 +233,7 @@ const Chat: React.FC = () => {
         const initMessage = getInitMessage();
         const ctrl = new AbortController();
         setReplyLoading(true);
+        setHasMessages(true);
         
         let currentOrder = order.current;
         if (history && history.length > 0) {
@@ -403,20 +409,28 @@ const Chat: React.FC = () => {
     if (scene === 'chat_dashboard') {
       return isContract ? <DbEditor /> : <ChatContainer />;
     } else {
-      return isChatDefault ? (
-        <Content>
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <p className="text-lg text-gray-600">Loading...</p>
-            </div>
-          </div>
-        </Content>
-      ) : (
+      return (
         <Spin spinning={historyLoading} className='w-full h-full m-auto'>
-          <Content className='flex flex-col h-screen'>
-            <ChatContentContainer ref={scrollRef} className='flex-1' />
-            {/* Pass ref to ChatInputPanel for external control */}
-            <ChatInputPanel ref={chatInputRef} ctrl={ctrl} />
+          <Content className={`flex flex-col h-screen bg-white ${!hasMessages ? 'justify-center items-center' : ''}`}>
+            {hasMessages && <ChatContentContainer ref={scrollRef} className='flex-1' />}
+            {/* Greeting and input container with animation */}
+            <motion.div
+              className={hasMessages ? 'w-full' : 'w-full max-w-4xl'}
+              initial={false}
+              animate={{
+                y: hasMessages ? 0 : 0,
+                scale: hasMessages ? 1 : 1,
+              }}
+              transition={{
+                duration: 0.6,
+                ease: [0.25, 0.1, 0.25, 1],
+              }}
+            >
+              {/* Greeting component above the chat input - only show when no messages */}
+              {!hasMessages && <ChatGreeting />}
+              {/* Pass ref to ChatInputPanel for external control */}
+              <ChatInputPanel ref={chatInputRef} ctrl={ctrl} />
+            </motion.div>
           </Content>
         </Spin>
       );

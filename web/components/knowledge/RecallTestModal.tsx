@@ -180,7 +180,7 @@ const RecallTestModal: React.FC<RecallTestModalProps> = ({ open, setOpen, space 
                   extra={
                     <div className='flex items-center gap-2'>
                       <span className='font-semibold'>score:</span>
-                      <span className='text-blue-500'>{item.score}</span>
+                      <span className='text-black-500'>{item.score}</span>
                     </div>
                   }
                   key={item.chunk_id}

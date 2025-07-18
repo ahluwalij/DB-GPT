@@ -84,7 +84,7 @@ const ChatDialog: React.FC<{
       ref={chatDialogRef}
     >
       {/* 用户提问 */}
-      {!isRobot && <div className='flex bg-[#0C75FC]  text-white p-3 rounded-xl rounded-br-none'>{context}</div>}
+      {!isRobot && <div className='flex bg-[#6B7280]  text-white p-3 rounded-xl rounded-br-none'>{context}</div>}
       {isRobot && (
         <div className='flex max-w-full flex-col flex-wrap bg-white dark:bg-[rgba(255,255,255,0.16)] p-3 rounded-xl rounded-bl-none'>
           {typeof context === 'string' && scene === 'chat_agent' && (

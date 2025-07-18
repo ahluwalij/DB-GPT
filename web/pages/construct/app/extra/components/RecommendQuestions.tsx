@@ -53,7 +53,7 @@ const RecommendQuestions: React.FC<{
                     <Form.Item label={t('is_effective')} name={[name, 'valid']}>
                       <Switch
                         style={{
-                          background: recommendQuestions?.[index]?.valid ? '#1677ff' : '#ccc',
+                          background: recommendQuestions?.[index]?.valid ? '#6B7280' : '#ccc',
                         }}
                       />
                     </Form.Item>

@@ -107,7 +107,7 @@ const Feedback: React.FC<{
       <div className='flex gap-3'>
         <LikeOutlined
           className={classNames('cursor-pointer', {
-            'text-[#0C75FC]': status === 'like',
+            'text-[#6B7280]': status === 'like',
           })}
           onClick={async () => {
             if (status === 'like') {
@@ -119,7 +119,7 @@ const Feedback: React.FC<{
         />
         <DislikeOutlined
           className={classNames('cursor-pointer', {
-            'text-[#0C75FC]': status === 'unlike',
+            'text-[#6B7280]': status === 'unlike',
           })}
           onClick={async () => {
             if (status === 'unlike') {

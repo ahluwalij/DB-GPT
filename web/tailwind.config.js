@@ -15,7 +15,7 @@ module.exports = {
       },
       colors: {
         theme: {
-          primary: '#0069fe',
+          primary: '#4B5563',
           light: '#f7f7f7',
           dark: '#151622',
           'dark-container': '#232734',
@@ -23,17 +23,17 @@ module.exports = {
           error: '#FF4D4F',
           warning: '#FAAD14',
         },
-        gradientL: '#00DAEF',
-        gradientR: '#105EFF',
+        gradientL: '#E5E7EB',
+        gradientR: '#9CA3AF',
       },
       backgroundColor: {
-        bar: '#e0e7f2',
+        bar: '#F3F4F6',
       },
       textColor: {
-        default: '#0C75FC',
+        default: '#4B5563',
       },
       backgroundImage: {
-        'gradient-light': 'linear-gradient(135deg, #f7f7f7 0%, #e0e7f2 100%)',
+        'gradient-light': 'linear-gradient(135deg, #f7f7f7 0%, #F3F4F6 100%)',
         'gradient-dark': 'linear-gradient(135deg, #151622 0%, #232734 100%)',
         'button-gradient': 'linear-gradient(to right, theme("colors.gradientL"), theme("colors.gradientR"))',
       },

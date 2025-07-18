@@ -44,8 +44,8 @@ const AgentSelect: React.FC<AgentSelectProps> = ({
         return (
           <div
             className={`flex grow h-8 items-center px-3 border ${
-              item.name === selectedTab ? 'border-[#0c75fc]' : 'border-[#d6d8da]'
-            } rounded-md hover:border-[#0c75fc] cursor-pointer`}
+              item.name === selectedTab ? 'border-[#6B7280]' : 'border-[#d6d8da]'
+            } rounded-md hover:border-[#6B7280] cursor-pointer`}
             key={item.name}
             onClick={() => {
               setSelectedTab(item.name || '');

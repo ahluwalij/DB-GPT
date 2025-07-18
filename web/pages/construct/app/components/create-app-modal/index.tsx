@@ -30,9 +30,9 @@ const WorkModeSelect: React.FC<WorkModeSelectProps> = ({ disable = false, option
         },
       );
     }
-    return `flex items-center p-4  border dark:border-[rgba(217,217,217,0.85)] rounded-lg cursor-pointer hover:border-[#0c75fc] hover:bg-[#f5faff] dark:hover:border-[rgba(12,117,252,0.85)] dark:hover:bg-[#606264] relative transition-all duration-300 ease-in-out ${
+    return `flex items-center p-4  border dark:border-[rgba(217,217,217,0.85)] rounded-lg cursor-pointer hover:border-[#6B7280] hover:bg-[#f5faff] dark:hover:border-[rgba(107,114,128,0.85)] dark:hover:bg-[#606264] relative transition-all duration-300 ease-in-out ${
       item.value === selected?.value
-        ? 'border-[#0c75fc] bg-[#f5faff] dark:bg-[#606264] dark:border-[#0c75fc]'
+        ? 'border-[#6B7280] bg-[#f5faff] dark:bg-[#606264] dark:border-[#6B7280]'
         : 'border-[#d9d9d9]'
     } `;
   };
@@ -65,7 +65,7 @@ const WorkModeSelect: React.FC<WorkModeSelectProps> = ({ disable = false, option
             <div
               className='w-3 h-3 rounded-tr-md absolute top-[1px] right-[1px] transition-all duration-300 ease-in-out'
               style={{
-                background: `linear-gradient(to right top, transparent 50%, transparent 50%, ${disable ? '#d0d0d0' : '#0c75fc'} 0)`,
+                background: `linear-gradient(to right top, transparent 50%, transparent 50%, ${disable ? '#d0d0d0' : '#6B7280'} 0)`,
               }}
             />
           )}

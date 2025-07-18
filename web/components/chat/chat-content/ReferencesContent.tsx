@@ -41,7 +41,7 @@ const ReferencesContentView: React.FC<{ references: any }> = ({ references }) =>
   return (
     <div>
       <Divider className='mb-1 mt-0' dashed />
-      <div className='flex text-sm gap-2 text-blue-400' onClick={() => setOpen(true)}>
+      <div className='flex text-sm gap-2 text-black-400' onClick={() => setOpen(true)}>
         <LinkOutlined />
         <span className='text-sm'>查看回复引用</span>
       </div>

@@ -169,7 +169,7 @@ const ExtraAppInfo: React.FC = () => {
           <header className='flex items-center justify-between px-6 py-2 h-14 border-b border-[#edeeef]'>
             <Space className='flex items-center'>
               <LeftOutlined
-                className='text-base cursor-pointer hover:text-[#0c75fc]'
+                className='text-base cursor-pointer hover:text-[#6B7280]'
                 onClick={() => {
                   router.replace('/construct/app');
                 }}
@@ -178,7 +178,7 @@ const ExtraAppInfo: React.FC = () => {
                 <AppDefaultIcon scene={curApp?.team_context?.chat_scene || 'chat_agent'} />
               </div>
               <span>{curApp?.app_name}</span>
-              <EditOutlined className='cursor-pointer hover:text-[#0c75fc]' onClick={() => setOpen(true)} />
+              <EditOutlined className='cursor-pointer hover:text-[#6B7280]' onClick={() => setOpen(true)} />
             </Space>
             <Button type='primary' onClick={submit} loading={createLoading} disabled={loading}>
               {curApp?.isEdit ? t('update') : t('save')}
