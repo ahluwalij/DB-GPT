@@ -27,13 +27,7 @@ function ConstructLayout({ children }: { children: React.ReactNode }) {
       name: 'Knowledge',
       icon: <BookOutlined />,
       path: '/knowledge',
-    },
-    {
-      key: 'app',
-      name: 'App',
-      icon: <AppstoreOutlined />,
-      path: '/app',
-    },
+    }
   ];
   const router = useRouter();
   const activeKey = router.pathname.split('/')[2];

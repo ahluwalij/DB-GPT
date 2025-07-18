@@ -346,7 +346,7 @@ function ModernDBResource({ value, onChange, databaseOptions = [], disabled = fa
                 <div className="p-3 space-y-2">
                   {/* None option */}
                   <div 
-                    className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
+                    className={`flex items-center gap-3 p-2 mx-3 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
                       selectedValue === '' 
                         ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
                         : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
