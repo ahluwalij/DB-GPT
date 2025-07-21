@@ -32,6 +32,7 @@ class MultiResourceHandler:
         Returns:
             GptsApp instance
         """
+        logger.info(f"DEBUG - get_or_create_multi_resource_app called with resources: {resources}")
         # Create a deterministic app code based on resources
         resource_key = json.dumps(sorted(resources, key=lambda x: x['name']), sort_keys=True)
         app_code = f"multi_resource_{hash(resource_key)}"
@@ -43,8 +44,24 @@ class MultiResourceHandler:
         # Check if app already exists in database
         existing_app = self.gpts_app_dao.app_detail(app_code)
         if existing_app:
-            self._app_cache[app_code] = existing_app
-            return existing_app
+            logger.info(f"DEBUG - Found existing app with team_mode: {existing_app.team_mode}")
+            # For multi-resource apps, always recreate to ensure correct configuration
+            if existing_app.team_mode != TeamMode.AUTO_PLAN.value:
+                logger.warning(f"Existing app has incorrect team_mode: {existing_app.team_mode}, deleting and recreating")
+                try:
+                    # Delete the incorrect app
+                    self.gpts_app_dao.delete(app_code)
+                    logger.info(f"Deleted app with incorrect team_mode")
+                    # Clear from cache
+                    if app_code in self._app_cache:
+                        del self._app_cache[app_code]
+                except Exception as e:
+                    logger.error(f"Failed to delete app: {e}")
+                    # Even if delete fails, recreate the app
+            else:
+                # App has correct team mode, use it
+                self._app_cache[app_code] = existing_app
+                return existing_app
         
         # Create new app
         app = self._create_multi_resource_app(resources, app_code, user_code)
@@ -84,25 +101,15 @@ class MultiResourceHandler:
         if len(resources) > 1:
             coordinator_detail = GptsAppDetail(
                 app_code=app_code,
-                agent_name="ConversableAgent",
+                agent_name="Summarizer",  # Use Summarizer role (SummaryAssistantAgent's role name)
                 node_id="coordinator",
                 resources=[],  # Coordinator doesn't need direct resource access
                 prompt_template="",
                 llm_strategy="default",
                 llm_strategy_value=None,
             )
-            # Set coordinator profile
-            coordinator_detail.agent_profile = {
-                "name": "Multi-Resource Coordinator",
-                "role": "Coordinator",
-                "goal": "Coordinate between different data sources to provide comprehensive answers",
-                "constraints": [
-                    "Delegate queries to appropriate specialist agents",
-                    "Combine results from multiple sources",
-                    "Ensure all relevant sources are consulted"
-                ],
-                "desc": "I coordinate between multiple data sources to answer your questions comprehensively."
-            }
+            # Note: agent_profile field doesn't exist in GptsAppDetail model
+            # The profile will be configured differently through the agent itself
             agent_details.append(coordinator_detail)
         
         # Create specialist agents for each resource
@@ -112,22 +119,31 @@ class MultiResourceHandler:
             
             # Choose appropriate agent type
             if resource_type == 'database':
-                agent_name = 'DataScientistAgent'
+                # For database resources, use DataScientist
+                agent_name = 'DataScientist'  # Use the role name, not class name
                 role = f"Database Analyst"
-                goal = f"Analyze and query data from {resource_name} database"
+                goal = f"Analyze and query data from {resource_name} database using SQL"
                 constraints = [
                     f"Only query {resource_name} database",
                     "Write accurate SQL queries",
-                    "Explain results clearly"
+                    "Explain results clearly",
+                    f"This agent ONLY has access to {resource_name} database, not to any knowledge spaces"
                 ]
             else:  # knowledge
-                agent_name = 'ToolAssistantAgent'
+                # For knowledge resources, use AI Assistant to avoid conflicts
+                if len(resources) > 1:
+                    # Use AI Assistant for knowledge when we have a coordinator
+                    agent_name = 'AI Assistant'  # SimpleAssistantAgent's role name
+                else:
+                    # Use Summarizer when it's the only resource
+                    agent_name = 'Summarizer'
                 role = f"Knowledge Expert"
-                goal = f"Search and retrieve information from {resource_name}"
+                goal = f"Search and retrieve information from {resource_name} knowledge space"
                 constraints = [
                     f"Only search {resource_name} knowledge space",
-                    "Provide relevant information",
-                    "Cite sources when available"
+                    "Provide relevant information from the knowledge base",
+                    "Cite sources when available",
+                    f"This agent ONLY has access to {resource_name} knowledge space, not to any databases"
                 ]
             
             agent_detail = GptsAppDetail(
@@ -144,20 +160,17 @@ class MultiResourceHandler:
                 llm_strategy_value=None,
             )
             
-            # Set agent profile
-            agent_detail.agent_profile = {
-                "name": f"{resource_type.title()} Expert - {resource_name}",
-                "role": role,
-                "goal": goal,
-                "constraints": constraints,
-                "desc": f"I specialize in {resource_type} {resource_name}"
-            }
+            # Note: agent_profile field doesn't exist in GptsAppDetail model
+            # The agent's behavior is configured through the agent_name and resources
             
             agent_details.append(agent_detail)
         
         # Create the app
         app_name = f"Multi-Resource Assistant ({len(resources)} sources)"
         app_describe = f"Access to: {', '.join([r['name'] for r in resources])}"
+        
+        logger.info(f"DEBUG - Creating app with team_mode: {TeamMode.AUTO_PLAN.value}")
+        logger.info(f"DEBUG - Agent details count: {len(agent_details)}")
         
         app = GptsApp(
             app_code=app_code,
@@ -173,6 +186,8 @@ class MultiResourceHandler:
             details=agent_details,
             icon=None,
         )
+        
+        logger.info(f"DEBUG - Created app object with team_mode: {app.team_mode}")
         
         return app
 

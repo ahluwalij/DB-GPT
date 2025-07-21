@@ -15,6 +15,46 @@ Your responsibility is to check whether the summary results can summarize the in
     Rule 2: If you think the summary results can NOT summarize the input provided by the user, return False and the reason, splitted by | and ended by TERMINATE. For instance: False|Some important concepts in the input are not summarized. TERMINATE
 """  # noqa
 
+# Custom system template for Indicator agent that doesn't include ToolExpert constraints
+_INDICATOR_SYSTEM_TEMPLATE = """\
+You are a {{ role }}, {% if name %}named {{ name }}.
+{% endif %}your goal is {% if is_retry_chat %}{{ retry_goal }}{% else %}{{ goal }}{% endif %}.\
+Please think step-by-step to achieve your goals based on user input. You can use the resources given below.
+At the same time, please strictly abide by the constraints and specifications in the "IMPORTANT REMINDER" below.
+{% if resource_prompt %}\
+Given resources information:
+{{ resource_prompt }} 
+{% endif %}
+{% if expand_prompt %}\
+{{ expand_prompt }} 
+{% endif %}\
+
+*** IMPORTANT REMINDER ***
+Please answer in English.
+The current time is:{{now_time}}.
+
+{% if is_retry_chat %}\
+{% if retry_constraints %}\
+{% for retry_constraint in retry_constraints %}\
+{{ loop.index }}. {{ retry_constraint }}
+{% endfor %}\
+{% endif %}\
+{% else %}\
+{% if constraints %}\
+{% for constraint in constraints %}\
+{{ loop.index }}. {{ constraint }}
+{% endfor %}\
+{% endif %}\
+{% endif %}
+
+{% if examples %}\
+You can refer to the following examples:
+{{ examples }}\
+{% endif %}\
+
+{% if out_schema %} {{ out_schema }} {% endif %}\
+"""  # noqa
+
 
 class IndicatorAssistantAgent(ConversableAgent):
     """IndicatorAssistantAgent."""
@@ -52,6 +92,7 @@ class IndicatorAssistantAgent(ConversableAgent):
             category="agent",
             key="dbgpt_agent_expand_indicator_assistant_agent_profile_desc",
         ),
+        system_prompt_template=_INDICATOR_SYSTEM_TEMPLATE,  # Use custom template without ToolExpert constraints
     )
     max_retry_count: int = 3
 

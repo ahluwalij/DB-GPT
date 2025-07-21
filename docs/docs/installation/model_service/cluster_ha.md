@@ -138,7 +138,7 @@ dbgpt start webserver \
 CONTROLLER_ADDRESS="http://server1:8000,http://server2:8000" dbgpt model list
 ```
 
-Congratulations! You have successfully deployed a high availability cluster of DB-GPT.
+s! You have successfully deployed a high availability cluster of DB-GPT.
 
 
 ## Deploy High Availability Cluster With Docker Compose

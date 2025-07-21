@@ -124,11 +124,11 @@ function DatabaseForm({
         message.error(err.message);
         return;
       }
-      message.success(t(editValue ? 'update_success' : 'create_success'));
+      message.success(t(editValue ? 'Update Success' : 'Create Success'));
       onSuccess?.();
     } catch (error) {
       console.error('Failed to submit form:', error);
-      message.error(t(editValue ? 'update_failed' : 'create_failed'));
+      message.error(t(editValue ? 'Update Failed' : 'Create Failed'));
     } finally {
       setLoading(false);
     }

@@ -41,7 +41,9 @@ class PlannerAgent(ConversableAgent):
             key="dbgpt_agent_plan_planner_agent_profile_goal",
         ),
         expand_prompt=DynConfig(
-            "Available Intelligent Agents:\n {{ agents }}",
+            "Available Intelligent Agents:\n {{ agents }}\n\n"
+            "IMPORTANT: Each agent can ONLY access the resources listed in their description. "
+            "Knowledge spaces are NOT SQL databases - they contain documents and text that must be searched and summarized, not queried with SQL.",
             category="agent",
             key="dbgpt_agent_plan_planner_agent_profile_expand_prompt",
         ),
@@ -112,6 +114,28 @@ assistants:[
         "content": "Integrate analytical data into the format required to build sales reports.",
         "rely": "1,2"
     }}
+]
+
+user:Find information from both database and knowledge documents
+assistants:[
+    {{
+        "serial_number": "1",
+        "agent": "AI Assistant",
+        "content": "Search and summarize relevant information from the knowledge space documents.",
+        "rely": ""
+    }},
+    {{
+        "serial_number": "2",
+        "agent": "DataScientist",
+        "content": "Query relevant data from the database tables using SQL.",
+        "rely": ""
+    }},
+    {{
+        "serial_number": "3",
+        "agent": "Summarizer",
+        "content": "Combine insights from knowledge documents and database query results into a comprehensive summary.",
+        "rely": "1,2"
+    }}
 ]""",  # noqa: E501
             category="agent",
             key="dbgpt_agent_plan_planner_agent_profile_examples",
@@ -150,8 +174,89 @@ assistants:[
         rely_messages: Optional[List[AgentMessage]] = None,
     ) -> AgentMessage:
         reply_message = super()._init_reply_message(received_message)
+        
+        # Build agent descriptions with resource information
+        agent_descriptions = []
+        for agent in self.agents:
+            # Get basic agent info
+            agent_info = f"- {agent.role}: {agent.desc}"
+            
+            # Add resource information if available
+            if hasattr(agent, 'resource') and agent.resource:
+                resource_details = []
+                
+                # Check if it's a ResourcePack (has 'resources' attribute)
+                if hasattr(agent.resource, 'resources') and agent.resource.resources:
+                    # ResourcePack with multiple resources
+                    for res in agent.resource.resources:
+                        res_name = None
+                        res_type = None
+                        
+                        # Get resource name
+                        if hasattr(res, 'name') and res.name:
+                            res_name = res.name
+                        elif hasattr(res, 'value'):
+                            res_name = str(res.value)
+                        
+                        # Get resource type
+                        if hasattr(res, 'type'):
+                            if callable(res.type):
+                                # type() method
+                                try:
+                                    res_type = res.type()
+                                    if hasattr(res_type, 'value'):
+                                        res_type = res_type.value
+                                except:
+                                    res_type = None
+                            else:
+                                # type property
+                                res_type = res.type
+                        
+                        if res_name:
+                            if res_type == 'database':
+                                resource_details.append(f"SQL database '{res_name}' (use SQL queries)")
+                            elif res_type == 'knowledge':
+                                resource_details.append(f"knowledge space '{res_name}' (contains documents/text, NOT a SQL table)")
+                            else:
+                                resource_details.append(res_name)
+                else:
+                    # Single resource
+                    res_name = None
+                    res_type = None
+                    
+                    # Get resource name
+                    if hasattr(agent.resource, 'name') and agent.resource.name:
+                        res_name = agent.resource.name
+                    elif hasattr(agent.resource, 'value'):
+                        res_name = str(agent.resource.value)
+                    
+                    # Get resource type
+                    if hasattr(agent.resource, 'type'):
+                        if callable(agent.resource.type):
+                            try:
+                                res_type = agent.resource.type()
+                                if hasattr(res_type, 'value'):
+                                    res_type = res_type.value
+                            except:
+                                res_type = None
+                        else:
+                            res_type = agent.resource.type
+                    
+                    if res_name:
+                        if res_type == 'database':
+                            resource_details.append(f"SQL database '{res_name}' (use SQL queries)")
+                        elif res_type == 'knowledge':
+                            resource_details.append(f"knowledge space '{res_name}' (contains documents/text, NOT a SQL table)")
+                        else:
+                            resource_details.append(res_name)
+                
+                if resource_details:
+                    agent_info += f" [Has access to: {', '.join(resource_details)}]"
+            
+            agent_descriptions.append(agent_info)
+        
         reply_message.context = {
-            "agents": "\n".join([f"- {item.role}:{item.desc}" for item in self.agents]),
+            "agents": "\n".join(agent_descriptions),
         }
         return reply_message
 

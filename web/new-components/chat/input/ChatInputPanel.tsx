@@ -57,14 +57,13 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
     // ChatContentContainer will handle scrolling when new content is added
     setUserInput('');
     const resources = parseResourceValue(resourceValue);
-    // Clear the resourceValue if it not empty
+    // Prepare user input
     let newUserInput: UserChatContent;
-    if (resources.length > 0) {
-      if (scene !== 'chat_excel') {
-        // Chat Excel scene does not need to clear the resourceValue
-        // We need to find a better way to handle this
-        setResourceValue(null);
-      }
+    
+    // parseResourceValue is for file resources (images, videos, etc.) in Excel chat mode
+    // For database/knowledge resources, they should only be in select_param, not in message content
+    if (resources.length > 0 && scene === 'chat_excel') {
+      // Only Chat Excel scene needs file resources in message content
       const messages = [...resources];
       messages.push({
         type: 'text',
@@ -75,6 +74,8 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
         content: messages,
       };
     } else {
+      // For database and knowledge resources, keep them in select_param only
+      // Don't include them in message content to avoid validation errors
       newUserInput = userInput;
     }
 
@@ -86,6 +87,9 @@ const ChatInputPanel: React.ForwardRefRenderFunction<any, { ctrl: AbortControlle
         select_param: resourceValue || currentDialogue.select_param,
       }),
     };
+
+    console.log('DEBUG - ChatInputPanel resourceValue:', resourceValue);
+    console.log('DEBUG - ChatInputPanel params:', params);
 
     await handleChat(newUserInput, params);
 

@@ -133,7 +133,7 @@ export default {
   // Plugins
   'Market_Plugins': 'Market Plugins',
   'My_Plugins': 'My Plugins',
-  'Add_problem': 'Add Problem',
+  'Add_problem': 'Add Correlated Question',
   'Correlation_problem': 'Correlation Problem',
   'Advices': 'Chart Type',
   'Incorrect': 'Incorrect',

@@ -124,17 +124,25 @@ const Chat: React.FC = () => {
                           (model && model.toLowerCase().includes('o3')) ? model :
                           appModel || model;
     setModelValue(preferredModel);
-    const initialResource = knowledgeId || dbName || appInfo?.param_need?.filter(item => item.type === 'resource')[0]?.bind_value;
-    setResourceValue(initialResource);
+    
+    // Only set initial resource if we don't already have one (preserves arrays)
+    // IMPORTANT: Don't reset multi-resource arrays
+    if (!resourceValue || (Array.isArray(resourceValue) && resourceValue.length === 0)) {
+      const initialResource = knowledgeId || dbName || appInfo?.param_need?.filter(item => item.type === 'resource')[0]?.bind_value;
+      if (initialResource) {
+        console.log('DEBUG - Setting initial resource:', initialResource);
+        setResourceValue(initialResource);
+      }
+    } else if (Array.isArray(resourceValue) && resourceValue.length > 1) {
+      console.log('DEBUG - Preserving multi-resource selection:', resourceValue);
+    }
     
     // Set resource type based on appInfo when initializing
-    if (initialResource) {
-      const resourceParam = appInfo?.param_need?.find(item => item.type === 'resource');
-      if (resourceParam?.value === 'database') {
-        setResourceType('database');
-      } else if (resourceParam?.value === 'knowledge') {
-        setResourceType('knowledge');
-      }
+    const resourceParam = appInfo?.param_need?.find(item => item.type === 'resource');
+    if (resourceParam?.value === 'database') {
+      setResourceType('database');
+    } else if (resourceParam?.value === 'knowledge') {
+      setResourceType('knowledge');
     }
   }, [appInfo, dbName, knowledgeId, model]);
 
@@ -147,6 +155,12 @@ const Chat: React.FC = () => {
     
     // If we have a resource value but the resource type has changed
     if (resourceValue && resourceType) {
+      // For arrays, check if we need to filter out incompatible resources
+      if (Array.isArray(resourceValue) && resourceValue.length > 0) {
+        // Don't clear multi-resource selections - they can contain mixed types
+        return;
+      }
+      
       // Check if we're switching from database to knowledge or vice versa
       const wasDatabase = databaseScenes.includes(currentDialogInfo.chat_scene || '');
       const isDatabase = resourceType === 'database';
@@ -357,38 +371,65 @@ const Chat: React.FC = () => {
         let chatMode = scene;
         let appCode = data?.app_code;
         
+        // Get the actual resource value from params or state
+        const actualResourceValue = data?.select_param || resourceValue;
+        console.log('DEBUG - actualResourceValue from data:', data?.select_param);
+        console.log('DEBUG - resourceValue from state:', resourceValue);
+        console.log('DEBUG - Using actualResourceValue:', actualResourceValue);
+        console.log('DEBUG - data object:', data);
+        console.log('DEBUG - scene:', scene);
+        
+        // Parse the resource value if it's a JSON string
+        let parsedResourceValue = actualResourceValue;
+        if (typeof actualResourceValue === 'string') {
+          try {
+            parsedResourceValue = JSON.parse(actualResourceValue);
+          } catch (e) {
+            // Not JSON, use as-is
+          }
+        }
+        
         // Handle multi-resource scenarios
-        if (resourceValue && Array.isArray(resourceValue) && resourceValue.length > 1) {
+        if (parsedResourceValue && Array.isArray(parsedResourceValue) && parsedResourceValue.length > 1) {
           // Multiple resources - use agent chat mode with dynamic multi-agent app
           chatMode = 'chat_agent';
           // Create a temporary app code for this multi-resource combination
-          appCode = `multi_resource_${resourceValue.map(r => r.name).join('_')}`;
-        } else if (resourceValue && resourceType) {
+          appCode = `multi_resource_${parsedResourceValue.map(r => r.name).join('_')}`;
+          console.log('DEBUG - Multi-resource detected:', parsedResourceValue);
+          console.log('DEBUG - Generated app_code:', appCode);
+        } else if (parsedResourceValue && resourceType) {
           // Single resource - use appropriate chat mode
           if (resourceType === 'database') {
             chatMode = 'chat_with_db_execute';
           } else if (resourceType === 'knowledge') {
             chatMode = 'chat_knowledge';
           }
+          console.log('DEBUG - Single resource detected:', parsedResourceValue);
         }
         
         // Create data object with all fields
+        const selectParamValue = actualResourceValue;
+        console.log('DEBUG - Final select_param being sent:', selectParamValue);
+        
         const apiData: Record<string, any> = {
           chat_mode: chatMode,
           model_name: modelValue,
           user_input: content,
-          select_param: data?.select_param || resourceValue,
+          select_param: selectParamValue,
         };
         
-        // Add app_code for multi-agent scenarios
-        if (appCode) {
-          apiData.app_code = appCode;
-        }
-
-        // Add other data fields
+        // Add other data fields first
         if (data) {
           Object.assign(apiData, data);
         }
+        
+        // Add app_code for multi-agent scenarios (after data assignment to prevent override)
+        if (appCode) {
+          apiData.app_code = appCode;
+          console.log('DEBUG - Sending with app_code:', appCode);
+        }
+        
+        console.log('DEBUG - Full API data:', apiData);
 
         // For non-dashboard scenes, try to get prompt_code from ref or localStorage
         if (scene !== 'chat_dashboard') {

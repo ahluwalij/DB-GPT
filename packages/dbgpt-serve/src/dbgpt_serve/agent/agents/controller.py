@@ -224,10 +224,25 @@ class MultiAgents(BaseComponent, ABC):
 
         historical_dialogues: List[GptsMessage] = []
         if not is_retry_chat:
-            # Create a new gpts conversation record
-            gpt_app: GptsApp = self.gpts_app.app_detail(gpts_name)
-            if not gpt_app:
-                raise ValueError(f"Not found app {gpts_name}!")
+            # Check if multi-resource app was passed in ext_info
+            if '_multi_resource_app' in ext_info:
+                gpt_app = ext_info['_multi_resource_app']
+                logger.info(f"Using multi-resource app from ext_info with team_mode: {gpt_app.team_mode}")
+            else:
+                # Create a new gpts conversation record
+                gpt_app: GptsApp = self.gpts_app.app_detail(gpts_name)
+                if not gpt_app:
+                    # For multi-resource apps, try to get from handler cache
+                    if gpts_name and gpts_name.startswith('multi_resource_'):
+                        logger.warning(f"Multi-resource app {gpts_name} not found in database, checking handler")
+                        from .multi_resource_handler import get_multi_resource_handler
+                        handler = get_multi_resource_handler(self.system_app)
+                        # Check if it's in the handler's cache
+                        if gpts_name in handler._app_cache:
+                            gpt_app = handler._app_cache[gpts_name]
+                            logger.info(f"Found app in handler cache with team_mode: {gpt_app.team_mode}")
+                    if not gpt_app:
+                        raise ValueError(f"Not found app {gpts_name}!")
 
             ## When creating a new gpts conversation record, determine whether to
             # include the history of previous topics according to the application
@@ -422,23 +437,60 @@ class MultiAgents(BaseComponent, ABC):
         
         # Check if this is a multi-resource request
         select_param = ext_info.get('select_param')
-        if gpts_name.startswith('multi_resource_') and isinstance(select_param, list):
+        original_select_param = select_param  # Keep original for conversation storage
+        
+        print(f"\n=== MULTI-RESOURCE DEBUG ===")
+        print(f"app_agent_chat called with gpts_name: {gpts_name}")
+        print(f"select_param: {select_param}")
+        print(f"Is list: {isinstance(select_param, list)}")
+        print(f"===========================\n")
+        
+        logger.info(f"DEBUG - app_agent_chat called with gpts_name: {gpts_name}")
+        logger.info(f"DEBUG - select_param: {select_param}")
+        logger.info(f"DEBUG - ext_info: {ext_info}")
+        
+        # Check both gpts_name and any multi-resource pattern
+        is_multi_resource = (gpts_name and gpts_name.startswith('multi_resource_')) or \
+                           (isinstance(select_param, list) and len(select_param) > 1)
+        
+        if is_multi_resource and select_param:
             # Handle dynamic multi-resource app creation
             from .multi_resource_handler import get_multi_resource_handler
             handler = get_multi_resource_handler(self.system_app)
             
-            # Create or get the multi-resource app
-            gpts_app = handler.get_or_create_multi_resource_app(
-                resources=select_param,
-                user_code=user_code
-            )
-            gpts_name = gpts_app.app_code
+            # Parse select_param if it's a string
+            if isinstance(select_param, str):
+                try:
+                    import json
+                    select_param = json.loads(select_param)
+                except:
+                    pass
+            
+            # Create or get the multi-resource app if we have a list of resources
+            if isinstance(select_param, list) and len(select_param) > 0:
+                logger.info(f"DEBUG - Creating multi-resource app for resources: {select_param}")
+                gpts_app = handler.get_or_create_multi_resource_app(
+                    resources=select_param,
+                    user_code=user_code
+                )
+                gpts_name = gpts_app.app_code
+                logger.info(f"DEBUG - Multi-resource app created/retrieved: {gpts_name}")
+                logger.info(f"DEBUG - App team_mode: {gpts_app.team_mode}")
+                
+                # Store the app in ext_info to pass it along
+                ext_info['_multi_resource_app'] = gpts_app
+            else:
+                logger.info(f"DEBUG - Not a multi-resource scenario. select_param type: {type(select_param)}, value: {select_param}")
 
         # Temporary compatible scenario messages
         conv_serve = ConversationServe.get_instance(CFG.SYSTEM_APP)
+        
+        # For multi-resource scenarios, store the resource array properly
+        conversation_param = original_select_param if original_select_param else gpts_name
+        
         current_message: StorageConversation = _build_conversation(
             conv_id=conv_uid,
-            select_param=gpts_name,
+            select_param=conversation_param,
             summary=user_query,
             model_name="",
             app_code=gpts_name,
@@ -560,7 +612,21 @@ class MultiAgents(BaseComponent, ABC):
                 )
                 employees.append(agent)
 
-            team_mode = TeamMode(gpts_app.team_mode)
+            logger.info(f"DEBUG - gpts_app.team_mode value: {gpts_app.team_mode}")
+            logger.info(f"DEBUG - gpts_app details count: {len(gpts_app.details) if gpts_app.details else 0}")
+            
+            try:
+                team_mode = TeamMode(gpts_app.team_mode)
+                logger.info(f"DEBUG - Parsed team_mode: {team_mode}")
+            except ValueError as e:
+                logger.error(f"Invalid team_mode value: {gpts_app.team_mode}")
+                # For multi-resource apps, default to AUTO_PLAN
+                if gpts_name and gpts_name.startswith('multi_resource_'):
+                    logger.info("Defaulting to AUTO_PLAN for multi-resource app")
+                    team_mode = TeamMode.AUTO_PLAN
+                else:
+                    raise ValueError(f"Invalid team_mode: {gpts_app.team_mode}")
+            
             if team_mode == TeamMode.SINGLE_AGENT:
                 recipient = employees[0]
             else:
@@ -581,6 +647,10 @@ class MultiAgents(BaseComponent, ABC):
                         strategy_context=json.dumps(["bailing_proxyllm"]),
                     )  # TODO
                 elif TeamMode.NATIVE_APP == team_mode:
+                    logger.error(f"ERROR - Hit NATIVE_APP branch for app: {gpts_app.app_code}")
+                    logger.error(f"ERROR - App details: code={gpts_app.app_code}, team_mode={gpts_app.team_mode}")
+                    print(f"CRITICAL ERROR - NATIVE_APP mode detected for {gpts_app.app_code}, team_mode value: {gpts_app.team_mode}")
+                    print(f"CRITICAL ERROR - This should be 'auto_plan' for multi-resource apps")
                     raise ValueError("Native APP chat not supported!")
                 else:
                     raise ValueError(f"Unknown Agent Team Mode!{team_mode}")
@@ -610,6 +680,8 @@ class MultiAgents(BaseComponent, ABC):
                 user_proxy: UserProxyAgent = (
                     await UserProxyAgent().bind(context).bind(agent_memory).build()
                 )
+                # Remove non-serializable objects from ext_info before passing to initiate_chat
+                clean_ext_info = {k: v for k, v in ext_info.items() if k != '_multi_resource_app'}
                 await user_proxy.initiate_chat(
                     recipient=recipient,
                     message=user_query,
@@ -620,7 +692,7 @@ class MultiAgents(BaseComponent, ABC):
                         historical_dialogues
                     ),
                     rely_messages=rely_messages,
-                    **ext_info,
+                    **clean_ext_info,
                 )
 
             if user_proxy:
@@ -630,7 +702,7 @@ class MultiAgents(BaseComponent, ABC):
             if not app_link_start:
                 self.gpts_conversations.update(conv_uid, gpts_status)
         except Exception as e:
-            logger.error(f"chat abnormal termination！{str(e)}", e)
+            logger.error(f"chat abnormal termination！{str(e)}", exc_info=True)
             self.gpts_conversations.update(conv_uid, Status.FAILED.value)
         finally:
             if not app_link_start:

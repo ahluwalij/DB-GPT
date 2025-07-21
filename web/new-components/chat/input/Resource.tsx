@@ -40,10 +40,12 @@ const Resource: React.FC<{
   // State for multi-selection
   const [selectedResources, setSelectedResources] = useState<Array<{name: string, type: 'database' | 'knowledge'}>>([]);
   const [popoverOpen, setPopoverOpen] = useState(false);
+  // Temporary state for popover selections (only applied on save)
+  const [tempSelectedResources, setTempSelectedResources] = useState<Array<{name: string, type: 'database' | 'knowledge'}>>([]);
 
-  // Handle resource selection/deselection
+  // Handle resource selection/deselection in popover (temporary)
   const handleResourceToggle = useCallback((resourceName: string, resourceType: 'database' | 'knowledge') => {
-    setSelectedResources(prev => {
+    setTempSelectedResources(prev => {
       const exists = prev.some(r => r.name === resourceName && r.type === resourceType);
       if (exists) {
         // Remove the resource
@@ -57,22 +59,40 @@ const Resource: React.FC<{
 
   // Handle saving the selection
   const handleSaveSelection = useCallback(() => {
-    if (selectedResources.length === 0) {
+    console.warn('🔴 MULTI-RESOURCE DEBUG - Saving selection');
+    console.log('DEBUG - Resource.tsx saving selection:', tempSelectedResources);
+    console.log('DEBUG - tempSelectedResources length:', tempSelectedResources.length);
+    console.log('DEBUG - tempSelectedResources details:', JSON.stringify(tempSelectedResources));
+    
+    // Update the actual selected resources from temp
+    setSelectedResources(tempSelectedResources);
+    
+    if (tempSelectedResources.length === 0) {
       setResourceValue(null);
       setResourceType(null);
     } else {
       // Send array of selected resources to backend
-      setResourceValue(selectedResources);
+      setResourceValue(tempSelectedResources);
+      console.warn('🔴 MULTI-RESOURCE DEBUG - Called setResourceValue with:', tempSelectedResources);
+      console.log('DEBUG - After setResourceValue, checking resourceValue:', resourceValue);
+      
       // Set primary resource type based on selection
-      const hasDatabase = selectedResources.some(r => r.type === 'database');
-      const hasKnowledge = selectedResources.some(r => r.type === 'knowledge');
+      const hasDatabase = tempSelectedResources.some(r => r.type === 'database');
+      const hasKnowledge = tempSelectedResources.some(r => r.type === 'knowledge');
       setResourceType(hasDatabase && hasKnowledge ? 'database' : hasDatabase ? 'database' : 'knowledge');
+      
+      if (tempSelectedResources.length > 1) {
+        console.warn('🔴 MULTI-RESOURCE DEBUG - Multiple resources selected!', {
+          count: tempSelectedResources.length,
+          resources: tempSelectedResources
+        });
+      }
     }
     
     // Update URL based on primary resource type
-    if (chatId && selectedResources.length > 0) {
-      const hasDatabase = selectedResources.some(r => r.type === 'database');
-      const hasKnowledge = selectedResources.some(r => r.type === 'knowledge');
+    if (chatId && tempSelectedResources.length > 0) {
+      const hasDatabase = tempSelectedResources.some(r => r.type === 'database');
+      const hasKnowledge = tempSelectedResources.some(r => r.type === 'knowledge');
       let newScene = scene;
       
       if (hasDatabase && hasKnowledge) {
@@ -91,7 +111,7 @@ const Resource: React.FC<{
     }
     
     setPopoverOpen(false);
-  }, [selectedResources, setResourceValue, setResourceType, chatId, modelValue, router, scene]);
+  }, [tempSelectedResources, setResourceValue, setResourceType, chatId, modelValue, router, scene, resourceValue]);
 
   // dataBase
   const [dbs, setDbs] = useState<IDB[]>([]);
@@ -125,20 +145,28 @@ const Resource: React.FC<{
 
   // Initialize selected resources from current resourceValue
   useEffect(() => {
+    console.log('DEBUG - Resource.tsx useEffect triggered');
+    console.log('DEBUG - resourceValue:', resourceValue);
+    console.log('DEBUG - resourceValue type:', typeof resourceValue);
+    console.log('DEBUG - Is array:', Array.isArray(resourceValue));
+    
     if (resourceValue) {
       try {
         // Check if resourceValue is already an array
         if (Array.isArray(resourceValue)) {
+          console.log('DEBUG - Setting selectedResources to array:', resourceValue);
           setSelectedResources(resourceValue);
         } else if (typeof resourceValue === 'string' && resourceValue) {
           // Legacy single resource - determine type based on current resource type
           const type = resourceType || (isDataBase ? 'database' : isKnowledge ? 'knowledge' : 'database');
+          console.log('DEBUG - Converting string to array:', resourceValue, type);
           setSelectedResources([{name: resourceValue, type}]);
         }
       } catch (e) {
         console.error('Failed to parse resourceValue:', e);
       }
     } else {
+      console.log('DEBUG - Clearing selectedResources because resourceValue is falsy');
       setSelectedResources([]);
     }
   }, [resourceValue, resourceType, isDataBase, isKnowledge]);
@@ -221,7 +249,10 @@ const Resource: React.FC<{
 
   // Set default resource value when dbOpts are available (only on initial load)
   useEffect(() => {
-    if (!resourceValue && dbOpts?.length > 0 && !hasInitialized.current && allResources) {
+    // Only set default if resourceValue is truly empty (not an empty array)
+    const isResourceEmpty = !resourceValue || (Array.isArray(resourceValue) && resourceValue.length === 0);
+    
+    if (isResourceEmpty && dbOpts?.length > 0 && !hasInitialized.current && allResources) {
       setResourceValue(dbOpts[0].value);
       // Determine if the first option is a database or knowledge space
       const firstDb = allResources.databases.find(db => db.param === dbOpts[0].value);
@@ -352,7 +383,13 @@ const Resource: React.FC<{
       };
       
       return (
-        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+        <Popover open={popoverOpen} onOpenChange={(open) => {
+          setPopoverOpen(open);
+          if (open) {
+            // When opening popover, sync temp state with current selection
+            setTempSelectedResources(selectedResources);
+          }
+        }}>
           <PopoverTrigger asChild>
             <Button
               variant="ghost"
@@ -408,16 +445,16 @@ const Resource: React.FC<{
                     {/* Clear all option */}
                     <div 
                       className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
-                        selectedResources.length === 0 
+                        tempSelectedResources.length === 0 
                           ? 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm' 
                           : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                       }`}
                       onClick={() => {
-                        setSelectedResources([]);
+                        setTempSelectedResources([]);
                       }}
                     >
                       <div className="h-5 w-5 border-2 border-gray-300 rounded-full flex items-center justify-center">
-                        {selectedResources.length === 0 && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
+                        {tempSelectedResources.length === 0 && <div className="h-2 w-2 bg-gray-600 rounded-full"></div>}
                       </div>
                       <span className="text-sm">None</span>
                     </div>
@@ -432,7 +469,7 @@ const Resource: React.FC<{
                               Databases
                             </div>
                             {allResources.databases.map(db => {
-                              const isSelected = selectedResources.some(r => r.name === db.param && r.type === 'database');
+                              const isSelected = tempSelectedResources.some(r => r.name === db.param && r.type === 'database');
                               return (
                                 <div 
                                   key={db.param}
@@ -471,7 +508,7 @@ const Resource: React.FC<{
                               Knowledge Spaces
                             </div>
                             {allResources.knowledge_spaces.map(space => {
-                              const isSelected = selectedResources.some(r => r.name === space.param && r.type === 'knowledge');
+                              const isSelected = tempSelectedResources.some(r => r.name === space.param && r.type === 'knowledge');
                               return (
                                 <div 
                                   key={space.param}
@@ -509,7 +546,7 @@ const Resource: React.FC<{
                         <div 
                           key={option.value}
                           className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
-                            selectedResources.some(r => r.name === option.value) 
+                            tempSelectedResources.some(r => r.name === option.value) 
                               ? 'bg-blue-50 text-blue-900 border border-blue-200 shadow-sm' 
                               : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                           }`}
@@ -523,7 +560,7 @@ const Resource: React.FC<{
                           }}
                         >
                           <div className={`h-5 w-5 border-2 rounded flex items-center justify-center ${
-                            selectedResources.some(r => r.name === option.value) ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
+                            tempSelectedResources.some(r => r.name === option.value) ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
                           }`}>
                             {selectedResources.some(r => r.name === option.value) && (
                               <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -571,21 +608,7 @@ const Resource: React.FC<{
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    // Reset to current resourceValue
-                    if (resourceValue) {
-                      try {
-                        if (Array.isArray(resourceValue)) {
-                          setSelectedResources(resourceValue);
-                        } else if (typeof resourceValue === 'string' && resourceValue) {
-                          const type = resourceType || (isDataBase ? 'database' : isKnowledge ? 'knowledge' : 'database');
-                          setSelectedResources([{name: resourceValue, type}]);
-                        }
-                      } catch (e) {
-                        setSelectedResources([]);
-                      }
-                    } else {
-                      setSelectedResources([]);
-                    }
+                    // Just close without saving changes
                     setPopoverOpen(false);
                   }}
                   className="border-gray-300 text-gray-700 hover:bg-gray-100 font-medium transition-all duration-200"

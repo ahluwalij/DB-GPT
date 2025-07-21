@@ -50,6 +50,10 @@ const useChat = ({ queryAgentURL = '/api/v1/chat/completions', app_code }: Props
       console.log('DEBUG - API request params:', params);
       console.log('DEBUG - prompt_code in params:', params.prompt_code);
       console.log('DEBUG - data object received:', data);
+      console.log('DEBUG - select_param type:', typeof params.select_param);
+      console.log('DEBUG - select_param value:', params.select_param);
+      console.log('DEBUG - chat_mode:', params.chat_mode);
+      console.log('DEBUG - app_code:', params.app_code);
 
       try {
         // Debug: Log the actual request body that will be sent
@@ -86,16 +90,35 @@ const useChat = ({ queryAgentURL = '/api/v1/chat/completions', app_code }: Props
           },
           onmessage: event => {
             let message = event.data;
+            
+            // Debug logging
+            console.log('DEBUG - SSE event data:', event.data);
+            console.log('DEBUG - Current scene:', scene);
+            console.log('DEBUG - Params chat_mode:', params.chat_mode);
+            
             try {
-              if (scene === 'chat_agent') {
-                message = JSON.parse(message).vis;
+              // For agent chat mode (including multi-resource scenarios)
+              if (scene === 'chat_agent' || (params.chat_mode === 'chat_agent')) {
+                const parsed = JSON.parse(message);
+                console.log('DEBUG - Parsed agent message:', parsed);
+                message = parsed.vis || parsed;
               } else {
-                data = JSON.parse(event.data);
-                message = data.choices?.[0]?.message?.content;
+                // For other chat modes
+                const parsed = JSON.parse(event.data);
+                console.log('DEBUG - Parsed non-agent message:', parsed);
+                message = parsed.choices?.[0]?.message?.content || parsed;
               }
-            } catch {
-              message.replaceAll('\\n', '\n');
+            } catch (e) {
+              console.log('DEBUG - Parse error:', e);
+              // If parsing fails, use the raw message
+              // Only do string replacements if message is actually a string
+              if (typeof message === 'string') {
+                message = message.replaceAll('\\n', '\n');
+              }
             }
+            
+            console.log('DEBUG - Final message to display:', message);
+            
             if (typeof message === 'string') {
               if (message === '[DONE]') {
                 onDone?.();
@@ -105,7 +128,8 @@ const useChat = ({ queryAgentURL = '/api/v1/chat/completions', app_code }: Props
                 onMessage?.(message);
               }
             } else {
-              onMessage?.(message);
+              // Handle non-string messages (could be objects or other types)
+              onMessage?.(JSON.stringify(message));
               onDone?.();
             }
           },
