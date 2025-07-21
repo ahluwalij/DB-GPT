@@ -3,6 +3,8 @@
 ## Repository Overview
 DB-GPT is a comprehensive AI database system that provides intelligent data analysis, multi-agent orchestration, and natural language database interactions. This repository contains agents, models, tools, and frameworks for building AI-powered data applications.
 
+NEVER INCLUDE IN COMMIT MESSAGES CO AUTHORED BY CLAUDE OR ANTHROPIC
+
 ## Project Structure
 
 ### Core Packages
