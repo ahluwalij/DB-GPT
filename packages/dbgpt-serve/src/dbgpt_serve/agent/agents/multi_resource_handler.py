@@ -119,13 +119,15 @@ class MultiResourceHandler:
             
             # Choose appropriate agent type
             if resource_type == 'database':
-                # For database resources, use DataScientist
+                # For database resources, use EnhancedDataScientist for better ID-to-name conversion
                 agent_name = 'DataScientist'  # Use the role name, not class name
                 role = f"Database Analyst"
-                goal = f"Analyze and query data from {resource_name} database using SQL"
+                goal = f"Analyze and query data from {resource_name} database using SQL with automatic ID-to-name conversion"
                 constraints = [
                     f"Only query {resource_name} database",
                     "Write accurate SQL queries",
+                    "Automatically convert ID columns to human-readable names",
+                    "When showing distributions or groupings, use names instead of IDs",
                     "Explain results clearly",
                     f"This agent ONLY has access to {resource_name} database, not to any knowledge spaces"
                 ]

@@ -194,15 +194,15 @@ const ChatContent: React.FC<{
                       navigator.clipboard
                         .writeText(context)
                         .then(() => {
-                          message.success(t('copy_to_clipboard_success'));
+                          message.success(t('Copied to clipboard'));
                         })
                         .catch(err => {
-                          console.error(t('copy_to_clipboard_failed'), err);
-                          message.error(t('copy_to_clipboard_failed'));
+                          console.error(t('Failed to copy to clipboard'), err);
+                          message.error(t('Failed to copy to clipboard'));
                         });
                     }
                   }}
-                  title={t('copy_to_clipboard')}
+                  title={t('Copy to clipboard')}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>

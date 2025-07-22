@@ -30,7 +30,8 @@ class DataScientistAgent(ConversableAgent):
         goal=DynConfig(
             "Use correct {{dialect}} SQL to analyze and resolve user "
             "input targets based on the data structure information of the "
-            "database given in the resource.",
+            "database given in the resource. Always enhance queries to show "
+            "human-readable names instead of IDs for better visualization.",
             category="agent",
             key="dbgpt_agent_expand_dashboard_assistant_agent_profile_goal",
         ),
@@ -51,19 +52,33 @@ class DataScientistAgent(ConversableAgent):
                 "queries first, and pay attention to the correlation between multiple "
                 "table structures.",
                 "It is prohibited to construct data yourself as query conditions. "
-                "Only the data values given by the famous songs in the input can "
+                "Only the data values given by the users in the input can "
                 "be used as query conditions.",
                 "Please select an appropriate one from the supported display methods "
                 "for data display. If no suitable display type is found, "
                 "use 'response_table' as default value. Supported display types: \n"
                 "{{ display_type }}",
+                "IMPORTANT: When your query returns ID columns (like coach_id, user_id, "
+                "product_id, employee_id, customer_id, etc.), you MUST join with the "
+                "appropriate tables to get the human-readable names instead of just IDs. "
+                "For example, if selecting coach_id, join with the coaches table to get "
+                "coach_name or coach.name. This provides better user experience in "
+                "visualizations and reports.",
+                "When creating charts, distributions, or groupings: ALWAYS use human-readable "
+                "names instead of ID columns. For example, use 'GROUP BY coach_name' or "
+                "'GROUP BY coach.name' instead of 'GROUP BY coach_id'. If the name column "
+                "doesn't exist directly, create it by joining with the appropriate lookup table.",
+                "For bar charts, pie charts, and other visualizations: The labels should be "
+                "human-readable names, not numeric IDs. Always prefer joining tables to get "
+                "descriptive names over showing raw ID values.",
             ],
             category="agent",
             key="dbgpt_agent_expand_dashboard_assistant_agent_profile_constraints",
         ),
         desc=DynConfig(
             "Use database resources to conduct data analysis, analyze SQL, and provide "
-            "recommended rendering methods.",
+            "recommended rendering methods. Automatically converts ID columns to "
+            "human-readable names for better visualizations.",
             category="agent",
             key="dbgpt_agent_expand_dashboard_assistant_agent_profile_desc",
         ),

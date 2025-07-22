@@ -9,7 +9,6 @@ const ReferencesContentView: React.FC<{ references: any }> = ({ references }) =>
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
 
-  // 是否移动端页面
   const isMobile = useMemo(() => {
     return router.pathname.includes('/mobile');
   }, [router]);
@@ -43,11 +42,11 @@ const ReferencesContentView: React.FC<{ references: any }> = ({ references }) =>
       <Divider className='mb-1 mt-0' dashed />
       <div className='flex text-sm gap-2 text-black-400' onClick={() => setOpen(true)}>
         <LinkOutlined />
-        <span className='text-sm'>查看回复引用</span>
+        <span className='text-sm'>View References</span>
       </div>
       <Drawer
         open={open}
-        title='回复引用'
+        title='References'
         placement={isMobile ? 'bottom' : 'right'}
         onClose={() => setOpen(false)}
         destroyOnClose={true}
