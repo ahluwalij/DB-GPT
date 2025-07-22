@@ -67,24 +67,21 @@ class DataScientistAgent(ConversableAgent):
                 "'show me the data', or if there are many non-numeric columns.\n"
                 "DEFAULT: When in doubt about visualization, use 'response_bar_chart' NOT 'response_table'.\n"
                 "Supported display types: \n{{ display_type }}",
-                "IMPORTANT: When your query returns ID columns (like coach_id, user_id, "
-                "product_id, employee_id, customer_id, etc.), you MUST join with the "
-                "appropriate tables to get the human-readable names instead of just IDs. "
-                "For example, if selecting coach_id, join with the coaches table to get "
-                "coach_name or coach.name. This provides better user experience in "
-                "visualizations and reports.",
+                "IMPORTANT: When your query returns ID columns (ending with _id or named id), "
+                "you MUST join with the appropriate tables to get the human-readable names "
+                "instead of just IDs. This provides better user experience in visualizations "
+                "and reports.",
                 "When creating charts, distributions, or groupings: ALWAYS use human-readable "
-                "names instead of ID columns. For example, use 'GROUP BY coach_name' or "
-                "'GROUP BY coach.name' instead of 'GROUP BY coach_id'. If the name column "
-                "doesn't exist directly, create it by joining with the appropriate lookup table.",
+                "names instead of ID columns. If the name column doesn't exist directly, "
+                "create it by joining with the appropriate lookup table.",
                 "For bar charts, pie charts, and other visualizations: The labels should be "
                 "human-readable names, not numeric IDs. Always prefer joining tables to get "
                 "descriptive names over showing raw ID values.",
-                "EXAMPLE: If user says 'show me the distribution of coaches by assignments' or "
-                "'give me a bar chart of coach distribution', you MUST:\n"
+                "EXAMPLE: If user asks for 'distribution of X by Y' or 'show me a bar chart', "
+                "you MUST:\n"
                 "1. Set display_type to 'response_bar_chart' (NOT 'response_table')\n"
-                "2. Join coaches table to get coach names instead of IDs\n"
-                "3. Use coach names as x-axis labels in the visualization",
+                "2. Join related tables to get human-readable names instead of IDs\n"
+                "3. Use descriptive labels as axis values in the visualization",
             ],
             category="agent",
             key="dbgpt_agent_expand_dashboard_assistant_agent_profile_constraints",
