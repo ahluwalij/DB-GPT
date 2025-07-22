@@ -54,10 +54,19 @@ class DataScientistAgent(ConversableAgent):
                 "It is prohibited to construct data yourself as query conditions. "
                 "Only the data values given by the users in the input can "
                 "be used as query conditions.",
-                "Please select an appropriate one from the supported display methods "
-                "for data display. If no suitable display type is found, "
-                "use 'response_table' as default value. Supported display types: \n"
-                "{{ display_type }}",
+                "CRITICAL CHART SELECTION RULE: You MUST carefully analyze the user's request "
+                "to determine the correct display type. Follow these rules EXACTLY:\n"
+                "1. If the user mentions ANY of these terms: 'bar chart', 'bar graph', 'bars', "
+                "'distribution', 'comparison', 'compare', 'show me a chart', 'visualize', "
+                "'graph', or asks to see data visually, you MUST use 'response_bar_chart'.\n"
+                "2. If the user asks about 'distribution of X by Y' or 'show me how X is "
+                "distributed', you MUST use 'response_bar_chart'.\n"
+                "3. For pie charts, proportions, or percentages: use 'response_pie_chart'.\n"
+                "4. For trends over time or time series: use 'response_line_chart'.\n"
+                "5. ONLY use 'response_table' if the user EXPLICITLY says 'table', 'list', "
+                "'show me the data', or if there are many non-numeric columns.\n"
+                "DEFAULT: When in doubt about visualization, use 'response_bar_chart' NOT 'response_table'.\n"
+                "Supported display types: \n{{ display_type }}",
                 "IMPORTANT: When your query returns ID columns (like coach_id, user_id, "
                 "product_id, employee_id, customer_id, etc.), you MUST join with the "
                 "appropriate tables to get the human-readable names instead of just IDs. "
@@ -71,6 +80,11 @@ class DataScientistAgent(ConversableAgent):
                 "For bar charts, pie charts, and other visualizations: The labels should be "
                 "human-readable names, not numeric IDs. Always prefer joining tables to get "
                 "descriptive names over showing raw ID values.",
+                "EXAMPLE: If user says 'show me the distribution of coaches by assignments' or "
+                "'give me a bar chart of coach distribution', you MUST:\n"
+                "1. Set display_type to 'response_bar_chart' (NOT 'response_table')\n"
+                "2. Join coaches table to get coach names instead of IDs\n"
+                "3. Use coach names as x-axis labels in the visualization",
             ],
             category="agent",
             key="dbgpt_agent_expand_dashboard_assistant_agent_profile_constraints",

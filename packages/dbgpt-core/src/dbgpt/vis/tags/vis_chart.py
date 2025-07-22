@@ -15,6 +15,11 @@ def default_chart_type_prompt() -> str:
         str: prompt information for the default chart type.
     """
     antv_charts = [
+        {
+            "response_bar_chart": "used to display distributions, comparisons between "
+            "categories, rankings, or frequency counts. Best for comparing discrete "
+            "categories or showing distributions."
+        },
         {"response_line_chart": "used to display comparative trend analysis data"},
         {
             "response_pie_chart": "suitable for scenarios such as proportion and "

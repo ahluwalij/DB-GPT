@@ -19,8 +19,11 @@ class SqlInput(BaseModel):
 
     display_type: str = Field(
         ...,
-        description="The chart rendering method selected for SQL. If you don’t know "
-        "what to output, just output 'response_table' uniformly.",
+        description="The chart rendering method. Use 'response_bar_chart' for distributions, "
+        "comparisons, or when user asks for charts/graphs. Use 'response_pie_chart' for "
+        "proportions. Use 'response_line_chart' for trends over time. Use 'response_table' "
+        "ONLY when user explicitly asks for a table or list. DEFAULT to 'response_bar_chart' "
+        "for any visualization request.",
     )
     sql: str = Field(
         ..., description="Executable sql generated for the current target/problem"
@@ -60,8 +63,10 @@ class ChartAction(Action[SqlInput]):
         **kwargs,
     ) -> ActionOutput:
         """Perform the action."""
+        logger.info(f"ChartAction.run - Received ai_message: {ai_message}")
         try:
             param: SqlInput = self._input_convert(ai_message, SqlInput)
+            logger.info(f"ChartAction.run - Parsed SqlInput: display_type={param.display_type}, sql={param.sql[:100]}...")
         except Exception as e:
             logger.exception(f"{str(e)}! \n {ai_message}")
             return ActionOutput(
